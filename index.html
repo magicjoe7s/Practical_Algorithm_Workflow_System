@@ -1,10 +1,3747 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content="0; url=veterinary_calculators.html">
-    <title>Loading…</title>
-  </head>
-  <body>
-    <p>Loading veterinary calculators…</p>
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCSU (Network for Clinical Support &amp; Utility) - PAWS (Practical Algorithm &amp; Workflow System)</title>
+    <style>
+        /* --- THEME CSS --- */
+        :root {
+            /* Palette: Dark Green & Gray */
+            --primary: #1B5E20;       /* Dark Green */
+            --primary-light: #4C8C4A; /* Lighter Green for hovers */
+            --secondary: #546E7A;     /* Blue Gray */
+            --bg-color: #F5F7F8;      /* Very light gray background */
+            --card-bg: #FFFFFF;
+            --text-main: #263238;     /* Dark Blue-Gray text */
+            --text-muted: #78909C;
+            --border-color: #CFD8DC;
+            --input-bg: #FFFFFF;
+            
+            --header-height: 64px;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- UTILITIES --- */
+        .hidden { display: none !important; }
+
+        /* --- HEADER --- */
+        .app-header {
+            min-height: var(--header-height);
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 100;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 0;
+        }
+
+        .app-title {
+            font-size: clamp(0.95rem, 1.8vw, 1.25rem);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+        }
+
+        /* Back Button */
+        .back-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: rgba(255, 255, 255, 0.25); }
+        .back-btn.hidden { display: none; }
+
+        /* --- MAIN LAYOUT --- */
+        #content-area {
+            flex: 1;
+            overflow-y: visible;
+            padding: 2rem;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* --- HOME GRID --- */
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .welcome-header h2 { font-size: 1.8rem; color: var(--primary); margin-bottom: 0.5rem; }
+        .welcome-header p { color: var(--text-muted); }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding-bottom: 2rem;
+        }
+
+        .home-section {
+            margin-bottom: 2rem;
+        }
+
+        .home-section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin: 0 0 0.75rem;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 120px;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+
+        .tool-card h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* --- CALCULATOR SECTIONS --- */
+        .calculator-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+            padding-bottom: 4rem;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+        .calculator-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .calc-header {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .calc-header h2 { color: var(--primary); }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 700px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            background: var(--input-bg);
+            color: var(--text-main);
+            transition: border 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.1);
+        }
+
+        /* Buttons */
+        .calculate-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: background 0.2s;
+        }
+        .calculate-btn:hover { background-color: var(--primary-light); }
+
+        .reset-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .reset-btn:hover { background: #f0f0f0; color: var(--text-main); }
+        
+        .copy-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1rem;
+            border-radius: var(--radius);
+            margin-top: 1rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            width: 100%;
+            font-weight: 500;
+        }
+        .copy-btn:hover { opacity: 0.9; }
+
+        /* Mode Buttons */
+        .mode-buttons {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .mode-btn {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.5rem 0.9rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .mode-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .mode-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.15);
+        }
+        .helper-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+        }
+
+        .mode-panel {
+            margin-top: 1.5rem;
+        }
+
+        .subsection-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: #fcfcfc;
+            padding: 1.25rem;
+        }
+
+        .subsection-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.35rem;
+        }
+
+        /* Results */
+        .result-box {
+            margin-top: 2rem;
+            background: #fcfcfc;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 0.5rem;
+        }
+
+        .text-output-box {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: white;
+            color: #333;
+            resize: vertical;
+        }
+
+        .alert-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-align: center;
+        }
+        .alert-box.normal { background: #E8F5E9; color: #1B5E20; }
+        .alert-box.warning { background: #FFF3E0; color: #E65100; }
+        .alert-box.critical { background: #FFEBEE; color: #C62828; }
+
+        /* Diet Specifics */
+        .diet-list-container {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            max-height: 250px;
+            overflow-y: auto;
+            background: white;
+            padding: 0.5rem;
+        }
+        .diet-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .diet-item input[type="checkbox"] { width: auto; margin-right: 0.75rem; }
+        .diet-item label { margin-bottom: 0; color: var(--text-main); cursor: pointer; flex: 1; }
+        
+        .diet-controls { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .diet-controls button {
+            flex: 1; padding: 0.5rem; font-size: 0.85rem;
+            background: #eee; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;
+        }
+        .diet-controls button:hover { background: #e0e0e0; }
+        
+        .custom-diet-row { display: flex; gap: 0.5rem; align-items: flex-end; margin-top: 1rem; }
+        .custom-diet-row .form-group { margin-bottom: 0; flex: 1; }
+        .btn-add-diet {
+            height: 42px; background: var(--secondary); color: white;
+            border: none; padding: 0 1rem; border-radius: var(--radius); cursor: pointer;
+        }
+
+        .inline-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+        .inline-row .inline-item { flex: 1; min-width: 0; }
+        .inline-row .inline-item.fixed { flex: 0 0 150px; }
+        .inline-row .inline-item.custom { flex: 0 0 140px; }
+
+        .button-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        .button-row .calculate-btn {
+            flex: 1;
+            min-width: 220px;
+            margin-top: 0;
+            width: auto;
+        }
+
+        /* Radio Buttons */
+        .radio-group { display: flex; gap: 2rem; margin-bottom: 1rem; }
+        .radio-group label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 600; }
+        .radio-group input[type="radio"] { width: 1.2rem; height: 1.2rem; }
+
+        /* Checkbox Lists */
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            padding: 0.5rem 0;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .checkbox-item input[type="checkbox"] { margin-top: 0.2rem; }
+
+        .rule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.6rem 1rem;
+            padding: 0.5rem 0;
+        }
+        .rule-tile {
+            border: 1px solid #e0b26f;
+            background: #fff3e0;
+            color: #7a4a00;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .rule-tile:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+        }
+        .rule-tile.is-on {
+            border-color: #81c784;
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+        .rule-tile:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.15);
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            background: var(--input-bg);
+            color: var(--text-main);
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Mobile */
+        @media (max-width: 600px) {
+            .app-header { padding: 0 1rem; }
+            #content-area { padding: 1rem; }
+            .custom-diet-row { flex-direction: column; align-items: stretch; }
+            .btn-add-diet { margin-top: 0.5rem; }
+            .inline-row { flex-direction: column; align-items: stretch; }
+            .inline-row .inline-item.fixed,
+            .inline-row .inline-item.custom { flex: 1; }
+            .button-row { flex-direction: column; }
+            .button-row .calculate-btn { min-width: 0; width: 100%; }
+        }
+
+        .protocol-block {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            background: #fff;
+            margin-bottom: 1.5rem;
+        }
+
+        .protocol-block h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .protocol-block h4 {
+            color: var(--secondary);
+            margin: 0.75rem 0 0.35rem;
+        }
+
+        .protocol-list {
+            padding-left: 1.25rem;
+            line-height: 1.6;
+        }
+
+        .protocol-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .protocol-table th,
+        .protocol-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.6rem;
+            text-align: center;
+        }
+
+        .protocol-table th {
+            background: #F0F4F5;
+            color: var(--text-main);
+        }
+
+        .protocol-table input,
+        .protocol-table select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            background: var(--input-bg);
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-left">
+            <button id="back-home" class="back-btn hidden" onclick="goHome()">← Home</button>
+            <h1 class="app-title">NCSU (Network for Clinical Support &amp; Utility)</h1>
+        </div>
+    </header>
+
+    <main id="content-area">
+        
+        <!-- DASHBOARD (HOME) -->
+        <section id="home" class="calculator-section active" style="background:transparent; box-shadow:none; border:none; padding:0;">
+            <div class="welcome-header">
+                <h2>PAWS (Practical Algorithm &amp; Workflow System)</h2>
+                <p>Select a tool to begin</p>
+            </div>
+            
+            <div class="home-section">
+                <div class="home-section-title">Intake Tools</div>
+                <div class="home-grid">
+                    <div class="tool-card" onclick="switchTab('consent')">
+                        <h3>Informed Consent</h3>
+                        <p>Generate complication text for informed consent documentation.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('hosplan')">
+                        <h3>Hospitalization Plan</h3>
+                        <p>Build a treatment and diagnostic plan for hospitalized patients.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-section">
+                <div class="home-section-title">Calculators for Hospitalized Patients</div>
+                <div class="home-grid">
+                    <div class="tool-card" onclick="switchTab('nutrition_support')">
+                        <h3>Nutrition Support</h3>
+                        <p>Switch between PO feeding and tube feeding workflows in one calculator.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('fluids')">
+                        <h3>Fluid Rate</h3>
+                        <p>Calculate maintenance and replacement fluid rates.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('sedation')">
+                        <h3>Sedation Protocol</h3>
+                        <p>Generate weight-based sedation protocols with mg/mcg totals.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('vampire')">
+                        <h3>Blood Draw Volume</h3>
+                        <p>Calculate safe blood draw limits based on weight.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('edd')">
+                        <h3>EDD (LVDd)</h3>
+                        <p>Estimate normal LVDd range by weight (optional measured EDD).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-section">
+                <div class="home-section-title">Treatment Sheet Contingencies</div>
+                <div class="home-grid">
+                    <div class="tool-card" onclick="switchTab('treatment_contingencies')">
+                        <h3>Treatment Sheet Contingencies</h3>
+                        <p>Insulin, potassium, pressor, and heparin CRI protocols.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-section">
+                <div class="home-section-title">Prognostic Calculators</div>
+                <div class="home-grid">
+                    <div class="tool-card" onclick="switchTab('apple')">
+                        <h3>APPLE Score</h3>
+                        <p>Acute Patient Physiologic and Laboratory Evaluation (Fast & Full models).</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('glasgow')">
+                        <h3>Glasgow Coma Scale</h3>
+                        <p>Modified scale for assessing level of consciousness.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('sofa')">
+                        <h3>SOFA Score</h3>
+                        <p>Sequential Organ Failure Assessment for sepsis.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('rox')">
+                        <h3>ROX Score</h3>
+                        <p>HFNO failure prediction using S/F or P/F ratio and RR.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('fsi')">
+                        <h3>Feline Shock Index</h3>
+                        <p>Evaluate shock status in cats (HR/SBP).</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('fencl')">
+                        <h3>Fencl Acid-Base</h3>
+                        <p>Estimate total base excess contribution from Na, Cl, Ph, lactate, and albumin.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('att')">
+                        <h3>Animal Trauma Triage</h3>
+                        <p>Score perfusion, cardiac, respiratory, and other systems.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('rule_of_20')">
+                        <h3>Kirby's Rule of 20</h3>
+                        <p>Checklist for critical care patient review.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NUTRITION SUPPORT -->
+        <section id="nutrition_support" class="calculator-section">
+            <div class="calc-header">
+                <h2>Nutrition Support</h2>
+                <button class="reset-btn" onclick="Calculators.NutritionSupport.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="form-group">
+                    <label>Workflow</label>
+                    <div class="mode-buttons" id="ns_mode_buttons">
+                        <button class="mode-btn active" type="button" data-mode="po" onclick="Calculators.NutritionSupport.setMode('po')">PO Feeding</button>
+                        <button class="mode-btn" type="button" data-mode="tube" onclick="Calculators.NutritionSupport.setMode('tube')">Tube Feeding</button>
+                    </div>
+                    <div class="helper-text">Select the nutrition workflow you want to use.</div>
+                </div>
+
+                <div id="ns_po_panel" class="mode-panel">
+                    <div class="subsection-card">
+                        <h3>PO Feeding</h3>
+                        <div class="helper-text" style="margin-top:0;">Generate a step-up oral feeding plan with diet-specific grams per meal.</div>
+
+                        <div class="calc-grid" style="margin-top:1rem;">
+                            <div class="form-group">
+                                <label>Weight (kg)</label>
+                                <input type="number" id="fpc_weight" placeholder="e.g. 5.0" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Species</label>
+                                <select id="fpc_species" onchange="Calculators.NutritionSupport.initPoDiets()">
+                                    <option value="Dog">Dog</option>
+                                    <option value="Cat">Cat</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="calc-grid">
+                            <div class="form-group">
+                                <label>Feedings/Day</label>
+                                <input type="number" id="fpc_feedings" value="4">
+                            </div>
+                            <div class="form-group">
+                                <label>RER %</label>
+                                <input type="number" id="fpc_rer_perc" value="100">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Select Diets</label>
+                            <div id="fpc_diet_list" class="diet-list-container">
+                                <!-- Populated by JS -->
+                            </div>
+                            <div class="diet-controls">
+                                <button type="button" onclick="Calculators.NutritionSupport.togglePoAll(true)">Select All</button>
+                                <button type="button" onclick="Calculators.NutritionSupport.togglePoAll(false)">Select None</button>
+                                <button type="button" onclick="Calculators.NutritionSupport.selectPoDefaults()">Defaults</button>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid var(--border-color); margin-top: 1.5rem; padding-top: 1rem;">
+                            <label style="color:var(--primary); font-weight:600;">Add Custom Diet:</label>
+                            <div class="custom-diet-row">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" id="fpc_custom_name" placeholder="Diet Name">
+                                </div>
+                                <div class="form-group">
+                                    <label>kcal/g</label>
+                                    <input type="number" id="fpc_custom_kcal" step="0.001" placeholder="e.g. 1.2">
+                                </div>
+                                <button class="btn-add-diet" type="button" onclick="Calculators.NutritionSupport.addPoCustomDiet()">Add</button>
+                            </div>
+                        </div>
+
+                        <button class="calculate-btn" type="button" onclick="Calculators.NutritionSupport.calculatePO()">Calculate PO Plan</button>
+                    </div>
+                </div>
+
+                <div id="ns_tube_panel" class="mode-panel hidden">
+                    <div class="subsection-card">
+                        <h3>Tube Feeding</h3>
+                        <div class="helper-text" style="margin-top:0;">Create ICU or IMC feeding schedules using liquid diet presets or custom caloric density.</div>
+
+                        <div class="calc-grid" style="margin-top:1rem;">
+                            <div class="form-group">
+                                <label>Weight (kg)</label>
+                                <input type="number" id="ns_tube_weight" placeholder="e.g. 5.0" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Species</label>
+                                <select id="ns_tube_species">
+                                    <option value="Dog">Dog</option>
+                                    <option value="Cat">Cat</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Diet Source</label>
+                                <select id="ns_tube_diet_source" onchange="Calculators.NutritionSupport.onTubeDietSourceChange()">
+                                    <option value="Commercial">Commercial</option>
+                                    <option value="Custom">Custom</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Commercial Diet</label>
+                                <select id="ns_tube_preset" onchange="Calculators.NutritionSupport.onTubePresetChange()"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Food Type</label>
+                                <input type="text" id="ns_tube_food_type" placeholder="Diet name">
+                            </div>
+                            <div class="form-group">
+                                <label>Caloric Density (kcal/ml)</label>
+                                <input type="number" id="ns_tube_kcal_ml" step="0.1" placeholder="e.g. 1.0">
+                            </div>
+                            <div class="form-group">
+                                <label>Starting RER %</label>
+                                <select id="ns_tube_start_rer">
+                                    <option value="25">25</option>
+                                    <option value="33">33</option>
+                                    <option value="50">50</option>
+                                    <option value="75">75</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Feeding Mode</label>
+                                <select id="ns_tube_feeding_mode" onchange="Calculators.NutritionSupport.toggleTubeFeedingMode()">
+                                    <option value="Bolus">Bolus</option>
+                                    <option value="Trickle">Trickle</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="ns_tube_bolus_group">
+                                <label>Bolus Feeds/Day</label>
+                                <input type="number" id="ns_tube_feeds_per_day" value="4" min="1" step="1">
+                            </div>
+                            <div class="form-group hidden" id="ns_tube_trickle_group">
+                                <label>Trickle Feeding Hours/Day</label>
+                                <input type="number" id="ns_tube_hours_per_day" value="24" min="1" max="24" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="date" id="ns_tube_start_date">
+                            </div>
+                        </div>
+
+                        <div class="button-row">
+                            <button class="calculate-btn" type="button" onclick="Calculators.NutritionSupport.calculateTube('ICU')">Calculate (ICU)</button>
+                            <button class="calculate-btn" type="button" onclick="Calculators.NutritionSupport.calculateTube('IMC')">Calculate (IMC)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="ns_result" class="result-box hidden">
+                <h3 style="margin-bottom:0.5rem; color:var(--primary);">Nutrition Support Output</h3>
+                <p class="small-text" style="color:var(--text-muted); margin-bottom:0.5rem;">Copy the text below:</p>
+                <textarea id="ns_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.NutritionSupport.copy()">Copy to Clipboard</button>
+            </div>
+        </section>
+
+        <!-- FLUIDS CALCULATOR -->
+        <section id="fluids" class="calculator-section">
+            <div class="calc-header">
+                <h2>Fluid Rate Calculator</h2>
+                <button class="reset-btn" onclick="Calculators.Fluids.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="form-group">
+                    <label>Health Status</label>
+                    <select id="flu_health">
+                        <option value="Healthy">Healthy</option>
+                        <option value="Sick">Sick</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Species</label>
+                    <select id="flu_species">
+                        <option value="Dog">Dog</option>
+                        <option value="Cat">Cat</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="flu_weight" placeholder="e.g. 5.0" step="0.1">
+                </div>
+                
+                <button class="calculate-btn" onclick="Calculators.Fluids.calculate()">Calculate Rate</button>
+            </div>
+            
+            <div id="flu_result" class="result-box hidden">
+                <h3 style="margin-bottom:0.5rem; color:var(--primary);">Results</h3>
+                <textarea id="flu_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.Fluids.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- SEDATION PROTOCOL CALCULATOR -->
+        <section id="sedation" class="calculator-section">
+            <div class="calc-header">
+                <h2>Sedation Protocol Generator</h2>
+                <button class="reset-btn" onclick="Calculators.Sedation.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="sed_weight" placeholder="e.g. 5.0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Format</label>
+                        <select id="sed_format">
+                            <option value="Instinct">Instinct</option>
+                            <option value="Ezyvet">Ezyvet</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table class="protocol-table">
+                    <thead>
+                        <tr>
+                            <th>Drug</th>
+                            <th>Dose</th>
+                            <th>Unit</th>
+                            <th>Route</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>alfaxalone</td>
+                            <td><input type="number" id="sed_alfaxalone_dose" step="0.01" placeholder="Dose"></td>
+                            <td>mg/kg</td>
+                            <td>
+                                <select id="sed_alfaxalone_route">
+                                    <option value="IV">IV</option>
+                                    <option value="IM">IM</option>
+                                    <option value="SC">SC</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>butorphanol</td>
+                            <td><input type="number" id="sed_butorphanol_dose" step="0.01" placeholder="Dose"></td>
+                            <td>mg/kg</td>
+                            <td>
+                                <select id="sed_butorphanol_route">
+                                    <option value="IV">IV</option>
+                                    <option value="IM">IM</option>
+                                    <option value="SC">SC</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>dexmedetomidine</td>
+                            <td><input type="number" id="sed_dexmedetomidine_dose" step="0.01" placeholder="Dose"></td>
+                            <td>mcg/kg</td>
+                            <td>
+                                <select id="sed_dexmedetomidine_route">
+                                    <option value="IV">IV</option>
+                                    <option value="IM">IM</option>
+                                    <option value="SC">SC</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ketamine</td>
+                            <td><input type="number" id="sed_ketamine_dose" step="0.01" placeholder="Dose"></td>
+                            <td>mg/kg</td>
+                            <td>
+                                <select id="sed_ketamine_route">
+                                    <option value="IV">IV</option>
+                                    <option value="IM">IM</option>
+                                    <option value="SC">SC</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>methadone</td>
+                            <td><input type="number" id="sed_methadone_dose" step="0.01" placeholder="Dose"></td>
+                            <td>mg/kg</td>
+                            <td>
+                                <select id="sed_methadone_route">
+                                    <option value="IV">IV</option>
+                                    <option value="IM">IM</option>
+                                    <option value="SC">SC</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>midazolam</td>
+                            <td><input type="number" id="sed_midazolam_dose" step="0.01" placeholder="Dose"></td>
+                            <td>mg/kg</td>
+                            <td>
+                                <select id="sed_midazolam_route">
+                                    <option value="IV">IV</option>
+                                    <option value="IM">IM</option>
+                                    <option value="SC">SC</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" id="sed_other_name" placeholder="Other Drug"></td>
+                            <td><input type="number" id="sed_other_dose" step="0.01" placeholder="Dose"></td>
+                            <td>mg/kg</td>
+                            <td>
+                                <select id="sed_other_route">
+                                    <option value="IV">IV</option>
+                                    <option value="IM">IM</option>
+                                    <option value="SC">SC</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <button class="calculate-btn" onclick="Calculators.Sedation.calculate()">Generate Protocol</button>
+            </div>
+
+            <div id="sed_result" class="result-box hidden">
+                <h3 style="margin-bottom:0.5rem; color:var(--primary);">Protocol</h3>
+                <textarea id="sed_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.Sedation.copy()">Copy to Clipboard</button>
+            </div>
+        </section>
+
+        <!-- VAMPIRE (BLOOD DRAW) CALCULATOR -->
+        <section id="vampire" class="calculator-section">
+            <div class="calc-header">
+                <h2>Blood Draw Volume Calculator</h2>
+                <button class="reset-btn" onclick="Calculators.Vampire.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="form-group">
+                    <label>Species</label>
+                    <select id="vamp_species">
+                        <option value="Dog">Dog</option>
+                        <option value="Cat">Cat</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="vamp_weight" placeholder="e.g. 3.68" step="0.01">
+                </div>
+                <button class="calculate-btn" onclick="Calculators.Vampire.calculate()">Calculate Safe Volumes</button>
+            </div>
+
+            <div id="vamp_result" class="result-box hidden">
+                <h3 style="margin-bottom:0.5rem; color:var(--primary);">Safe Blood Volumes</h3>
+                <textarea id="vamp_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.Vampire.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- EDD (LVDd) CALCULATOR -->
+        <section id="edd" class="calculator-section">
+            <div class="calc-header">
+                <h2>EDD (LVDd) Calculator</h2>
+                <button class="reset-btn" onclick="Calculators.EDD.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Patient Weight (kg)</label>
+                        <input type="number" id="edd_weight" placeholder="e.g. 12.5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Measured EDD (cm)</label>
+                        <input type="number" id="edd_measured" placeholder="optional" step="0.01">
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="Calculators.EDD.calculate()">Calculate EDD</button>
+            </div>
+
+            <div id="edd_result" class="result-box hidden">
+                <h3 style="margin-bottom:0.5rem; color:var(--primary);">Results</h3>
+                <textarea id="edd_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.EDD.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- APPLE SCORE -->
+        <section id="apple" class="calculator-section">
+            <div class="calc-header">
+                <h2>APPLE Score</h2>
+                <button class="reset-btn" onclick="Calculators.APPLE.reset()">Reset</button>
+            </div>
+            
+            <div class="form-group">
+                <div class="radio-group">
+                    <label><input type="radio" name="apple_mode" value="fast" checked onchange="Calculators.APPLE.toggleMode()"> APPLE Fast</label>
+                    <label><input type="radio" name="apple_mode" value="full" onchange="Calculators.APPLE.toggleMode()"> APPLE Full</label>
+                </div>
+            </div>
+
+            <!-- APPLE FAST FORM -->
+            <div class="calc-form" id="apple_form_fast">
+                <div class="form-group">
+                    <label>Mentation Score (0-4)</label>
+                    <select id="apple_fast_mentation">
+                        <option value="0">0 - Normal</option>
+                        <option value="1">1 - Depressed/Lethargic</option>
+                        <option value="2">2 - Obtunded</option>
+                        <option value="3">3 - Stuporous</option>
+                        <option value="4">4 - Comatose/Seizure</option>
+                    </select>
+                </div>
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Glucose (mg/dL)</label>
+                        <input type="number" id="apple_fast_glucose" placeholder="e.g. 100">
+                    </div>
+                    <div class="form-group">
+                        <label>Albumin (g/dL)</label>
+                        <input type="number" id="apple_fast_albumin" step="0.1" placeholder="e.g. 3.0">
+                    </div>
+                    <div class="form-group">
+                        <label>Lactate (mmol/L)</label>
+                        <input type="number" id="apple_fast_lactate" step="0.1" placeholder="e.g. 1.5">
+                    </div>
+                    <div class="form-group">
+                        <label>Platelet Count (x10^9/L)</label>
+                        <input type="number" id="apple_fast_platelet" placeholder="e.g. 200">
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="Calculators.APPLE.calculate()">Calculate APPLEfast</button>
+            </div>
+            
+            <!-- APPLE FULL FORM -->
+            <div id="apple_form_full" class="calc-form hidden">
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Creatinine (mg/dL)</label>
+                        <input type="number" id="apple_full_creat" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>WBC (x10^9/L)</label>
+                        <input type="number" id="apple_full_wbc" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Albumin (g/dL)</label>
+                        <input type="number" id="apple_full_albumin" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>SpO₂ (%)</label>
+                        <input type="number" id="apple_full_spo2" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Bilirubin (mg/dL)</label>
+                        <input type="number" id="apple_full_bili" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Resp Rate (bpm)</label>
+                        <input type="number" id="apple_full_rr" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Age (years)</label>
+                        <input type="number" id="apple_full_age" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Lactate (mmol/L)</label>
+                        <input type="number" id="apple_full_lactate" step="0.1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Mentation Score (0-4)</label>
+                    <select id="apple_full_mentation">
+                        <option value="0">0 - Alert and Responsive</option>
+                        <option value="1">1 - Depressed/Lethargic</option>
+                        <option value="2">2 - Obtunded</option>
+                        <option value="3">3 - Stuporous</option>
+                        <option value="4">4 - Comatose</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fluid Score (0-2)</label>
+                    <select id="apple_full_fluid">
+                        <option value="0">0 - None (<5% Dehyd)</option>
+                        <option value="1">1 - SQ Fluids (Mild Dehyd)</option>
+                        <option value="2">2 - IV Fluids (Mod/Severe/Shock)</option>
+                    </select>
+                </div>
+                <button class="calculate-btn" onclick="Calculators.APPLE.calculate()">Calculate APPLEfull</button>
+            </div>
+
+            <div id="apple_result" class="result-box hidden">
+                <div class="result-row"><span>Score:</span><strong id="apple_score_val">--</strong></div>
+                <div class="result-row"><span>Est. Mortality:</span><strong id="apple_mortality_val">--</strong></div>
+                <p class="small-text" id="apple_prognosis_text" style="text-align:right; margin-top:0.25rem;"></p>
+                <button class="copy-btn" onclick="Calculators.APPLE.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- GLASGOW -->
+        <section id="glasgow" class="calculator-section">
+            <div class="calc-header">
+                <h2>Modified Glasgow Coma Scale</h2>
+                <button class="reset-btn" onclick="Calculators.Glasgow.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="form-group">
+                    <label>Motor Activity</label>
+                    <select id="gcs_motor">
+                        <option value="6">6 - Normal gait, normal reflexes</option>
+                        <option value="5">5 - Hemiparesis/Tetraparesis/Decerebrate</option>
+                        <option value="4">4 - Recumbent, intermittent extensor rigidity</option>
+                        <option value="3">3 - Recumbent, constant extensor rigidity</option>
+                        <option value="2">2 - Constant extensor rigidity w/ opisthotonus</option>
+                        <option value="1">1 - Hypotonia, depressed/absent reflexes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Brainstem Reflexes</label>
+                    <select id="gcs_brain">
+                        <option value="6">6 - Normal PLR & oculocephalic</option>
+                        <option value="5">5 - Slow PLR, normal/reduced oculocephalic</option>
+                        <option value="4">4 - Bilateral unresponsive miosis</option>
+                        <option value="3">3 - Pinpoint pupils, reduced oculocephalic</option>
+                        <option value="2">2 - Unilateral unresponsive mydriasis</option>
+                        <option value="1">1 - Bilateral unresponsive mydriasis</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Level of Consciousness</label>
+                    <select id="gcs_loc">
+                        <option value="6">6 - Periods of alertness, responsive</option>
+                        <option value="5">5 - Depression/delirium, responsive</option>
+                        <option value="4">4 - Semicomatose, responsive to visual</option>
+                        <option value="3">3 - Semicomatose, responsive to audio</option>
+                        <option value="2">2 - Semicomatose, responsive to noxious</option>
+                        <option value="1">1 - Comatose, unresponsive</option>
+                    </select>
+                </div>
+                <button class="calculate-btn" onclick="Calculators.Glasgow.calculate()">Calculate Score</button>
+            </div>
+            <div id="gcs_result" class="result-box hidden">
+                <div class="result-row"><span>Total Score:</span><strong id="gcs_total">-- / 18</strong></div>
+                <div id="gcs_prognosis" class="alert-box"></div>
+                <button class="copy-btn" onclick="Calculators.Glasgow.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- SOFA SCORE -->
+        <section id="sofa" class="calculator-section">
+            <div class="calc-header">
+                <h2>SOFA Score (Dog)</h2>
+                <button class="reset-btn" onclick="Calculators.SOFA.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Respiratory (PaO2/FiO2)</label>
+                        <select id="sofa_resp">
+                            <option value="0">≥ 400 (0 pts)</option>
+                            <option value="1">&lt; 400 (1 pt)</option>
+                            <option value="2">&lt; 300 (2 pts)</option>
+                            <option value="3">&lt; 200 (3 pts)</option>
+                            <option value="4">&lt; 100 (4 pts)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Coagulation (Platelets x10^3)</label>
+                        <select id="sofa_coag">
+                            <option value="0">≥ 200 (0 pts)</option>
+                            <option value="1">&lt; 200 (1 pt)</option>
+                            <option value="2">&lt; 150 (2 pts)</option>
+                            <option value="3">&lt; 100 (3 pts)</option>
+                            <option value="4">&lt; 50 (4 pts)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Liver (Bilirubin mg/dL)</label>
+                        <select id="sofa_liver">
+                            <option value="0">&lt; 1.2 (0 pts)</option>
+                            <option value="1">1.2 - 1.9 (1 pt)</option>
+                            <option value="2">2.0 - 5.9 (2 pts)</option>
+                            <option value="3">6.0 - 11.9 (3 pts)</option>
+                            <option value="4">&gt; 12.0 (4 pts)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>CV (MAP or Pressors)</label>
+                        <select id="sofa_cv">
+                            <option value="0">MAP ≥ 70 (0 pts)</option>
+                            <option value="1">MAP &lt; 70 (1 pt)</option>
+                            <option value="2">Dopamine &le; 5 (2 pts)</option>
+                            <option value="3">Dopamine &gt; 5 (3 pts)</option>
+                            <option value="4">Dopamine &gt; 15 (4 pts)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>CNS (Glasgow Score)</label>
+                        <select id="sofa_cns">
+                            <option value="0">GCS 15-18 (0 pts)</option>
+                            <option value="1">GCS 13-14 (1 pt)</option>
+                            <option value="2">GCS 10-12 (2 pts)</option>
+                            <option value="3">GCS 6-9 (3 pts)</option>
+                            <option value="4">GCS &lt; 6 (4 pts)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Renal (Creatinine mg/dL)</label>
+                        <select id="sofa_renal">
+                            <option value="0">&lt; 1.2 (0 pts)</option>
+                            <option value="1">1.2 - 1.9 (1 pt)</option>
+                            <option value="2">2.0 - 3.4 (2 pts)</option>
+                            <option value="3">3.5 - 4.9 (3 pts)</option>
+                            <option value="4">&gt; 5.0 (4 pts)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="Calculators.SOFA.calculate()">Calculate SOFA</button>
+            </div>
+            <div id="sofa_result" class="result-box hidden">
+                <div class="result-row"><span>Total Score:</span><strong id="sofa_total">-- / 24</strong></div>
+                <button class="copy-btn" onclick="Calculators.SOFA.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- ROX SCORE -->
+        <section id="rox" class="calculator-section">
+            <div class="calc-header">
+                <h2>ROX Score</h2>
+                <button class="reset-btn" onclick="Calculators.ROX.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="form-group">
+                    <label>Input Mode</label>
+                    <div class="mode-buttons">
+                        <button class="mode-btn" type="button" data-mode="SpO2" onclick="Calculators.ROX.setMode('SpO2')">SpO2</button>
+                        <button class="mode-btn" type="button" data-mode="PaO2" onclick="Calculators.ROX.setMode('PaO2')">PaO2</button>
+                        <button class="mode-btn" type="button" data-mode="Both" onclick="Calculators.ROX.setMode('Both')">Both</button>
+                    </div>
+                    <div class="helper-text">S/F uses SpO2; P/F uses PaO2</div>
+                </div>
+
+                <div class="calc-grid">
+                    <div class="form-group" id="rox_spo2_group">
+                        <label>SpO2 (%)</label>
+                        <input type="number" id="rox_spo2" placeholder="e.g. 95">
+                    </div>
+                    <div class="form-group" id="rox_pao2_group">
+                        <label>PaO2 (mmHg)</label>
+                        <input type="number" id="rox_pao2" placeholder="e.g. 80">
+                    </div>
+                    <div class="form-group">
+                        <label>FiO2 (decimal)</label>
+                        <input type="number" id="rox_fio2" step="0.01" placeholder="e.g. 0.6">
+                    </div>
+                    <div class="form-group">
+                        <label>Respiratory rate (breaths/min)</label>
+                        <input type="number" id="rox_rr" placeholder="e.g. 30">
+                    </div>
+                </div>
+
+                <div class="inline-row" style="margin-top: 0.5rem;">
+                    <div class="inline-item fixed form-group">
+                        <label>HFNO timeline</label>
+                        <select id="rox_timeline" onchange="Calculators.ROX.toggleCustomHours()">
+                            <option value="3">3 hours</option>
+                            <option value="6">6 hours</option>
+                            <option value="7">7 hours</option>
+                            <option value="12">12 hours</option>
+                            <option value="24">24 hours</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="inline-item custom form-group hidden" id="rox_custom_group">
+                        <label>Custom hours</label>
+                        <input type="number" id="rox_custom_hours" placeholder="e.g. 5">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label><input type="checkbox" id="rox_delta_check" onchange="Calculators.ROX.toggleDelta()"> Include Delta (T6 - T0)</label>
+                </div>
+
+                <div class="calc-grid hidden" id="rox_delta_group">
+                    <div class="form-group">
+                        <label>Previous ROX (T0)</label>
+                        <input type="number" id="rox_prev_rox" placeholder="e.g. 3.2">
+                    </div>
+                    <div class="form-group" id="rox_prev_sf_group">
+                        <label>Previous S/F (T0)</label>
+                        <input type="number" id="rox_prev_sf" placeholder="e.g. 150">
+                    </div>
+                    <div class="form-group" id="rox_prev_pf_group">
+                        <label>Previous P/F (T0)</label>
+                        <input type="number" id="rox_prev_pf" placeholder="e.g. 200">
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="Calculators.ROX.calculate()">Calculate ROX</button>
+            </div>
+            <div id="rox_result" class="result-box hidden">
+                <textarea id="rox_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.ROX.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- FELINE SHOCK INDEX -->
+        <section id="fsi" class="calculator-section">
+            <div class="calc-header">
+                <h2>Feline Shock Index</h2>
+                <button class="reset-btn" onclick="Calculators.FSI.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Heart Rate (bpm)</label>
+                        <input type="number" id="fsi_hr" placeholder="e.g. 180">
+                    </div>
+                    <div class="form-group">
+                        <label>Systolic BP (mm Hg)</label>
+                        <input type="number" id="fsi_sbp" placeholder="e.g. 120">
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="Calculators.FSI.calculate()">Calculate FSI</button>
+            </div>
+            <div id="fsi_result" class="result-box hidden">
+                <div class="result-row"><span>Index:</span><strong id="fsi_val">--</strong></div>
+                <div id="fsi_interpretation" class="alert-box"></div>
+                <button class="copy-btn" onclick="Calculators.FSI.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- FENCL ACID-BASE -->
+        <section id="fencl" class="calculator-section">
+            <div class="calc-header">
+                <h2>Fencl Acid-Base Calculator</h2>
+                <button class="reset-btn" onclick="Calculators.FENCL.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Sodium (Na, mmol/L)</label>
+                        <input type="number" id="fencl_na" step="0.01" placeholder="Ref 148">
+                    </div>
+                    <div class="form-group">
+                        <label>Chloride (Cl, mmol/L)</label>
+                        <input type="number" id="fencl_cl" step="0.01" placeholder="Ref 111">
+                    </div>
+                    <div class="form-group">
+                        <label>Phosphorous (Ph, mmol/L)</label>
+                        <input type="number" id="fencl_ph" step="0.001" placeholder="Ref 3.95">
+                    </div>
+                    <div class="form-group">
+                        <label>Lactate (Lac, mmol/L)</label>
+                        <input type="number" id="fencl_lac" step="0.01" placeholder="e.g. 2.5">
+                    </div>
+                    <div class="form-group">
+                        <label>Albumin (Alb, g/dL)</label>
+                        <input type="number" id="fencl_alb" step="0.01" placeholder="Ref 3.75">
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="Calculators.FENCL.calculate()">Calculate Total Effect</button>
+            </div>
+            <div id="fencl_result" class="result-box hidden">
+                <textarea id="fencl_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.FENCL.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- ATT SCORE -->
+        <section id="att" class="calculator-section">
+            <div class="calc-header">
+                <h2>Animal Trauma Triage (ATT)</h2>
+                <button class="reset-btn" onclick="Calculators.ATT.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="form-group">
+                    <label>Species</label>
+                    <select id="att_species">
+                        <option value="dog">Dog</option>
+                        <option value="cat">Cat</option>
+                    </select>
+                </div>
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Perfusion</label>
+                        <select id="att_perfusion">
+                            <option value="0">0 - Normal</option>
+                            <option value="1">1 - Pink/Tacky MM, CRT 2-3s</option>
+                            <option value="2">2 - Pale/Tacky MM, CRT 3-5s</option>
+                            <option value="3">3 - White/Gray/Dry MM, CRT >5s</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cardiac</label>
+                        <select id="att_cardiac">
+                            <option value="0">0 - Normal HR</option>
+                            <option value="1">1 - Mild Tachycardia (D:120-160, C:200-240)</option>
+                            <option value="2">2 - Mod Tachycardia (D:160-200, C:240-280)</option>
+                            <option value="3">3 - Sev Tachy/Brady (D:>200 or <60)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Respiratory</label>
+                        <select id="att_resp">
+                            <option value="0">0 - Normal</option>
+                            <option value="1">1 - Mild Tachypnea</option>
+                            <option value="2">2 - Mod Dyspnea (Abd effort)</option>
+                            <option value="3">3 - Sev Dyspnea / Cyanosis</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Eye/Muscle/Integument</label>
+                        <select id="att_eye">
+                            <option value="0">0 - Normal</option>
+                            <option value="1">1 - Abrasions / Minor Lacerations</option>
+                            <option value="2">2 - Deep Lacerations / Penetrating</option>
+                            <option value="3">3 - Degloving / Evisceration</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Skeletal</label>
+                        <select id="att_skel">
+                            <option value="0">0 - Normal</option>
+                            <option value="1">1 - Closed Fracture / Lameness</option>
+                            <option value="2">2 - Open Fracture / Mult. Fractures</option>
+                            <option value="3">3 - Spinal Fracture / Unstable Pelvis</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Neurological</label>
+                        <select id="att_neuro">
+                            <option value="0">0 - Normal</option>
+                            <option value="1">1 - Slight Deficits</option>
+                            <option value="2">2 - Paresis / Monoparesis</option>
+                            <option value="3">3 - Plegia / Coma / Seizures</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="Calculators.ATT.calculate()">Calculate ATT</button>
+            </div>
+            <div id="att_result" class="result-box hidden">
+                <div class="result-row"><span>Total Score:</span><strong id="att_total">-- / 18</strong></div>
+                <div class="small-text" style="text-align: center;">Higher scores indicate decreased likelihood of survival.</div>
+                <button class="copy-btn" onclick="Calculators.ATT.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- INFORMED CONSENT -->
+        <section id="consent" class="calculator-section">
+            <div class="calc-header">
+                <h2>Informed Consent Complications</h2>
+                <button class="reset-btn" onclick="Calculators.Consent.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="form-group">
+                    <label>Select complications</label>
+                    <div class="checklist">
+                        <label class="checkbox-item"><input type="checkbox" id="consent_test" checked> Diagnostic Tests</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_sedation" checked> Sedation and Anesthesia</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_hospitalization"> Hospitalization</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_transfusion"> Blood and Plasma Transfusions</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_fna"> Fine Needle Aspirates</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_ucath"> Cystoscopy and Urethral Catheterization</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_hfno"> High Flow Nasal Oxygen</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_ventilation"> Mechanical Ventilation</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_surgery"> Surgical Procedures</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_brachy"> Brachycephaly</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_ngt"> Nasogastric Tube Placement</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_ect"> Dialysis and Hemoperfusion</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_ile"> Intralipid Therapy</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_vomiting"> Emesis</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_chest_tube"> Chest Tube Placement</label>
+                        <label class="checkbox-item"><input type="checkbox" id="consent_long_line"> Central Catheter Placement</label>
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="Calculators.Consent.generate()">Generate Consent Text</button>
+            </div>
+            <div id="consent_result" class="result-box hidden">
+                <h3 style="margin-bottom:0.5rem; color:var(--primary);">Consent Text</h3>
+                <textarea id="consent_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.Consent.copy()">Copy to Clipboard</button>
+            </div>
+        </section>
+
+        <!-- HOSPITALIZATION PLAN -->
+        <section id="hosplan" class="calculator-section">
+            <div class="calc-header">
+                <h2>Hospitalization Treatment Plan</h2>
+                <button class="reset-btn" onclick="Calculators.HospPlan.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="calc-grid">
+                    <div>
+                        <div class="form-group">
+                            <label>Treatment options</label>
+                            <div class="checklist">
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_hosp" checked> Hospitalization</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_iv_catheter" checked> IV catheter placement</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_iv_fluids"> IV fluids</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_antibiotic"> Antibiotic therapy</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_pain"> Pain management</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_ng_tube"> Nasogastric tube placement</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_cvc"> Central venous catheter placement</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_oxygen"> Oxygen supplementation</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_hf_oxygen"> High flow oxygen</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_mech_vent"> Mechanical ventilation</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_dialysis"> Dialysis/hemoperfusion</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_as_needed" checked> Treatments as needed</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_antiemetic"> Antiemetic therapy</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Additional treatments (one per line)</label>
+                            <textarea id="hosplan_additional" placeholder="e.g. Tube feeds"></textarea>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label>Diagnostic options</label>
+                            <div class="checklist">
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_cbc"> Complete blood count</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_chemistry"> Serum chemistry</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_coags"> Coagulation panel</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_blood_type"> Blood Typing</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_abd_xray"> Abdominal radiographs</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_chest_xray"> Thoracic radiographs</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_ua"> Urinalysis</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_fna"> Fine needle aspirate</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_ultrasound"> Abdominal ultrasound</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_ct"> CT scan</label>
+                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_serial" checked> Serial diagnostics as needed</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Miscellaneous tests (one per line)</label>
+                            <textarea id="hosplan_misc" placeholder="e.g. ACTH stimulation test"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Plan to consult service</label>
+                    <input type="text" id="hosplan_consult" placeholder="e.g. Surgery">
+                </div>
+                <div class="form-group">
+                    <label>Transfer service</label>
+                    <input type="text" id="hosplan_transfer" placeholder="e.g. ICU">
+                </div>
+
+                <button class="calculate-btn" onclick="Calculators.HospPlan.generate()">Generate Treatment Plan</button>
+            </div>
+            <div id="hosplan_result" class="result-box hidden">
+                <h3 style="margin-bottom:0.5rem; color:var(--primary);">Treatment Plan</h3>
+                <textarea id="hosplan_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.HospPlan.copy()">Copy to Clipboard</button>
+            </div>
+        </section>
+
+        <!-- OUTPATIENT MEDICATIONS -->
+        <section id="outpatient_meds" class="calculator-section">
+            <div class="calc-header">
+                <h2>Outpatient Medications</h2>
+                <button class="reset-btn" onclick="Calculators.OutpatientMeds.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="form-group">
+                    <label>Medication</label>
+                    <select id="out_med_select" onchange="Calculators.OutpatientMeds.onMedChange()">
+                        <option value="Ondansetron">Ondansetron</option>
+                        <option value="Maropitant">Maropitant</option>
+                        <option value="Clavamox">Clavamox</option>
+                        <option value="Prednisone">Prednisone</option>
+                        <option value="Carprofen">Carprofen</option>
+                        <option value="Trazodone">Trazodone</option>
+                        <option value="Gabapentin">Gabapentin</option>
+                        <option value="pimobendan (Vetmedin)">pimobendan (Vetmedin)</option>
+                        <option value="clopidogrel (Plavix)">clopidogrel (Plavix)</option>
+                        <option value="doxycycline">doxycycline</option>
+                        <option value="Psyllium">Psyllium</option>
+                        <option value="Proviable Forte Kit">Proviable Forte Kit</option>
+                        <option value="sucralfate">sucralfate</option>
+                        <option value="Mirtazipine">Mirtazipine</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group hidden" id="out_med_other_group">
+                    <label>Enter Medication Name</label>
+                    <input type="text" id="out_med_other">
+                </div>
+
+                <div class="calc-grid" id="out_conc_grid">
+                    <div class="form-group" id="out_conc_group">
+                        <label id="out_conc_label">Concentration</label>
+                        <div class="inline-row">
+                            <div class="inline-item">
+                                <input type="text" id="out_conc_value" placeholder="e.g. 8">
+                            </div>
+                            <div class="inline-item fixed">
+                                <select id="out_conc_unit">
+                                    <option value="mg">mg</option>
+                                    <option value="mg/ml">mg/ml</option>
+                                    <option value="tablespoons">tablespoons</option>
+                                    <option value="gram">gram</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group hidden" id="out_proviable_paste_group">
+                        <label>Paste mL per dose</label>
+                        <input type="text" id="out_proviable_paste_ml" placeholder="e.g. 3-4">
+                    </div>
+                </div>
+
+                <div class="calc-grid" id="out_dose_freq_group">
+                    <div class="form-group">
+                        <label>Dose per Administration</label>
+                        <div class="inline-row">
+                            <div class="inline-item">
+                                <input type="text" id="out_dose_amount" placeholder="e.g. 1">
+                            </div>
+                            <div class="inline-item fixed">
+                                <select id="out_dose_unit">
+                                    <option value="tablet(s)">tablet(s)</option>
+                                    <option value="capsule(s)">capsule(s)</option>
+                                    <option value="ml(s)">ml(s)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Times per Day</label>
+                        <input type="text" id="out_frequency" placeholder="e.g. 2-3">
+                    </div>
+                </div>
+
+                <div class="calc-grid" id="out_duration_group">
+                    <div class="form-group">
+                        <label>Duration (days)</label>
+                        <input type="number" id="out_duration" placeholder="e.g. 7">
+                    </div>
+                    <div class="form-group">
+                        <label>Options</label>
+                        <div class="checklist">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="out_until_directed" onchange="Calculators.OutpatientMeds.toggleDuration()">
+                                Until Directed
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="out_until_gone" onchange="Calculators.OutpatientMeds.toggleDuration()">
+                                Until Gone
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="out_next_dose_group">
+                    <label>Next Dose Due</label>
+                    <input type="text" id="out_next_dose" placeholder="e.g. 8 PM">
+                </div>
+
+                <div class="form-group" id="out_side_effects_group">
+                    <label>Side Effects / Notes</label>
+                    <textarea id="out_side_effects" readonly></textarea>
+                </div>
+
+                <button class="calculate-btn" onclick="Calculators.OutpatientMeds.generate()">Generate</button>
+            </div>
+
+            <div id="out_med_result" class="result-box hidden">
+                <h3 style="margin-bottom:0.5rem; color:var(--primary);">Medication Instructions</h3>
+                <p class="small-text" style="color:var(--text-muted); margin-bottom:0.5rem;">Copy the text below:</p>
+                <textarea id="out_med_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.OutpatientMeds.copy()">Copy to Clipboard</button>
+            </div>
+        </section>
+
+        <!-- TREATMENT SHEET CONTINGENCIES -->
+        <section id="treatment_contingencies" class="calculator-section">
+            <div class="calc-header">
+                <h2>Treatment Sheet Contingencies</h2>
+                <button class="reset-btn" onclick="goHome()">Back</button>
+            </div>
+
+            <div class="protocol-block">
+                <h3>Insulin Monitoring</h3>
+                <h4>Protocol 1</h4>
+                <table class="protocol-table">
+                    <thead>
+                        <tr>
+                            <th>Blood Glucose</th>
+                            <th>Insulin</th>
+                            <th>Dextrose CRI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Greater than 250</td>
+                            <td>0.1 U/kg/hr</td>
+                            <td>d/c</td>
+                        </tr>
+                        <tr>
+                            <td>200 to 249</td>
+                            <td>0.075 U/kg/hr</td>
+                            <td>2.5%</td>
+                        </tr>
+                        <tr>
+                            <td>150 to 199</td>
+                            <td>0.05 U/kg/hr</td>
+                            <td>2.5%</td>
+                        </tr>
+                        <tr>
+                            <td>100 to 149</td>
+                            <td>0.025 U/kg/hr</td>
+                            <td>5%</td>
+                        </tr>
+                        <tr>
+                            <td>Less than 100</td>
+                            <td>d/c until next check</td>
+                            <td>5%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('insulin_protocol_1', this)">Copy Protocol 1</button>
+
+                <h4 style="margin-top:1.25rem;">Protocol 2 (DKA) - Infusion Rate Adjustment</h4>
+                <ul class="protocol-list">
+                    <li>Blood glucose &gt; 250 mg/dL: Insulin rate 10 mL/hr, Dextrose none</li>
+                    <li>Blood glucose 200-250 mg/dL: Insulin rate 7 mL/hr, Dextrose 2.5%</li>
+                    <li>Blood glucose 150-200 mg/dL: Insulin rate 5 mL/hr, Dextrose 2.5%</li>
+                    <li>Blood glucose 100-150 mg/dL: Insulin rate 5 mL/hr, Dextrose 5%</li>
+                    <li>Blood glucose &lt; 100 mg/dL: Stop insulin, Dextrose 5%</li>
+                </ul>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('insulin_protocol_2', this)">Copy Protocol 2</button>
+            </div>
+
+            <div class="protocol-block">
+                <h3>Potassium Supplementation</h3>
+                <table class="protocol-table">
+                    <thead>
+                        <tr>
+                            <th>Serum Potassium (mEq/L)</th>
+                            <th>mEq KCl to Add to 250 mL Fluid</th>
+                            <th>mEq KCl to Add to 1 L Fluid</th>
+                            <th>Max Fluid Infusion Rate (mL/kg/hr)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>&lt; 2.0</td>
+                            <td>20</td>
+                            <td>80</td>
+                            <td>6</td>
+                        </tr>
+                        <tr>
+                            <td>2.1 to 2.5</td>
+                            <td>15</td>
+                            <td>60</td>
+                            <td>8</td>
+                        </tr>
+                        <tr>
+                            <td>2.6 to 3.0</td>
+                            <td>10</td>
+                            <td>40</td>
+                            <td>12</td>
+                        </tr>
+                        <tr>
+                            <td>3.1 to 3.5</td>
+                            <td>7</td>
+                            <td>28</td>
+                            <td>18</td>
+                        </tr>
+                        <tr>
+                            <td>3.6 to 5.0</td>
+                            <td>5</td>
+                            <td>20</td>
+                            <td>25</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('potassium_table', this)">Copy Potassium Supplementation</button>
+            </div>
+
+            <div class="protocol-block">
+                <h3>Potassium Supplementation Calculator</h3>
+                <div class="form-group">
+                    <div class="radio-group">
+                        <label><input type="radio" name="k_supp_mode" value="table" checked onchange="Calculators.Treatment.toggleKMode()"> Table-based</label>
+                        <label><input type="radio" name="k_supp_mode" value="dose" onchange="Calculators.Treatment.toggleKMode()"> Dose-based (mEq/kg/hr)</label>
+                    </div>
+                </div>
+
+                <div id="k_supp_table_mode">
+                    <div class="calc-grid">
+                        <div class="form-group">
+                            <label>Serum Potassium (mEq/L)</label>
+                            <select id="k_supp_level">
+                                <option value="lt2">&lt; 2.0</option>
+                                <option value="2_1_2_5">2.1 to 2.5</option>
+                                <option value="2_6_3_0">2.6 to 3.0</option>
+                                <option value="3_1_3_5">3.1 to 3.5</option>
+                                <option value="3_6_5_0">3.6 to 5.0</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Weight (kg)</label>
+                            <input type="number" id="k_supp_weight" placeholder="e.g. 12.5" step="0.1">
+                        </div>
+                    </div>
+                    <button class="calculate-btn" onclick="Calculators.Treatment.calcK()">Calculate Supplementation</button>
+
+                    <div id="k_supp_result" class="result-box hidden">
+                        <div class="result-row">
+                            <span>KCl to Add (250 mL Bag)</span>
+                            <strong id="k_supp_250">--</strong>
+                        </div>
+                        <div class="result-row">
+                            <span>KCl to Add (1 L Bag)</span>
+                            <strong id="k_supp_1000">--</strong>
+                        </div>
+                        <div class="result-row">
+                            <span>Max Infusion Rate</span>
+                            <strong id="k_supp_rate">--</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="k_supp_dose_mode" class="hidden">
+                    <div class="calc-grid">
+                        <div class="form-group">
+                            <label>Target Dose (mEq/kg/hr)</label>
+                            <input type="number" id="k_dose_mEqkg" value="0.05" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Weight (kg)</label>
+                            <input type="number" id="k_dose_weight" placeholder="e.g. 12.5" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Fluid Rate (mL/hr)</label>
+                            <input type="number" id="k_dose_rate" placeholder="e.g. 60" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Bag Volume (mL)</label>
+                            <input type="number" id="k_dose_volume" placeholder="e.g. 1000" step="1">
+                        </div>
+                    </div>
+                    <button class="calculate-btn" onclick="Calculators.Treatment.calcKByDose()">Calculate KCl Additive</button>
+
+                    <div id="k_dose_result" class="result-box hidden">
+                        <div class="result-row">
+                            <span>Required Concentration</span>
+                            <strong id="k_dose_conc">--</strong>
+                        </div>
+                        <div class="result-row">
+                            <span>Math</span>
+                            <strong id="k_dose_math">--</strong>
+                        </div>
+                        <div class="result-row">
+                            <span>KCl to Add to Bag</span>
+                            <strong id="k_dose_add">--</strong>
+                        </div>
+                        <div class="result-row">
+                            <span>Info</span>
+                            <strong id="k_dose_warn">--</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="protocol-block">
+                <h3>Pressor Monitoring (Norepinephrine Sliding Scale)</h3>
+                <h4>Oscillometric Monitoring</h4>
+                <ul class="protocol-list">
+                    <li>If MAP &gt; 95 mmHg: decrease norepinephrine by 0.1 mcg/kg/min</li>
+                    <li>If MAP 70-95 mmHg: maintain current dose</li>
+                    <li>If MAP &lt; 70 mmHg: increase norepinephrine by 0.1 mcg/kg/min</li>
+                </ul>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('pressor_osc', this)">Copy Oscillometric</button>
+
+                <h4>Doppler Monitoring</h4>
+                <ul class="protocol-list">
+                    <li>If Doppler BP &gt; 110 mmHg: decrease norepinephrine by 0.1 mcg/kg/min</li>
+                    <li>If Doppler BP 80-100 mmHg: maintain current dose</li>
+                    <li>If Doppler BP &lt; 80 mmHg: increase norepinephrine by 0.1 mcg/kg/min</li>
+                </ul>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('pressor_doppler', this)">Copy Doppler</button>
+            </div>
+
+            <div class="protocol-block">
+                <h3>Amlodipine Loading</h3>
+                <h4>Cat</h4>
+                <ul class="protocol-list">
+                    <li>Start with 1/4 tablet (2.5/4 = 0.625 = 0.1 mg/kg), check in 1-2 hours</li>
+                    <li>If still high give another 1/4 tablet (0.625 mg), repeat until BP &lt; 180</li>
+                    <li>Then in 12 hours repeat total dose that was titrate</li>
+                </ul>
+                <h4>Dog</h4>
+                <ul class="protocol-list">
+                    <li>0.1 mg/kg amlodipine PO q 1 hr until BP &lt; 160 mm Hg, or a total of 5 doses are given (0.5 mg/kg)</li>
+                </ul>
+                <h4>Goal</h4>
+                <ul class="protocol-list">
+                    <li>Minimal goal: prehypertensive SBP &lt; 160</li>
+                    <li>End-organ damage noted in dogs SBP &gt; 160 mmHg</li>
+                    <li>Ideal goal: normotensive SBP &lt; 140</li>
+                </ul>
+                <h4>Maintenance Instructions</h4>
+                <ul class="protocol-list">
+                    <li>If systolic BP &gt; 160, give</li>
+                    <li>If systolic BP 130-159, ask clinician. report last SBP</li>
+                    <li>If systolic BP &lt; 130, skip and alert clinician</li>
+                </ul>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('amlodipine_loading', this)">Copy Amlodipine Loading</button>
+            </div>
+
+            <div class="protocol-block">
+                <h3>Heparin CRI - Titration Protocol</h3>
+                <ul class="protocol-list">
+                    <li>80 U/kg bolus over 2 min, then 600 U/kg/day (25 U/kg/hr)</li>
+                    <li>Please record total volume infused in treatment notes (mandatory)</li>
+                    <li>&lt; 1.3-1.5 x baseline: add in 400 U/kg/day (41 U/kg/hr)</li>
+                    <li>If between 1.3-1.5 x baseline: OK (no change)</li>
+                    <li>&gt; 1.5 x baseline: minus 300 U/kg/day (-12.5 U/kg/hr)</li>
+                    <li>&gt; 2 x baseline: either stop for 1 hr or -500 U/kg/day (20 U/kg/hr)</li>
+                    <li>If close to baseline, give a 20-30 U/kg bolus to bump without increasing CRI rate</li>
+                </ul>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('heparin_cri', this)">Copy Heparin CRI</button>
+            </div>
+        </section>
+
+        <!-- KIRBY'S RULE OF 20 -->
+        <section id="rule_of_20" class="calculator-section">
+            <div class="calc-header">
+                <h2>Kirby's Rule of 20</h2>
+                <button class="reset-btn" onclick="Calculators.RuleOf20.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="form-group">
+                    <label>Critical Care Checklist</label>
+                    <div class="rule-grid" id="rule20_list">
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Fluid balance</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Oncotic pull</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Glucose/blood sugar</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Electrolyte/acid-base</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Oxygenation/ventilation</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Mentation/attitude</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Perfusion/blood pressure</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Heart rate/rhythm/contractility</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Albumin/protein levels</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Coagulation/clotting</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">RBC and hemoglobin</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Renal function</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Immune status/antibiotic dosage</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Gastrointestinal motility/mucosal integrity</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Drug doses/metabolism</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Nutrition</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Pain control</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Nursing care/mobility</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Wound/bandage care</button>
+                        <button class="rule-tile" type="button" data-rule20 aria-pressed="false">Tender loving care</button>
+                    </div>
+                </div>
+                <div id="rule20_result" class="alert-box normal hidden">
+                    All 20 items complete. Great job staying thorough.
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+    window.Calculators = window.Calculators || {};
+
+    // --- NAVIGATION LOGIC ---
+    function switchTab(id) {
+        document.querySelectorAll('.calculator-section').forEach(sec => {
+            sec.classList.remove('active');
+        });
+        document.getElementById(id).classList.add('active');
+        
+        // Handle Back Button Visibility
+        const backBtn = document.getElementById('back-home');
+        if (id === 'home') {
+            backBtn.classList.add('hidden');
+        } else {
+            backBtn.classList.remove('hidden');
+        }
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
+    }
+
+    function goHome() {
+        switchTab('home');
+    }
+
+    const Utils = {
+        getValue: (id) => {
+            const el = document.getElementById(id);
+            return (el && el.value !== "") ? parseFloat(el.value) : null;
+        },
+        getText: (id) => {
+            const el = document.getElementById(id);
+            return el ? el.value : "";
+        },
+        setText: (id, text) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = text;
+        },
+        showResult: (id) => {
+            const el = document.getElementById(id);
+            el.classList.remove('hidden');
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        },
+        hideResult: (id) => {
+            document.getElementById(id).classList.add('hidden');
+        },
+        copy: async (text, btn) => {
+            try {
+                await navigator.clipboard.writeText(text);
+                Utils.feedback(btn);
+            } catch (err) {
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    Utils.feedback(btn);
+                } catch (e) { alert("Copy failed. Please copy manually."); }
+                document.body.removeChild(ta);
+            }
+        },
+        feedback: (btn) => {
+            const original = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.backgroundColor = "#4C8C4A"; // Lighter Green
+            setTimeout(() => {
+                btn.innerText = original;
+                btn.style.backgroundColor = "";
+            }, 2000);
+        }
+    };
+
+    // --- NUTRITION SUPPORT ---
+    (function(){
+        const PO_DATA = {
+            Dog: [
+                { n: "RC GI Low Fat (dry)", k: 3.227 },
+                { n: "RC GI Low Fat (wet)", k: 0.910 },
+                { n: "Purina EN (dry)", k: 3.800 },
+                { n: "Purina EN (wet)", k: 1.139 },
+                { n: "RC Hydrolyzed protein (wet)", k: 1.016 },
+                { n: "Purina Puppy (wet)", k: 1.19 },
+                { n: "Purina NF (wet)", k: 1.04 },
+                { n: "RC Hepatic", k: 1.37 },
+                { n: "Hills i/d (wet)", k: 1.04 },
+                { n: "Hills k/d (wet)", k: 1.04 },
+                { n: "Hills g/d (wet)", k: 1.05 },
+                { n: "Hills z/d", k: 0.97 },
+                { n: "Purina HA (dry)", k: 3.782 },
+                { n: "Purina HA (wet)", k: 0.905 },
+                { n: "Ultamino (dry)", k: 3.766 },
+                { n: "Hills a/d", k: 1.2 },
+                { n: "Chicken", k: 1.84 }
+            ],
+            Cat: [
+                { n: "Chicken", k: 1.84 },
+                { n: "EN (fel wet)", k: 1.02 },
+                { n: "EN (fel dry)", k: 3.8 },
+                { n: "Hills i/d (fel wet)", k: 1.11 },
+                { n: "Hills i/d (fel dry)", k: 4.04 },
+                { n: "Purina DM (fel wet)", k: 1.04 },
+                { n: "Purina NF (fel wet)", k: 1.05 },
+                { n: "Purina NF (fel dry)", k: 4.09 },
+                { n: "Hills k/d (fel wet)", k: 1.17 },
+                { n: "Hills c/d (fel wet)", k: 1.14 },
+                { n: "Hills m/d (fel wet)", k: 1.11 },
+                { n: "RC SO (fel dry)", k: 3.71 }
+            ],
+            Defaults: {
+                Dog: ["RC GI Low Fat (dry)", "RC GI Low Fat (wet)", "Purina EN (wet)", "RC Hydrolyzed protein (wet)"],
+                Cat: ["Chicken", "EN (fel wet)", "EN (fel dry)", "Hills i/d (fel wet)", "Hills i/d (fel dry)"]
+            }
+        };
+        const TUBE_PRESETS = [
+            { name: "Royal Canin Recovery Liquid", kcal: "1.0" },
+            { name: "Royal Canin Gastrointestinal Low Fat Liquid", kcal: "1.0" },
+            { name: "Royal Canin Renal Liquid", kcal: "1.0" },
+            { name: "Royal Canin Hepatic Liquid", kcal: "1.0" },
+            { name: "Royal Canin GI Liquid / GI High Energy", kcal: "1.0" },
+            { name: "Clinicare Canine/Feline (Abbott)", kcal: "1.0" },
+            { name: "RF Liquid Diet (Abbott)", kcal: "1.0" },
+            { name: "Vivonex RTF", kcal: "1.0" },
+            { name: "Peptamen AF", kcal: "1.2" }
+        ];
+        const START_RER_OPTIONS = [25, 33, 50, 75, 100];
+        const DEFAULT_TUBE_PRESET = "Royal Canin Gastrointestinal Low Fat Liquid";
+        let poCustomDiets = [];
+
+        const todayString = () => {
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${now.getFullYear()}-${month}-${day}`;
+        };
+
+        const parseLocalDate = (value) => {
+            const [year, month, day] = value.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        };
+
+        const addDays = (date, days) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+
+        const formatDateShort = (date) => date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        });
+
+        const roundToTenth = (value) => Math.round(value * 10) / 10;
+
+        const setResult = (text) => {
+            document.getElementById('ns_text_output').value = text;
+            Calculators.NutritionSupport.lastRes = text;
+            Utils.showResult('ns_result');
+        };
+
+        const tubePresetByName = (name) => TUBE_PRESETS.find((preset) => preset.name === name);
+
+        Calculators.NutritionSupport = {
+            init: () => {
+                Calculators.NutritionSupport.populateTubePresets();
+                Calculators.NutritionSupport.reset();
+            },
+
+            setMode: (mode) => {
+                document.querySelectorAll('#ns_mode_buttons .mode-btn').forEach((btn) => {
+                    btn.classList.toggle('active', btn.dataset.mode === mode);
+                });
+                document.getElementById('ns_po_panel').classList.toggle('hidden', mode !== 'po');
+                document.getElementById('ns_tube_panel').classList.toggle('hidden', mode !== 'tube');
+                Utils.hideResult('ns_result');
+            },
+
+            initPoDiets: () => {
+                const species = document.getElementById('fpc_species').value;
+                const container = document.getElementById('fpc_diet_list');
+                container.innerHTML = "";
+                const standard = PO_DATA[species] || [];
+                const custom = poCustomDiets.map((diet) => ({ n: `${diet.n} (custom)`, k: diet.k }));
+                [...standard, ...custom].forEach((diet, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'diet-item';
+                    const id = `ns_diet_${idx}`;
+                    const safeName = diet.n.replace(/"/g, '&quot;');
+                    row.innerHTML = `<input type="checkbox" id="${id}" value="${safeName}" data-kcal="${diet.k}"><label for="${id}">${diet.n} (${diet.k} kcal/g)</label>`;
+                    container.appendChild(row);
+                });
+                Calculators.NutritionSupport.selectPoDefaults();
+            },
+
+            togglePoAll: (select) => {
+                document.querySelectorAll('#fpc_diet_list input[type="checkbox"]').forEach((cb) => {
+                    cb.checked = select;
+                });
+            },
+
+            selectPoDefaults: () => {
+                Calculators.NutritionSupport.togglePoAll(false);
+                const species = document.getElementById('fpc_species').value;
+                const defaults = PO_DATA.Defaults[species] || [];
+                document.querySelectorAll('#fpc_diet_list input[type="checkbox"]').forEach((cb) => {
+                    if (defaults.includes(cb.value)) cb.checked = true;
+                });
+            },
+
+            addPoCustomDiet: () => {
+                const name = Utils.getText('fpc_custom_name').trim();
+                const kcal = Utils.getValue('fpc_custom_kcal');
+                if (!name || !kcal || kcal <= 0) {
+                    alert("Enter a valid custom diet name and kcal/g value.");
+                    return;
+                }
+                if (poCustomDiets.some((diet) => diet.n.toLowerCase() === name.toLowerCase())) {
+                    alert("That custom diet already exists.");
+                    return;
+                }
+                poCustomDiets.push({ n: name, k: kcal });
+                document.getElementById('fpc_custom_name').value = "";
+                document.getElementById('fpc_custom_kcal').value = "";
+                Calculators.NutritionSupport.initPoDiets();
+                Calculators.NutritionSupport.togglePoAll(false);
+                const checkboxes = document.querySelectorAll('#fpc_diet_list input[type="checkbox"]');
+                if (checkboxes.length > 0) checkboxes[checkboxes.length - 1].checked = true;
+            },
+
+            calculatePO: () => {
+                const weight = Utils.getValue('fpc_weight');
+                const feedings = Utils.getValue('fpc_feedings');
+                const rerPercent = Utils.getValue('fpc_rer_perc');
+                if (!weight || weight <= 0 || !feedings || feedings <= 0 || !rerPercent || rerPercent <= 0) {
+                    alert("Please enter valid positive values for weight, feedings/day, and RER %.");
+                    return;
+                }
+                const selected = [];
+                document.querySelectorAll('#fpc_diet_list input:checked').forEach((cb) => {
+                    selected.push({ n: cb.value, k: parseFloat(cb.dataset.kcal) });
+                });
+                if (selected.length === 0) {
+                    alert("Select at least one diet.");
+                    return;
+                }
+                const rer = 70 * Math.pow(weight, 0.75);
+                const adjustedDaily = rer * (rerPercent / 100);
+                const perMeal = adjustedDaily / feedings;
+                let output = `Feeding Plan - ${rerPercent}% RER\n`;
+                output += `RER: ${Math.round(rer)} kcal\n`;
+                output += `Per meal: ${Math.round(perMeal)} kcal (${feedings} meals)\n`;
+                output += `Preferred diets:\n`;
+                selected.forEach((diet) => {
+                    const cleanName = diet.n.replace(/ \(custom\)$/i, '');
+                    if (!diet.k || diet.k <= 0) {
+                        output += `${cleanName}: UNKNOWN kcal/g - cannot calculate\n`;
+                        return;
+                    }
+                    output += `${cleanName}: ${Math.ceil(perMeal / diet.k)} g per meal\n`;
+                });
+                setResult(output);
+            },
+
+            populateTubePresets: () => {
+                const select = document.getElementById('ns_tube_preset');
+                if (!select) return;
+                select.innerHTML = "";
+                TUBE_PRESETS.forEach((preset) => {
+                    const option = document.createElement('option');
+                    option.value = preset.name;
+                    option.textContent = preset.name;
+                    select.appendChild(option);
+                });
+            },
+
+            onTubeDietSourceChange: () => {
+                const source = document.getElementById('ns_tube_diet_source').value;
+                const presetSelect = document.getElementById('ns_tube_preset');
+                presetSelect.disabled = source !== 'Commercial';
+                if (source === 'Commercial') {
+                    Calculators.NutritionSupport.onTubePresetChange();
+                }
+            },
+
+            onTubePresetChange: () => {
+                if (document.getElementById('ns_tube_diet_source').value !== 'Commercial') return;
+                const preset = tubePresetByName(document.getElementById('ns_tube_preset').value);
+                if (!preset) return;
+                document.getElementById('ns_tube_food_type').value = preset.name;
+                document.getElementById('ns_tube_kcal_ml').value = preset.kcal;
+            },
+
+            toggleTubeFeedingMode: () => {
+                const mode = document.getElementById('ns_tube_feeding_mode').value;
+                document.getElementById('ns_tube_bolus_group').classList.toggle('hidden', mode !== 'Bolus');
+                document.getElementById('ns_tube_trickle_group').classList.toggle('hidden', mode !== 'Trickle');
+            },
+
+            calculateTube: (scheduleType) => {
+                const weight = Utils.getValue('ns_tube_weight');
+                const species = document.getElementById('ns_tube_species').value;
+                const foodType = Utils.getText('ns_tube_food_type').trim();
+                const kcalPerMl = Utils.getValue('ns_tube_kcal_ml');
+                const kcalPerMlRaw = Utils.getText('ns_tube_kcal_ml').trim();
+                const startRer = parseInt(document.getElementById('ns_tube_start_rer').value, 10);
+                const feedingMode = document.getElementById('ns_tube_feeding_mode').value;
+                const feedsPerDay = Utils.getValue('ns_tube_feeds_per_day');
+                const hoursPerDay = Utils.getValue('ns_tube_hours_per_day');
+                const startDateValue = Utils.getText('ns_tube_start_date');
+
+                if (!weight || weight <= 0) {
+                    alert("Please enter a valid weight greater than 0.");
+                    return;
+                }
+                if (!kcalPerMl || kcalPerMl <= 0) {
+                    alert("Please enter a valid caloric density greater than 0.");
+                    return;
+                }
+                if (feedingMode === 'Bolus' && (!feedsPerDay || feedsPerDay <= 0)) {
+                    alert("Please enter a valid number of bolus feeds per day.");
+                    return;
+                }
+                if (feedingMode === 'Trickle' && (!hoursPerDay || hoursPerDay <= 0 || hoursPerDay > 24)) {
+                    alert("Please enter a valid trickle feeding duration between 0 and 24 hours per day.");
+                    return;
+                }
+                if (!startDateValue) {
+                    alert("Please enter a start date.");
+                    return;
+                }
+
+                const startIndex = START_RER_OPTIONS.indexOf(startRer);
+                if (startIndex === -1) {
+                    alert("Please select a valid starting RER %.");
+                    return;
+                }
+
+                const rer = species === 'Cat'
+                    ? 70 + (30 * weight)
+                    : 70 * Math.pow(weight, 0.75);
+                const weightRaw = Utils.getText('ns_tube_weight').trim();
+                const timeLabel = scheduleType === 'ICU' ? '7a' : '8a';
+                let output = `Food type: ${foodType} (${kcalPerMlRaw} kcal/ml)\n`;
+                output += `Species: ${species} | Weight: ${weightRaw} kg | Mode: ${feedingMode}\n`;
+                output += `RER: ${rer.toFixed(1)} kcal/day\n`;
+                if (feedingMode === 'Bolus') {
+                    output += `Bolus frequency: ${parseInt(feedsPerDay, 10)} feeds/day\n`;
+                }
+                if (feedingMode === 'Trickle') {
+                    output += `Trickle duration: ${Number(hoursPerDay).toFixed(1)} hr/day\n`;
+                }
+                output += `\n`;
+
+                let currentDate = parseLocalDate(startDateValue);
+                for (let i = startIndex; i < START_RER_OPTIONS.length; i++) {
+                    const percentage = START_RER_OPTIONS[i];
+                    const dailyKcal = rer * (percentage / 100);
+                    const dailyMl = dailyKcal / kcalPerMl;
+                    const mealMl = dailyMl / feedsPerDay;
+                    const trickleRate = dailyMl / hoursPerDay;
+                    const dateText = formatDateShort(currentDate);
+                    if (i === startIndex) {
+                        output += `${dateText} - `;
+                    } else if (i === START_RER_OPTIONS.length - 1) {
+                        output += `${dateText} ${timeLabel} and beyond - `;
+                    } else {
+                        output += `${dateText} ${timeLabel} - `;
+                    }
+                    output += `${percentage}% RER | ${dailyKcal.toFixed(1)} kcal/day | ${dailyMl.toFixed(1)} ml/day`;
+                    if (feedingMode === 'Bolus') {
+                        output += ` | ${Math.round(mealMl)} ml/feed`;
+                    }
+                    if (feedingMode === 'Trickle') {
+                        output += ` | ${roundToTenth(trickleRate).toFixed(1)} ml/hr`;
+                    }
+                    output += `\n`;
+
+                    if (i < START_RER_OPTIONS.length - 1) {
+                        currentDate = addDays(currentDate, i === startIndex ? 2 : 1);
+                    }
+                }
+
+                setResult(output);
+            },
+
+            reset: () => {
+                poCustomDiets = [];
+                document.getElementById('fpc_weight').value = "";
+                document.getElementById('fpc_species').value = "Dog";
+                document.getElementById('fpc_feedings').value = "4";
+                document.getElementById('fpc_rer_perc').value = "100";
+                document.getElementById('fpc_custom_name').value = "";
+                document.getElementById('fpc_custom_kcal').value = "";
+                Calculators.NutritionSupport.initPoDiets();
+
+                document.getElementById('ns_tube_weight').value = "";
+                document.getElementById('ns_tube_species').value = "Dog";
+                document.getElementById('ns_tube_diet_source').value = "Commercial";
+                document.getElementById('ns_tube_preset').value = DEFAULT_TUBE_PRESET;
+                document.getElementById('ns_tube_food_type').value = "";
+                document.getElementById('ns_tube_kcal_ml').value = "";
+                document.getElementById('ns_tube_start_rer').value = "25";
+                document.getElementById('ns_tube_feeding_mode').value = "Bolus";
+                document.getElementById('ns_tube_feeds_per_day').value = "4";
+                document.getElementById('ns_tube_hours_per_day').value = "24";
+                document.getElementById('ns_tube_start_date').value = todayString();
+                Calculators.NutritionSupport.onTubeDietSourceChange();
+                Calculators.NutritionSupport.toggleTubeFeedingMode();
+
+                document.getElementById('ns_text_output').value = "";
+                Calculators.NutritionSupport.lastRes = "";
+                Calculators.NutritionSupport.setMode('po');
+                Utils.hideResult('ns_result');
+            },
+
+            copy: () => Utils.copy(Calculators.NutritionSupport.lastRes, document.querySelector('#nutrition_support .copy-btn'))
+        };
+    })();
+
+    // --- FLUIDS ---
+    Calculators.Fluids = {
+        calculate: () => {
+            const health = document.getElementById('flu_health').value;
+            const species = document.getElementById('flu_species').value;
+            const weight = Utils.getValue('flu_weight');
+            if (!weight || weight <= 0) { alert("Please enter valid weight > 0"); return; }
+            let result = "";
+            if (species === "Dog") {
+                const rate = health === "Healthy" 
+                    ? (140 * Math.pow(weight, 0.73)) / 24
+                    : (97 * Math.pow(weight, 0.655)) / 24;
+                const ratePerDay = (rate * 24) / weight;
+                result = `Rate: ${rate.toFixed(1)} ml/hr\n(${ratePerDay.toFixed(1)} ml/kg/day)`;
+            } else { 
+                const minRate = health === "Healthy" ? (30 * weight) / 24 : (20 * weight) / 24;
+                const maxRate = health === "Healthy" ? (70 * weight) / 24 : (35 * weight) / 24;
+                const minDay = (minRate * 24) / weight;
+                const maxDay = (maxRate * 24) / weight;
+                result = `Rate: ${minRate.toFixed(1)} - ${maxRate.toFixed(1)} ml/hr\n(${minDay.toFixed(1)} - ${maxDay.toFixed(1)} ml/kg/day)`;
+            }
+            document.getElementById('flu_text_output').value = result;
+            Calculators.Fluids.lastRes = result;
+            Utils.showResult('flu_result');
+        },
+        reset: () => {
+            document.getElementById('flu_weight').value = '';
+            document.getElementById('flu_text_output').value = '';
+            Utils.hideResult('flu_result');
+        },
+        copy: () => Utils.copy(Calculators.Fluids.lastRes, document.querySelector('#fluids .copy-btn'))
+    };
+
+    // --- SEDATION PROTOCOL ---
+    Calculators.Sedation = {
+        meds: [
+            { id: "sed_alfaxalone", name: "alfaxalone", unit: "mg/kg" },
+            { id: "sed_butorphanol", name: "butorphanol", unit: "mg/kg" },
+            { id: "sed_dexmedetomidine", name: "dexmedetomidine", unit: "mcg/kg" },
+            { id: "sed_ketamine", name: "ketamine", unit: "mg/kg" },
+            { id: "sed_methadone", name: "methadone", unit: "mg/kg" },
+            { id: "sed_midazolam", name: "midazolam", unit: "mg/kg" }
+        ],
+        roundToTenth: (value) => Math.round(value * 10) / 10,
+        formatTotal: (value) => {
+            const rounded = Calculators.Sedation.roundToTenth(value);
+            return rounded.toFixed(1);
+        },
+        calculate: () => {
+            const weight = Utils.getValue('sed_weight');
+            if (!weight || weight <= 0) { alert("Please enter a valid weight."); return; }
+            const format = document.getElementById('sed_format').value;
+            const lines = [];
+
+            Calculators.Sedation.meds.forEach(med => {
+                const dose = Utils.getValue(`${med.id}_dose`);
+                const routeEl = document.getElementById(`${med.id}_route`);
+                const route = routeEl ? routeEl.value : "";
+                if (dose !== null) {
+                    const unitLabel = med.unit === "mcg/kg" ? "mcg" : "mg";
+                    const total = Calculators.Sedation.formatTotal(dose * weight);
+                    lines.push(`${med.name} ${dose} ${med.unit} ${route} (${total} ${unitLabel})`);
+                }
+            });
+
+            const otherName = Utils.getText('sed_other_name').trim();
+            const otherDose = Utils.getValue('sed_other_dose');
+            const otherRouteEl = document.getElementById('sed_other_route');
+            const otherRoute = otherRouteEl ? otherRouteEl.value : "";
+            if (otherName && otherDose !== null) {
+                const total = Calculators.Sedation.formatTotal(otherDose * weight);
+                lines.push(`${otherName} ${otherDose} mg/kg ${otherRoute} (${total} mg)`);
+            }
+
+            if (!lines.length) { alert("Enter at least one medication dose."); return; }
+
+            let output = "";
+            if (format === "Instinct") {
+                output = lines.map(line => `- ${line}`).join("\n");
+            } else {
+                output = `- ${lines.join(", ")}`;
+            }
+
+            document.getElementById('sed_text_output').value = output;
+            Calculators.Sedation.lastRes = output;
+            Utils.showResult('sed_result');
+        },
+        reset: () => {
+            document.getElementById('sed_weight').value = "";
+            document.getElementById('sed_format').value = "Instinct";
+            Calculators.Sedation.meds.forEach(med => {
+                const doseEl = document.getElementById(`${med.id}_dose`);
+                const routeEl = document.getElementById(`${med.id}_route`);
+                if (doseEl) doseEl.value = "";
+                if (routeEl) routeEl.value = "IV";
+            });
+            document.getElementById('sed_other_name').value = "";
+            document.getElementById('sed_other_dose').value = "";
+            document.getElementById('sed_other_route').value = "IV";
+            document.getElementById('sed_text_output').value = "";
+            Utils.hideResult('sed_result');
+        },
+        copy: () => Utils.copy(Calculators.Sedation.lastRes, document.querySelector('#sedation .copy-btn'))
+    };
+
+    // --- VAMPIRE (Blood Draw) ---
+    Calculators.Vampire = {
+        calculate: () => {
+            const species = document.getElementById('vamp_species').value;
+            const weight = Utils.getValue('vamp_weight');
+            if (!weight || weight <= 0) { alert("Please enter a valid positive weight."); return; }
+            const rates = species === "Dog" ? { lower: 80, upper: 90 } : { lower: 50, upper: 60 };
+            const dailyPct = 0.01;
+            const weeklyPct = 0.075;
+            const tbvLower = Math.floor(weight * rates.lower);
+            const tbvUpper = Math.ceil(weight * rates.upper);
+            const rawSddLower = weight * rates.lower * dailyPct;
+            const rawSddUpper = weight * rates.upper * dailyPct;
+            const rawSwdLower = weight * rates.lower * weeklyPct;
+            const rawSwdUpper = weight * rates.upper * weeklyPct;
+            let sddLower, sddUpper, swdLower, swdUpper;
+            if (weight <= 5) {
+                sddLower = rawSddLower.toFixed(1); sddUpper = rawSddUpper.toFixed(1);
+                swdLower = rawSwdLower.toFixed(1); swdUpper = rawSwdUpper.toFixed(1);
+            } else {
+                sddLower = Math.floor(rawSddLower); sddUpper = Math.ceil(rawSddUpper);
+                swdLower = Math.floor(rawSwdLower); swdUpper = Math.ceil(rawSwdUpper);
+            }
+            let result = `1. Total Blood Volume:\t${tbvLower} - ${tbvUpper} mL\n`;
+            result += `2. Safe Daily Draw (1%):\t${sddLower} - ${sddUpper} mL\n`;
+            result += `3. Safe Weekly Draw (7.5%):\t${swdLower} - ${swdUpper} mL\n\n`;
+            result += `Note: TBV is whole mL. Safe draws are whole mL for >5kg animals,\nand precise to 1 decimal place for <=5kg animals.`;
+            document.getElementById('vamp_text_output').value = result;
+            Calculators.Vampire.lastRes = result;
+            Utils.showResult('vamp_result');
+        },
+        reset: () => {
+            document.getElementById('vamp_weight').value = '';
+            document.getElementById('vamp_text_output').value = '';
+            Utils.hideResult('vamp_result');
+        },
+        copy: () => Utils.copy(Calculators.Vampire.lastRes, document.querySelector('#vampire .copy-btn'))
+    };
+
+    // --- EDD (LVDd) ---
+    Calculators.EDD = {
+        config: {
+            minWeight: 2.0,
+            maxWeight: 75.0,
+            minMeasured: 0.5,
+            maxMeasured: 10.0,
+            decimalPlaces: 2
+        },
+        table: [
+            { weight: 2, mean: 1.7, min: 1.5, max: 2.0 },
+            { weight: 3.5, mean: 2.1, min: 1.7, max: 2.4 },
+            { weight: 5, mean: 2.3, min: 2.0, max: 2.7 },
+            { weight: 7.5, mean: 2.6, min: 2.2, max: 3.1 },
+            { weight: 10, mean: 2.9, min: 2.4, max: 3.4 },
+            { weight: 12.5, mean: 3.1, min: 2.6, max: 3.7 },
+            { weight: 15, mean: 3.3, min: 2.8, max: 3.9 },
+            { weight: 17.5, mean: 3.5, min: 2.9, max: 4.1 },
+            { weight: 20, mean: 3.6, min: 3.1, max: 4.3 },
+            { weight: 22.5, mean: 3.8, min: 3.2, max: 4.4 },
+            { weight: 25, mean: 3.9, min: 3.3, max: 4.6 },
+            { weight: 27.5, mean: 4.0, min: 3.4, max: 4.7 },
+            { weight: 30, mean: 4.1, min: 3.5, max: 4.9 },
+            { weight: 32.5, mean: 4.2, min: 3.6, max: 5.0 },
+            { weight: 35, mean: 4.3, min: 3.7, max: 5.1 },
+            { weight: 40, mean: 4.5, min: 3.8, max: 5.3 },
+            { weight: 45, mean: 4.7, min: 4.0, max: 5.6 },
+            { weight: 50, mean: 4.9, min: 4.1, max: 5.7 },
+            { weight: 55, mean: 5.0, min: 4.2, max: 5.9 },
+            { weight: 60, mean: 5.2, min: 4.4, max: 6.1 },
+            { weight: 65, mean: 5.3, min: 4.5, max: 6.3 },
+            { weight: 70, mean: 5.4, min: 4.6, max: 6.4 },
+            { weight: 75, mean: 5.5, min: 4.7, max: 6.5 }
+        ],
+        lastRes: "",
+        closest: (weight) => {
+            let closest = null;
+            let minDiff = Infinity;
+            for (const entry of Calculators.EDD.table) {
+                const diff = Math.abs(weight - entry.weight);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    closest = entry;
+                }
+            }
+            if (!closest) { throw new Error("EDD reference table is empty."); }
+            return {
+                mean: closest.mean,
+                min: closest.min,
+                max: closest.max,
+                roundedWeight: closest.weight
+            };
+        },
+        interpret: (measured, reference) => {
+            const rangeSize = reference.max - reference.min;
+            const lowerQuartile = reference.min + (rangeSize * 0.25);
+            const upperQuartile = reference.max - (rangeSize * 0.25);
+            const decimals = Calculators.EDD.config.decimalPlaces;
+
+            if (measured < reference.min) {
+                return {
+                    status: "LOW",
+                    details: `Below normal range (< ${reference.min.toFixed(decimals)} cm)`
+                };
+            }
+            if (measured > reference.max) {
+                return {
+                    status: "HIGH",
+                    details: `Above normal range (> ${reference.max.toFixed(decimals)} cm)`
+                };
+            }
+            if (measured < lowerQuartile) {
+                return {
+                    status: "LOW NORMAL",
+                    details: `Lower 25% of normal range (${reference.min.toFixed(decimals)} - ${lowerQuartile.toFixed(decimals)} cm)`
+                };
+            }
+            if (measured > upperQuartile) {
+                return {
+                    status: "HIGH NORMAL",
+                    details: `Upper 25% of normal range (${upperQuartile.toFixed(decimals)} - ${reference.max.toFixed(decimals)} cm)`
+                };
+            }
+            return {
+                status: "NORMAL",
+                details: `Within middle 50% of normal range (${lowerQuartile.toFixed(decimals)} - ${upperQuartile.toFixed(decimals)} cm)`
+            };
+        },
+        calculate: () => {
+            const weight = Utils.getValue('edd_weight');
+            if (!weight || weight <= 0) { alert("Please enter a valid weight."); return; }
+
+            const config = Calculators.EDD.config;
+            if (weight < config.minWeight || weight > config.maxWeight) {
+                alert(`Please enter a weight between ${config.minWeight.toFixed(1)} and ${config.maxWeight.toFixed(1)} kg.`);
+                return;
+            }
+
+            const measuredStr = document.getElementById('edd_measured').value.trim();
+            let hasMeasured = false;
+            let measured = 0;
+
+            if (measuredStr !== "") {
+                measured = parseFloat(measuredStr);
+                if (!Number.isFinite(measured) || measured <= 0 || measured < config.minMeasured || measured > config.maxMeasured) {
+                    alert(`Please enter a measured EDD between ${config.minMeasured.toFixed(1)} and ${config.maxMeasured.toFixed(1)} cm.`);
+                    return;
+                }
+                hasMeasured = true;
+            }
+
+            const eddData = Calculators.EDD.closest(weight);
+            const decimals = config.decimalPlaces;
+            let output = `Patient Weight: ${weight.toFixed(1)} kg`;
+            if (weight !== eddData.roundedWeight) {
+                output += ` (Ref: ${eddData.roundedWeight.toFixed(1)} kg)`;
+            }
+            output += `\nLVDd Mean: ${eddData.mean.toFixed(decimals)} cm`;
+            output += `\nNormal Range: ${eddData.min.toFixed(decimals)} - ${eddData.max.toFixed(decimals)} cm`;
+
+            if (hasMeasured) {
+                const interpretation = Calculators.EDD.interpret(measured, eddData);
+                output += `\nMeasured: ${measured.toFixed(decimals)} cm`;
+                output += `\nStatus: ${interpretation.status}`;
+                if (interpretation.details) output += `\nDetails: ${interpretation.details}`;
+            }
+
+            document.getElementById('edd_text_output').value = output;
+            Calculators.EDD.lastRes = output;
+            Utils.showResult('edd_result');
+        },
+        reset: () => {
+            document.getElementById('edd_weight').value = '';
+            document.getElementById('edd_measured').value = '';
+            document.getElementById('edd_text_output').value = '';
+            Utils.hideResult('edd_result');
+        },
+        copy: () => Utils.copy(Calculators.EDD.lastRes, document.querySelector('#edd .copy-btn'))
+    };
+
+    // --- APPLE CALCULATOR (UPDATED FULL/FAST LOGIC) ---
+    Calculators.APPLE = {
+        config: {
+            APPLEfast: {
+                maxScore: 50,
+                prognosisCutoff: 25,
+                mortality: { intercept: -7.549, coefficient: 0.291 },
+                ranges: {
+                    glucose: [[0,84,7], [84,103,8], [103,165,9], [165,274,10], [274,9999,0]],
+                    albumin: [[0,2.6,8], [2.6,3.1,7], [3.1,3.3,6], [3.3,3.6,0], [3.6,99,2]],
+                    lactate: [[0,2.0,0], [2.0,8.0,4], [8.0,10.0,8], [10.0,999,12]],
+                    platelet: [[0,151,5], [151,201,6], [201,261,3], [261,421,0], [421,9999,1]],
+                    mentation: {0:0, 1:4, 2:6, 3:7, 4:14} // Map
+                }
+            },
+            APPLEfull: {
+                maxScore: 80,
+                prognosisCutoff: 40,
+                mortality: { intercept: -8.294, coefficient: 0.237 },
+                ranges: {
+                    creatinine: [[0,0.63,0], [0.63,1.36,1], [1.36,2.27,8], [2.27,99,9]],
+                    wbc: [[0,5.1,9], [5.1,8.6,0], [8.6,18.1,2], [18.1,999,3]],
+                    albumin: [[0,2.6,8], [2.6,3.1,7], [3.1,3.3,6], [3.3,3.6,0], [3.6,99,2]],
+                    spo2: [[0,90,10], [90,95,4], [95,98,1], [98,101,0]],
+                    bilirubin: [[0,0.24,0], [0.24,0.47,6], [0.47,0.94,4], [0.94,99,3]],
+                    rr: [[0,25,0], [25,37,3], [37,49,5], [49,61,6], [61,999,5]],
+                    age: [[0,3,0], [3,6,6], [6,9,8], [9,99,7]],
+                    lactate: [[0,2.0,0], [2.0,8.0,4], [8.0,10.0,8], [10.0,999,12]],
+                    mentation: {0:0, 1:5, 2:7, 3:8, 4:13}, // Different map than Fast
+                    fluid: {0:0, 1:4, 2:3}
+                }
+            }
+        },
+
+        toggleMode: () => {
+            const mode = document.querySelector('input[name="apple_mode"]:checked').value;
+            if(mode === 'fast') {
+                document.getElementById('apple_form_fast').classList.remove('hidden');
+                document.getElementById('apple_form_full').classList.add('hidden');
+            } else {
+                document.getElementById('apple_form_fast').classList.add('hidden');
+                document.getElementById('apple_form_full').classList.remove('hidden');
+            }
+            Utils.hideResult('apple_result');
+        },
+
+        getScore: (val, ranges) => {
+            if (val === null) return 0;
+            for(let r of ranges) {
+                // range is [min, max, score]
+                if(val >= r[0] && val < r[1]) return r[2];
+            }
+            return 0;
+        },
+
+        calculate: () => {
+            const mode = document.querySelector('input[name="apple_mode"]:checked').value;
+            const cfg = mode === 'fast' ? Calculators.APPLE.config.APPLEfast : Calculators.APPLE.config.APPLEfull;
+            let total = 0;
+            let inputsText = "";
+
+            if (mode === 'fast') {
+                const ment = Utils.getValue('apple_fast_mentation'); // 0-4 int
+                const glu = Utils.getValue('apple_fast_glucose');
+                const alb = Utils.getValue('apple_fast_albumin');
+                const lac = Utils.getValue('apple_fast_lactate');
+                const plt = Utils.getValue('apple_fast_platelet');
+
+                if ([glu, alb, lac, plt].some(v => v === null)) { alert("Please fill all numeric fields."); return; }
+
+                total += cfg.ranges.mentation[ment] || 0;
+                total += Calculators.APPLE.getScore(glu, cfg.ranges.glucose);
+                total += Calculators.APPLE.getScore(alb, cfg.ranges.albumin);
+                total += Calculators.APPLE.getScore(lac, cfg.ranges.lactate);
+                total += Calculators.APPLE.getScore(plt, cfg.ranges.platelet);
+                
+                inputsText = `(Glu:${glu}, Alb:${alb}, Lac:${lac}, Plt:${plt}, Ment:${ment})`;
+
+            } else {
+                const creat = Utils.getValue('apple_full_creat');
+                const wbc = Utils.getValue('apple_full_wbc');
+                const alb = Utils.getValue('apple_full_albumin');
+                const spo2 = Utils.getValue('apple_full_spo2');
+                const bili = Utils.getValue('apple_full_bili');
+                const rr = Utils.getValue('apple_full_rr');
+                const age = Utils.getValue('apple_full_age');
+                const lac = Utils.getValue('apple_full_lactate');
+                const ment = Utils.getValue('apple_full_mentation');
+                const fluid = Utils.getValue('apple_full_fluid');
+
+                if ([creat, wbc, alb, spo2, bili, rr, age, lac].some(v => v === null)) { alert("Please fill all numeric fields."); return; }
+
+                total += Calculators.APPLE.getScore(creat, cfg.ranges.creatinine);
+                total += Calculators.APPLE.getScore(wbc, cfg.ranges.wbc);
+                total += Calculators.APPLE.getScore(alb, cfg.ranges.albumin);
+                total += Calculators.APPLE.getScore(spo2, cfg.ranges.spo2);
+                total += Calculators.APPLE.getScore(bili, cfg.ranges.bilirubin);
+                total += Calculators.APPLE.getScore(rr, cfg.ranges.rr);
+                total += Calculators.APPLE.getScore(age, cfg.ranges.age);
+                total += Calculators.APPLE.getScore(lac, cfg.ranges.lactate);
+                total += cfg.ranges.mentation[ment] || 0;
+                total += cfg.ranges.fluid[fluid] || 0;
+
+                inputsText = `Full Score Inputs`; 
+            }
+
+            // Probability P = 1 / (1 + e^(-(intercept + coeff*score)))
+            // (Note: AHK uses P = e^R / (1 + e^R) which is the same as 1 / (1 + e^-R))
+            const R = cfg.mortality.intercept + (cfg.mortality.coefficient * total);
+            const prob = 1 / (1 + Math.exp(-R));
+            const mortPct = (prob * 100).toFixed(1);
+
+            const prognosis = total > cfg.prognosisCutoff 
+                ? `Worse prognosis (Score > ${cfg.prognosisCutoff})` 
+                : `Better prognosis (Score ≤ ${cfg.prognosisCutoff})`;
+
+            Utils.setText('apple_score_val', `${total} / ${cfg.maxScore}`);
+            Utils.setText('apple_mortality_val', `${mortPct}%`);
+            Utils.setText('apple_prognosis_text', prognosis);
+            Utils.showResult('apple_result');
+
+            Calculators.APPLE.lastRes = `APPLE Score (${mode === 'fast' ? 'Fast' : 'Full'}): ${total}/${cfg.maxScore}\n${prognosis}\nEst. Mortality: ${mortPct}%\n${inputsText}`;
+        },
+        reset: () => {
+            document.querySelectorAll('#apple input').forEach(i => i.value = '');
+            document.getElementById('apple_fast_mentation').selectedIndex = 0;
+            document.getElementById('apple_full_mentation').selectedIndex = 0;
+            document.getElementById('apple_full_fluid').selectedIndex = 0;
+            Utils.hideResult('apple_result');
+        },
+        copy: () => Utils.copy(Calculators.APPLE.lastRes, document.querySelector('#apple .copy-btn'))
+    };
+
+    // --- GLASGOW ---
+    Calculators.Glasgow = {
+        calculate: () => {
+            const m = Utils.getValue('gcs_motor');
+            const b = Utils.getValue('gcs_brain');
+            const l = Utils.getValue('gcs_loc');
+            const total = m + b + l;
+            let prog = total >= 15 ? "GOOD" : (total >= 9 ? "GUARDED" : "POOR/GRAVE");
+            let surv = total >= 15 ? "~90%" : (total >= 9 ? "~50%" : "<25-50%");
+            let color = total >= 15 ? "normal" : (total >= 9 ? "warning" : "critical");
+            Utils.setText('gcs_total', `${total} / 18`);
+            const alert = document.getElementById('gcs_prognosis');
+            alert.innerText = `${prog} Prognosis (${surv} Survival)`;
+            alert.className = `alert-box ${color}`;
+            Utils.showResult('gcs_result');
+            Calculators.Glasgow.lastRes = `Glasgow Coma Scale: ${total}/18\nPrognosis: ${prog} (${surv})`;
+        },
+        reset: () => {
+            document.querySelectorAll('#glasgow select').forEach(s => s.selectedIndex = 0);
+            Utils.hideResult('gcs_result');
+        },
+        copy: () => Utils.copy(Calculators.Glasgow.lastRes, document.querySelector('#glasgow .copy-btn'))
+    };
+
+    // --- FSI ---
+    Calculators.FSI = {
+        calculate: () => {
+            const hr = Utils.getValue('fsi_hr');
+            const sbp = Utils.getValue('fsi_sbp');
+            if(!hr || !sbp) { alert("Enter HR and SBP"); return; }
+            const idx = (hr/sbp).toFixed(2);
+            let int = idx < 1.0 ? "Low (Bradycardia?)" : (idx <= 1.6 ? "Normal (1.47±0.2)" : "SHOCK LIKELY (>1.6)");
+            let cls = idx > 1.6 ? "critical" : "normal";
+            Utils.setText('fsi_val', idx);
+            const div = document.getElementById('fsi_interpretation');
+            div.innerText = int;
+            div.className = `alert-box ${cls}`;
+            Utils.showResult('fsi_result');
+            Calculators.FSI.lastRes = `Feline Shock Index: ${idx}\n${int} (HR:${hr}, SBP:${sbp})`;
+        },
+        reset: () => {
+            document.querySelectorAll('#fsi input').forEach(i => i.value = '');
+            Utils.hideResult('fsi_result');
+        },
+        copy: () => Utils.copy(Calculators.FSI.lastRes, document.querySelector('#fsi .copy-btn'))
+    };
+
+    // --- FENCL (Acid-Base) ---
+    Calculators.FENCL = {
+        ref: { Na: 148, Cl: 111, Ph: 3.95, Alb: 3.75 },
+        coeff: { Na: -0.25, Cl: 1, Ph: 0.58, Lac: -1, Alb: 3.7 },
+        lastRes: "",
+        fmt: (n, d = 3) => Number(n).toFixed(d).replace(/\.?0+$/, ""),
+        calculate: () => {
+            const na = Utils.getValue('fencl_na');
+            const cl = Utils.getValue('fencl_cl');
+            const ph = Utils.getValue('fencl_ph');
+            const lac = Utils.getValue('fencl_lac');
+            const alb = Utils.getValue('fencl_alb');
+
+            if ([na, cl, ph, lac, alb].some(v => v === null)) {
+                alert("Please enter Na, Cl, Ph, Lactate, and Albumin.");
+                return;
+            }
+            if (na === 0) {
+                alert("Sodium cannot be 0.");
+                return;
+            }
+
+            const naEffect = Calculators.FENCL.coeff.Na * (na - Calculators.FENCL.ref.Na);
+            const corrCl = (Calculators.FENCL.ref.Na / na) * cl;
+            const clEffect = Calculators.FENCL.coeff.Cl * (Calculators.FENCL.ref.Cl - corrCl);
+            const phEffect = Calculators.FENCL.coeff.Ph * (Calculators.FENCL.ref.Ph - ph);
+            const lacEffect = Calculators.FENCL.coeff.Lac * lac;
+            const albEffect = Calculators.FENCL.coeff.Alb * (Calculators.FENCL.ref.Alb - alb);
+            const total = naEffect + clEffect + phEffect + lacEffect + albEffect;
+
+            let out = "";
+            out += `Total Effect on Base Excess: ${Calculators.FENCL.fmt(total, 2)}\n\n`;
+            out += `1. Sodium Effect\n`;
+            out += `   Coefficient: ${Calculators.FENCL.coeff.Na}\n`;
+            out += `   Calculation: ${Calculators.FENCL.coeff.Na} * (Na - Ref Na)\n`;
+            out += `   Value: ${Calculators.FENCL.fmt(naEffect)}\n\n`;
+
+            out += `2. Chloride Effect\n`;
+            out += `   Corrected Cl: (Ref Na / Na) * Cl = ${Calculators.FENCL.fmt(corrCl)}\n`;
+            out += `   Calculation: Ref Cl - Corrected Cl\n`;
+            out += `   Value: ${Calculators.FENCL.fmt(clEffect)}\n\n`;
+
+            out += `3. Phosphorous Effect\n`;
+            out += `   Coefficient: ${Calculators.FENCL.coeff.Ph}\n`;
+            out += `   Calculation: ${Calculators.FENCL.coeff.Ph} * (Ref Ph - Current Ph)\n`;
+            out += `   Value: ${Calculators.FENCL.fmt(phEffect)}\n\n`;
+
+            out += `4. Lactate Effect\n`;
+            out += `   Coefficient: ${Calculators.FENCL.coeff.Lac}\n`;
+            out += `   Calculation: ${Calculators.FENCL.coeff.Lac} * Lactate\n`;
+            out += `   Value: ${Calculators.FENCL.fmt(lacEffect)}\n\n`;
+
+            out += `5. Albumin Effect\n`;
+            out += `   Coefficient: ${Calculators.FENCL.coeff.Alb}\n`;
+            out += `   Calculation: ${Calculators.FENCL.coeff.Alb} * (Ref Alb - Current Alb)\n`;
+            out += `   Value: ${Calculators.FENCL.fmt(albEffect)}\n\n`;
+
+            out += `6. Total Effect Calculation\n`;
+            out += `   Total = Na + Cl + Ph + Lac + Alb\n`;
+            out += `   Total: ${Calculators.FENCL.fmt(total)}`;
+
+            document.getElementById('fencl_text_output').value = out;
+            Calculators.FENCL.lastRes = out;
+            Utils.showResult('fencl_result');
+        },
+        reset: () => {
+            document.querySelectorAll('#fencl input').forEach(i => i.value = '');
+            document.getElementById('fencl_text_output').value = '';
+            Utils.hideResult('fencl_result');
+        },
+        copy: () => Utils.copy(Calculators.FENCL.lastRes, document.querySelector('#fencl .copy-btn'))
+    };
+
+    // --- SOFA ---
+    Calculators.SOFA = {
+        calculate: () => {
+            const r = Utils.getValue('sofa_resp');
+            const c = Utils.getValue('sofa_coag');
+            const l = Utils.getValue('sofa_liver');
+            const cv = Utils.getValue('sofa_cv');
+            const cns = Utils.getValue('sofa_cns');
+            const ren = Utils.getValue('sofa_renal');
+            const total = r + c + l + cv + cns + ren;
+            Utils.setText('sofa_total', `${total} / 24`);
+            Utils.showResult('sofa_result');
+            Calculators.SOFA.lastRes = `SOFA Score: ${total}/24\n(Resp:${r}, Coag:${c}, Liv:${l}, CV:${cv}, CNS:${cns}, Ren:${ren})`;
+        },
+        reset: () => {
+            document.querySelectorAll('#sofa select').forEach(s => s.selectedIndex = 0);
+            Utils.hideResult('sofa_result');
+        },
+        copy: () => Utils.copy(Calculators.SOFA.lastRes, document.querySelector('#sofa .copy-btn'))
+    };
+
+    // --- ROX ---
+    Calculators.ROX = {
+        mode: "PaO2",
+        lastRes: "",
+        setMode: (mode) => {
+            Calculators.ROX.mode = mode;
+            document.querySelectorAll('#rox .mode-btn').forEach(btn => {
+                const isActive = btn.getAttribute('data-mode') === mode;
+                btn.classList.toggle('active', isActive);
+            });
+
+            const showSpO2 = (mode === "SpO2" || mode === "Both");
+            const showPaO2 = (mode === "PaO2" || mode === "Both");
+
+            document.getElementById('rox_spo2_group').classList.toggle('hidden', !showSpO2);
+            document.getElementById('rox_pao2_group').classList.toggle('hidden', !showPaO2);
+
+            Calculators.ROX.updateDeltaGroups();
+        },
+        toggleCustomHours: () => {
+            const tl = document.getElementById('rox_timeline').value;
+            const group = document.getElementById('rox_custom_group');
+            if (tl === 'custom') {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+                document.getElementById('rox_custom_hours').value = "";
+            }
+        },
+        toggleDelta: () => {
+            const enabled = document.getElementById('rox_delta_check').checked;
+            const group = document.getElementById('rox_delta_group');
+            if (enabled) {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+                document.getElementById('rox_prev_rox').value = "";
+                document.getElementById('rox_prev_sf').value = "";
+                document.getElementById('rox_prev_pf').value = "";
+            }
+            Calculators.ROX.updateDeltaGroups();
+        },
+        updateDeltaGroups: () => {
+            const enabled = document.getElementById('rox_delta_check').checked;
+            const showSpO2 = (Calculators.ROX.mode === "SpO2" || Calculators.ROX.mode === "Both");
+            const showPaO2 = (Calculators.ROX.mode === "PaO2" || Calculators.ROX.mode === "Both");
+
+            document.getElementById('rox_prev_sf_group').classList.toggle('hidden', !enabled || !showSpO2);
+            document.getElementById('rox_prev_pf_group').classList.toggle('hidden', !enabled || !showPaO2);
+        },
+        calculate: () => {
+            const mode = Calculators.ROX.mode;
+            const fio2 = Utils.getValue('rox_fio2');
+            const rr = Utils.getValue('rox_rr');
+            let spo2 = Utils.getValue('rox_spo2');
+            let pao2 = Utils.getValue('rox_pao2');
+
+            if (mode === "SpO2") {
+                pao2 = null;
+            } else if (mode === "PaO2") {
+                spo2 = null;
+            }
+
+            if (!fio2 || fio2 <= 0) { alert("Please enter a valid FiO2 > 0."); return; }
+            if (!rr || rr <= 0) { alert("Please enter a valid respiratory rate > 0."); return; }
+
+            if (mode === "SpO2" && spo2 === null) { alert("Please enter SpO2."); return; }
+            if (mode === "PaO2" && pao2 === null) { alert("Please enter PaO2."); return; }
+            if (mode === "Both" && spo2 === null && pao2 === null) { alert("Please enter SpO2 and/or PaO2."); return; }
+
+            let hours = 0;
+            const tl = document.getElementById('rox_timeline').value;
+            if (tl === "custom") {
+                const customHours = Utils.getValue('rox_custom_hours');
+                if (!customHours || customHours <= 0) { alert("Please enter custom hours > 0."); return; }
+                hours = customHours;
+            } else {
+                hours = parseFloat(tl);
+            }
+
+            const ratios = {};
+            const roxScores = {};
+            let details = "Inputs:\n";
+
+            if (spo2 !== null) {
+                details += `SpO2: ${spo2} %\n`;
+                ratios["S/F"] = spo2 / fio2;
+                roxScores["S/F"] = ratios["S/F"] / rr;
+            }
+            if (pao2 !== null) {
+                details += `PaO2: ${pao2} mmHg\n`;
+                ratios["P/F"] = pao2 / fio2;
+                roxScores["P/F"] = ratios["P/F"] / rr;
+            }
+            details += `FiO2: ${fio2}\nRespiratory rate: ${rr} breaths/min\nHFNO timeline: ${hours} hours\n\n`;
+
+            Object.keys(ratios).forEach(key => {
+                details += `${key} ratio: ${ratios[key].toFixed(2)}\n`;
+                details += `ROX (${key}): ${roxScores[key].toFixed(2)}\n`;
+            });
+            details += "\n";
+
+            const interpretation = Calculators.ROX.buildInterpretation(hours, roxScores, ratios);
+            let deltaSection = "";
+
+            const deltaEnabled = document.getElementById('rox_delta_check').checked;
+            if (deltaEnabled) {
+                const prevRox = Utils.getValue('rox_prev_rox');
+                const prevSf = Utils.getValue('rox_prev_sf');
+                const prevPf = Utils.getValue('rox_prev_pf');
+
+                if (prevRox === null && prevSf === null && prevPf === null) {
+                    alert("Delta selected. Provide previous ROX and/or previous S/F or P/F ratio.");
+                    return;
+                }
+
+                deltaSection = "\nDelta (T6 - T0):\n";
+                if (prevRox !== null) {
+                    let deltaRox = null;
+                    let roxLabel = "";
+                    if (roxScores["S/F"] !== undefined) {
+                        deltaRox = roxScores["S/F"] - prevRox;
+                        roxLabel = "S/F";
+                    } else if (roxScores["P/F"] !== undefined) {
+                        deltaRox = roxScores["P/F"] - prevRox;
+                        roxLabel = "P/F";
+                    }
+                    if (deltaRox !== null) {
+                        deltaSection += `Delta ROX (${roxLabel}): ${deltaRox.toFixed(2)} (T6 - T0)\n`;
+                        if (deltaRox < 2.08) {
+                            deltaSection += "Delta ROX < 2.08 predicts failure (94% sensitivity)\n";
+                        }
+                    }
+                }
+
+                if (prevSf !== null && ratios["S/F"] !== undefined) {
+                    const deltaSf = ratios["S/F"] - prevSf;
+                    deltaSection += `Delta S/F: ${deltaSf.toFixed(2)} (T6 - T0)\n`;
+                    if (deltaSf < 42) {
+                        deltaSection += "Delta S/F < 42 predicts failure (83% sensitivity)\n";
+                    }
+                }
+                if (prevPf !== null && ratios["P/F"] !== undefined) {
+                    const deltaPf = ratios["P/F"] - prevPf;
+                    deltaSection += `Delta P/F: ${deltaPf.toFixed(2)} (T6 - T0)\n`;
+                }
+            }
+
+            const cutoffs = Calculators.ROX.buildCutoffs(hours, roxScores, ratios, deltaEnabled);
+            const output = details + interpretation + deltaSection + cutoffs;
+
+            document.getElementById('rox_text_output').value = output.trim();
+            Utils.showResult('rox_result');
+
+            let summary = "ROX: ";
+            if (roxScores["S/F"] !== undefined) {
+                summary += `S/F ${roxScores["S/F"].toFixed(2)}`;
+            }
+            if (roxScores["P/F"] !== undefined) {
+                if (roxScores["S/F"] !== undefined) summary += " | ";
+                summary += `P/F ${roxScores["P/F"].toFixed(2)}`;
+            }
+            summary += ` | RR: ${rr} | FiO2: ${fio2} | Time: ${hours}h`;
+            if (spo2 !== null) summary += ` | SpO2: ${spo2}%`;
+            if (pao2 !== null) summary += ` | PaO2: ${pao2}mmHg`;
+
+            Calculators.ROX.lastRes = summary;
+        },
+        buildInterpretation: (hours, roxScores, ratios) => {
+            let msg = "Interpretation:\n";
+            if (hours >= 2 && hours <= 3) {
+                Object.keys(roxScores).forEach(key => {
+                    const val = roxScores[key];
+                    if (val < 2.85) msg += `At 2-3 hours (${key}): ROX < 2.85 (higher risk)\n`;
+                    else if (val < 4.88) msg += `At 2-3 hours (${key}): ROX 2.85-4.87 (intermediate risk)\n`;
+                    else msg += `At 2-3 hours (${key}): ROX >= 4.88 (lower need for mechanical ventilation)\n`;
+                });
+            } else if (hours === 6) {
+                Object.keys(roxScores).forEach(key => {
+                    const val = roxScores[key];
+                    if (val < 3.68) msg += `At 6 hours (${key}): ROX < 3.68 (92% specific for HFNO failure)\n`;
+                    else if (val >= 4.88) msg += `At 6 hours (${key}): ROX >= 4.88 (lower need for mechanical ventilation)\n`;
+                });
+                Object.keys(ratios).forEach(key => {
+                    if (ratios[key] < 143) msg += `At 6 hours (${key}): ratio < 143 (predictive of HFNO failure)\n`;
+                });
+            } else if (hours === 7) {
+                Object.keys(ratios).forEach(key => {
+                    if (ratios[key] < 191) msg += `At 7 hours (${key}): ratio < 191 (83% predictive of HFNO failure)\n`;
+                });
+            } else if (hours === 12) {
+                Object.keys(roxScores).forEach(key => {
+                    const val = roxScores[key];
+                    if (val >= 4.88) msg += `At 12 hours (${key}): ROX >= 4.88 (lower need for mechanical ventilation)\n`;
+                });
+            }
+            return msg + "\n";
+        },
+        buildCutoffs: (hours, roxScores, ratios, deltaEnabled) => {
+            let cutoffs = "";
+            if (hours >= 2 && hours <= 3) {
+                cutoffs += "\nCutoffs (2-3 hours):\n";
+                Object.keys(roxScores).forEach(key => {
+                    cutoffs += `${key} ROX < 2.85\n`;
+                    cutoffs += `${key} ROX 2.85-4.87 (intermediate risk)\n`;
+                    cutoffs += `${key} ROX > 4.88 (lower need for mechanical ventilation)\n`;
+                });
+            } else if (hours === 6) {
+                cutoffs += "\nCutoffs (6 hours):\n";
+                Object.keys(roxScores).forEach(key => {
+                    cutoffs += `${key} ROX < 3.68 (92% specific for HFNO failure)\n`;
+                    cutoffs += `${key} ROX > 4.88 (lower need for mechanical ventilation)\n`;
+                });
+                Object.keys(ratios).forEach(key => {
+                    cutoffs += `${key} < 143 (predictive of HFNO failure)\n`;
+                });
+            } else if (hours === 7) {
+                cutoffs += "\nCutoffs (7 hours):\n";
+                Object.keys(ratios).forEach(key => {
+                    cutoffs += `${key} < 191 (83% predictive of HFNO failure)\n`;
+                });
+            } else if (hours === 12) {
+                cutoffs += "\nCutoffs (12 hours):\n";
+                Object.keys(roxScores).forEach(key => {
+                    cutoffs += `${key} ROX > 4.88 (lower need for mechanical ventilation)\n`;
+                });
+            }
+
+            if (deltaEnabled) {
+                cutoffs += "\nDelta Cutoffs (T6 - T0):\n";
+                cutoffs += "Delta ROX < 2.08 predicts failure (94% sensitivity)\n";
+                if (ratios["S/F"] !== undefined) {
+                    cutoffs += "Delta S/F < 42 predicts failure (83% sensitivity)\n";
+                }
+            }
+            return cutoffs;
+        },
+        reset: () => {
+            document.querySelectorAll('#rox input').forEach(i => i.value = '');
+            document.getElementById('rox_timeline').value = "3";
+            document.getElementById('rox_delta_check').checked = false;
+            Calculators.ROX.toggleDelta();
+            Calculators.ROX.toggleCustomHours();
+            Calculators.ROX.setMode("PaO2");
+            Utils.hideResult('rox_result');
+        },
+        copy: () => Utils.copy(Calculators.ROX.lastRes, document.querySelector('#rox .copy-btn'))
+    };
+
+    // --- ATT ---
+    Calculators.ATT = {
+        calculate: () => {
+            const perf = Utils.getValue('att_perfusion');
+            const card = Utils.getValue('att_cardiac');
+            const resp = Utils.getValue('att_resp');
+            const eye = Utils.getValue('att_eye');
+            const skel = Utils.getValue('att_skel');
+            const neuro = Utils.getValue('att_neuro');
+            const species = document.getElementById('att_species').value;
+            const total = perf + card + resp + eye + skel + neuro;
+            Utils.setText('att_total', `${total} / 18`);
+            Utils.showResult('att_result');
+            Calculators.ATT.lastRes = `ATT Score (${species}): ${total}/18\n(Perf:${perf}, Card:${card}, Resp:${resp}, Eye:${eye}, Skel:${skel}, Neuro:${neuro})`;
+        },
+        reset: () => {
+            document.querySelectorAll('#att select').forEach(s => s.selectedIndex = 0);
+            Utils.hideResult('att_result');
+        },
+        copy: () => Utils.copy(Calculators.ATT.lastRes, document.querySelector('#att .copy-btn'))
+    };
+
+    // --- INFORMED CONSENT ---
+    Calculators.Consent = {
+        data: [
+            { id: "consent_test", text: "Risks with diagnostic tests (Test may not yield results or unexpected findings from test that changes prognosis)." },
+            { id: "consent_sedation", text: "Complications associated with sedation and anesthesia (hypotension, Acute Kidney Injury (AKI), ileus, regurgitation with subsequent aspiration pneumonia, cardiac arrhythmias, cardiac arrest, anaphylaxis, death)." },
+            { id: "consent_hospitalization", text: "Complications associated with hospitalization (Hospital acquired infections, Gastrointestinal upset, medication errors or adverse reactions, fluid overload leading to heart failure, spread of infectious disease, complications from diagnostic procedures)." },
+            { id: "consent_transfusion", text: "Complications associated with blood and plasma transfusions (Febrile Non-Hemolytic Transfusion Reaction (FNHTR), Allergic Reactions, Acute Hemolytic Transfusion Reaction, Transfusion Related Acute Lung Injury (TRALI), Transfusion-Associated Circulatory Overload (TACO), Dilutional Coagulopathy, Hypothermia, Citrate Toxicity, Infectious Disease Transmission, Air Embolism, Volume Overload, Metabolic Disturbances)." },
+            { id: "consent_fna", text: "Complications associated with fine needle aspirates (infection, hemorrhage, damage to internal organs, gastrointestinal or other organ rupture leading to morbidity and mortality, non-diagnostic results)." },
+            { id: "consent_ucath", text: "Complications associated with cystoscopy and urethral catheterization (urethral rupture, worsening UTI, bladder rupture, urethritis, urethral stricture, hemorrhage)." },
+            { id: "consent_hfno", text: "Complications associated with High Flow Nasal Oxygen (complications associated with sedation, pneumothorax, oxygen toxicity, worsening despite proper therapy, needing mechanical ventilation, rhinitis, inflammation of the upper and lower airways, aerophagia)." },
+            { id: "consent_ventilation", text: "Complications with mechanical ventilation (ventilator associated pneumonia (VAP), acute lung injury (ALI), ventilator induced lung injury (VILI), barotrauma, pneumothorax) and complications associated with intubation (pneumonia, acute lung injury, barotrauma, sepsis, accidental extubation causing respiratory compromise, requiring permanent or temporary tracheostomy, death)." },
+            { id: "consent_surgery", text: "Risks associated with surgical procedures (hemorrhage, infection, dehiscence of the incision site, prolonged hospitalization requiring further testing and care, Acute Kidney Injury (AKI), inability to repair the defect/disease, recurrence or progression of disease despite intervention, unexpected findings that change prognosis)." },
+            { id: "consent_brachy", text: "Risks associated with brachycephaly (upper airway obstruction, regurgitation, aspiration, respiratory distress requiring intubation, permanent tracheostomy, death)." },
+            { id: "consent_ngt", text: "Complications associated with nasogastric tube placement (pneumothorax, aspiration pneumonia, bleeding, infection, damage to the nasal passages and airways)." },
+            { id: "consent_ect", text: "Complications associated with dialysis and hemoperfusion (Dialysis disequilibrium syndrome, low blood pressure, low blood volume, infection of dialysis catheter, coagulopathy, clot formation), Complications associated with blood and plasma transfusions (Febrile Non-Hemolytic Transfusion Reaction (FNHTR), Allergic Reactions, Acute Hemolytic Transfusion Reaction, Transfusion Related Acute Lung Injury (TRALI), Transfusion-Associated Circulatory Overload (TACO), Dilutional Coagulopathy, Hypothermia, Citrate Toxicity, Infectious Disease Transmission, Air Embolism, Volume Overload, Metabolic Disturbances)." },
+            { id: "consent_ile", text: "Complications associated with Intralipid Therapy (pancreatitis, lipemia, anaphylaxis, hemolysis, facial pruritis, acute kidney injury, acute lung injury)." },
+            { id: "consent_vomiting", text: "Complications associated with induction of vomiting (aspiration leading to pneumonia or damage to the lungs, inability to recover ingested material, inflammation to the esophagus, mouth, and nasal passages, gastrointestinal irritation, nausea, sedation)." },
+            { id: "consent_chest_tube", text: "Complications associated with chest tube placement (hemorrhage, infection, accidental lung or vascular injury, tube misplacement or blockage, and dislodgement, localized pain and swelling at the insertion site, subcutaneous emphysema, persistent pneumothorax, re-expansion pulmonary edema, and respiratory distress, which may necessitate additional interventions or extended supportive care)." },
+            { id: "consent_long_line", text: "Complications associated with central line placement (complications associated with sedation, clot formation, bleeding, inappropriate placement, damage to vessels, infection and inflammation)." }
+        ],
+        generate: () => {
+            let output = "";
+            Calculators.Consent.data.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb && cb.checked) output += item.text + "\n\n";
+            });
+            if (!output) { alert("Please select at least one complication."); return; }
+            document.getElementById('consent_text_output').value = output.trim() + "\n";
+            Calculators.Consent.lastRes = output.trim() + "\n";
+            Utils.showResult('consent_result');
+        },
+        reset: () => {
+            document.getElementById('consent_test').checked = true;
+            document.getElementById('consent_sedation').checked = true;
+            Calculators.Consent.data.forEach(item => {
+                if (item.id !== "consent_test" && item.id !== "consent_sedation") {
+                    const cb = document.getElementById(item.id);
+                    if (cb) cb.checked = false;
+                }
+            });
+            document.getElementById('consent_text_output').value = "";
+            Utils.hideResult('consent_result');
+        },
+        copy: () => Utils.copy(Calculators.Consent.lastRes, document.querySelector('#consent .copy-btn'))
+    };
+
+    // --- HOSPITALIZATION PLAN ---
+    Calculators.HospPlan = {
+        treatments: [
+            { id: "hosplan_treat_hosp", text: "Hospitalization" },
+            { id: "hosplan_treat_iv_catheter", text: "IV catheter placement" },
+            { id: "hosplan_treat_iv_fluids", text: "IV fluids" },
+            { id: "hosplan_treat_antibiotic", text: "Antibiotic therapy" },
+            { id: "hosplan_treat_pain", text: "Pain management" },
+            { id: "hosplan_treat_ng_tube", text: "Nasogastric tube placement" },
+            { id: "hosplan_treat_cvc", text: "Central venous catheter placement" },
+            { id: "hosplan_treat_oxygen", text: "Oxygen supplementation" },
+            { id: "hosplan_treat_hf_oxygen", text: "High flow oxygen" },
+            { id: "hosplan_treat_mech_vent", text: "Mechanical ventilation" },
+            { id: "hosplan_treat_dialysis", text: "Dialysis/hemoperfusion" },
+            { id: "hosplan_treat_as_needed", text: "Treatments as needed" },
+            { id: "hosplan_treat_antiemetic", text: "Antiemetic therapy" }
+        ],
+        diagnostics: [
+            { id: "hosplan_diag_cbc", text: "Complete blood count" },
+            { id: "hosplan_diag_chemistry", text: "Serum chemistry" },
+            { id: "hosplan_diag_coags", text: "Coagulation panel" },
+            { id: "hosplan_diag_blood_type", text: "Blood Typing" },
+            { id: "hosplan_diag_abd_xray", text: "Abdominal radiographs" },
+            { id: "hosplan_diag_chest_xray", text: "Thoracic radiographs" },
+            { id: "hosplan_diag_ua", text: "Urinalysis" },
+            { id: "hosplan_diag_fna", text: "Fine needle aspirate" },
+            { id: "hosplan_diag_ultrasound", text: "Abdominal ultrasound" },
+            { id: "hosplan_diag_ct", text: "CT scan" },
+            { id: "hosplan_diag_serial", text: "Serial diagnostics as needed" }
+        ],
+        joinList: (items) => items.join(", "),
+        parseLines: (value) => value.split("\n").map(s => s.trim()).filter(Boolean),
+        generate: () => {
+            const selectedTreatments = [];
+            const selectedDiagnostics = [];
+            const outputParts = [];
+
+            const consultValue = Utils.getText('hosplan_consult').trim();
+            if (consultValue) outputParts.push(`Plan to consult ${consultValue} service`);
+
+            Calculators.HospPlan.treatments.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb && cb.checked) selectedTreatments.push(item.text);
+            });
+
+            const additionalValue = Utils.getText('hosplan_additional').trim();
+            if (additionalValue) selectedTreatments.push(...Calculators.HospPlan.parseLines(additionalValue));
+
+            Calculators.HospPlan.diagnostics.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb && cb.checked) selectedDiagnostics.push(item.text);
+            });
+
+            const miscValue = Utils.getText('hosplan_misc').trim();
+            if (miscValue) selectedDiagnostics.push(...Calculators.HospPlan.parseLines(miscValue));
+
+            if (selectedTreatments.length) {
+                const treatmentText = Calculators.HospPlan.joinList(selectedTreatments);
+                outputParts.push(`Treatments (${treatmentText})`);
+            }
+            if (selectedDiagnostics.length) {
+                const diagText = Calculators.HospPlan.joinList(selectedDiagnostics);
+                outputParts.push(`Diagnostics (${diagText})`);
+            }
+
+            const transferValue = Utils.getText('hosplan_transfer').trim();
+            if (transferValue) outputParts.push(`with transfer to ${transferValue} service`);
+
+            if (!outputParts.length) {
+                alert("Please make at least one selection or enter a service.");
+                return;
+            }
+
+            const fullText = outputParts.join(" ");
+            document.getElementById('hosplan_text_output').value = fullText;
+            Calculators.HospPlan.lastRes = fullText;
+            Utils.showResult('hosplan_result');
+        },
+        reset: () => {
+            Calculators.HospPlan.treatments.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (!cb) return;
+                cb.checked = ["hosplan_treat_hosp", "hosplan_treat_iv_catheter", "hosplan_treat_as_needed"].includes(item.id);
+            });
+            Calculators.HospPlan.diagnostics.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (!cb) return;
+                cb.checked = item.id === "hosplan_diag_serial";
+            });
+            document.getElementById('hosplan_additional').value = "";
+            document.getElementById('hosplan_misc').value = "";
+            document.getElementById('hosplan_consult').value = "";
+            document.getElementById('hosplan_transfer').value = "";
+            document.getElementById('hosplan_text_output').value = "";
+            Utils.hideResult('hosplan_result');
+        },
+        copy: () => Utils.copy(Calculators.HospPlan.lastRes, document.querySelector('#hosplan .copy-btn'))
+    };
+
+    // --- TREATMENT SHEET CONTINGENCIES ---
+    Calculators.Treatment = {
+        protocolText: {
+            insulin_protocol_1:
+`Protocol 1 - Insulin Monitoring
+BG > 250: 0.1 U/kg/hr, Dextrose d/c
+BG 200-249: 0.075 U/kg/hr, Dextrose 2.5%
+BG 150-199: 0.05 U/kg/hr, Dextrose 2.5%
+BG 100-149: 0.025 U/kg/hr, Dextrose 5%
+BG < 100: d/c until next check, Dextrose 5%`,
+            insulin_protocol_2:
+`Protocol 2 (DKA) - Infusion Rate Adjustment
+BG > 250 mg/dL: Insulin 10 mL/hr, Dextrose none
+BG 200-250 mg/dL: Insulin 7 mL/hr, Dextrose 2.5%
+BG 150-200 mg/dL: Insulin 5 mL/hr, Dextrose 2.5%
+BG 100-150 mg/dL: Insulin 5 mL/hr, Dextrose 5%
+BG < 100 mg/dL: Stop insulin, Dextrose 5%`,
+            potassium_table:
+`Potassium Supplementation Table
+K < 2.0: add 20 mEq to 250 mL / 80 mEq to 1 L, max 6 mL/kg/hr
+K 2.1-2.5: add 15 mEq to 250 mL / 60 mEq to 1 L, max 8 mL/kg/hr
+K 2.6-3.0: add 10 mEq to 250 mL / 40 mEq to 1 L, max 12 mL/kg/hr
+K 3.1-3.5: add 7 mEq to 250 mL / 28 mEq to 1 L, max 18 mL/kg/hr
+K 3.6-5.0: add 5 mEq to 250 mL / 20 mEq to 1 L, max 25 mL/kg/hr`,
+            pressor_osc:
+`Norepinephrine Sliding Scale - Oscillometric
+MAP > 95: decrease norepinephrine by 0.1 mcg/kg/min
+MAP 70-95: maintain current dose
+MAP < 70: increase norepinephrine by 0.1 mcg/kg/min`,
+            pressor_doppler:
+`Norepinephrine Sliding Scale - Doppler
+Doppler BP > 110: decrease norepinephrine by 0.1 mcg/kg/min
+Doppler BP 80-100: maintain current dose
+Doppler BP < 80: increase norepinephrine by 0.1 mcg/kg/min`,
+            heparin_cri:
+`Heparin CRI - Titration Protocol
+80 U/kg bolus over 2 min, then 600 U/kg/day (25 U/kg/hr)
+Record total volume infused in treatment notes (mandatory)
+< 1.3-1.5 x baseline: add 400 U/kg/day (41 U/kg/hr)
+1.3-1.5 x baseline: OK (no change)
+> 1.5 x baseline: minus 300 U/kg/day (-12.5 U/kg/hr)
+> 2 x baseline: stop for 1 hr or -500 U/kg/day (20 U/kg/hr)
+If close to baseline, give 20-30 U/kg bolus to bump without increasing CRI rate`,
+            amlodipine_loading:
+`Amlodipine Loading
+Cat:
+- Start with 1/4 tablet (2.5/4 = 0.625 = 0.1 mg/kg), check in 1-2 hours
+- If still high give another 1/4 tablet (0.625 mg), repeat until BP < 180
+- Then in 12 hours repeat total dose that was titrate
+Dog:
+- 0.1 mg/kg amlodipine PO q 1 hr until BP < 160 mm Hg, or a total of 5 doses are given (0.5 mg/kg)
+Goal:
+- Minimal goal: prehypertensive SBP < 160
+- End-organ damage noted in dogs SBP > 160 mmHg
+- Ideal goal: normotensive SBP < 140
+Maintenance Instructions:
+- If systolic BP > 160, give
+- If systolic BP 130-159, ask clinician. report last SBP
+- If systolic BP < 130, skip and alert clinician`
+        },
+        potassiumMap: {
+            lt2: { add250: 20, add1000: 80, maxRate: 6 },
+            "2_1_2_5": { add250: 15, add1000: 60, maxRate: 8 },
+            "2_6_3_0": { add250: 10, add1000: 40, maxRate: 12 },
+            "3_1_3_5": { add250: 7, add1000: 28, maxRate: 18 },
+            "3_6_5_0": { add250: 5, add1000: 20, maxRate: 25 }
+        },
+        copy: (key, btn) => {
+            const text = Calculators.Treatment.protocolText[key];
+            if (!text) { alert("Protocol not found."); return; }
+            Utils.copy(text, btn);
+        },
+        calcK: () => {
+            const level = document.getElementById('k_supp_level').value;
+            const weight = Utils.getValue('k_supp_weight');
+            if (!weight || weight <= 0) { alert("Please enter a valid weight."); return; }
+
+            const row = Calculators.Treatment.potassiumMap[level];
+            const maxRate = row.maxRate * weight;
+            document.getElementById('k_supp_250').innerText = `${row.add250} mEq`;
+            document.getElementById('k_supp_1000').innerText = `${row.add1000} mEq`;
+            document.getElementById('k_supp_rate').innerText = `${maxRate.toFixed(1)} mL/hr (max ${row.maxRate} mL/kg/hr)`;
+            Utils.showResult('k_supp_result');
+        },
+        toggleKMode: () => {
+            const mode = document.querySelector('input[name="k_supp_mode"]:checked').value;
+            const tableMode = document.getElementById('k_supp_table_mode');
+            const doseMode = document.getElementById('k_supp_dose_mode');
+
+            if (mode === 'table') {
+                tableMode.classList.remove('hidden');
+                doseMode.classList.add('hidden');
+                Utils.hideResult('k_dose_result');
+            } else {
+                tableMode.classList.add('hidden');
+                doseMode.classList.remove('hidden');
+                Utils.hideResult('k_supp_result');
+            }
+        },
+        calcKByDose: () => {
+            const dose = Utils.getValue('k_dose_mEqkg');
+            const weight = Utils.getValue('k_dose_weight');
+            const rate = Utils.getValue('k_dose_rate');
+            const volume = Utils.getValue('k_dose_volume');
+
+            if (!dose || dose <= 0) { alert("Please enter a valid dose."); return; }
+            if (!weight || weight <= 0) { alert("Please enter a valid weight."); return; }
+            if (!rate || rate <= 0) { alert("Please enter a valid fluid rate."); return; }
+            if (!volume || volume <= 0) { alert("Please enter a valid bag volume."); return; }
+
+            const meqPerL = (dose * weight * 1000) / rate;
+            const addToBag = meqPerL * (volume / 1000);
+            const concEl = document.getElementById('k_dose_conc');
+            const warnEl = document.getElementById('k_dose_warn');
+            concEl.innerText = `${meqPerL.toFixed(2)} mEq/L`;
+            document.getElementById('k_dose_math').innerText =
+                `mEq/L = (${dose} x ${weight} x 1000) / ${rate} = ${meqPerL.toFixed(2)}; ` +
+                `mEq to add = ${meqPerL.toFixed(2)} x (${volume} / 1000) = ${addToBag.toFixed(2)}`;
+            document.getElementById('k_dose_add').innerText = `${addToBag.toFixed(2)} mEq`;
+            if (meqPerL > 60) {
+                concEl.style.color = "#C62828";
+                concEl.style.fontWeight = "700";
+                warnEl.style.color = "#C62828";
+                warnEl.style.fontWeight = "700";
+                warnEl.innerText = "Warning: exceeds 60 mEq/L";
+            } else {
+                concEl.style.color = "";
+                concEl.style.fontWeight = "";
+                warnEl.style.color = "";
+                warnEl.style.fontWeight = "";
+                warnEl.innerText = "Below 60 mEq/L";
+            }
+            Utils.showResult('k_dose_result');
+        }
+    };
+
+    // --- KIRBY'S RULE OF 20 ---
+    Calculators.RuleOf20 = {
+        init: () => {
+            const list = document.getElementById('rule20_list');
+            if (!list) return;
+            list.addEventListener('click', (event) => {
+                const target = event.target;
+                if (target && target.matches('button[data-rule20]')) {
+                    const isOn = target.classList.toggle('is-on');
+                    target.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+                    Calculators.RuleOf20.checkAll();
+                }
+            });
+        },
+        checkAll: () => {
+            const checks = document.querySelectorAll('button[data-rule20]');
+            const allChecked = Array.from(checks).every(btn => btn.classList.contains('is-on'));
+            const result = document.getElementById('rule20_result');
+            if (!result) return;
+            if (allChecked) result.classList.remove('hidden');
+            else result.classList.add('hidden');
+        },
+        reset: () => {
+            document.querySelectorAll('button[data-rule20]').forEach(btn => {
+                btn.classList.remove('is-on');
+                btn.setAttribute('aria-pressed', 'false');
+            });
+            const result = document.getElementById('rule20_result');
+            if (result) result.classList.add('hidden');
+        }
+    };
+
+    // --- OUTPATIENT MEDICATIONS ---
+    Calculators.OutpatientMeds = {
+        sideEffects: {
+            "Ondansetron": "Common side effects may include headache, drowsiness, and constipation.",
+            "Maropitant": "May cause decreased appetite, drowsiness, and lethargy.",
+            "Clavamox": "May cause diarrhea, vomiting, and loss of appetite.",
+            "Prednisone": "May cause increased thirst, hunger, and urination. Long-term use requires careful monitoring.",
+            "Carprofen": "Watch for vomiting, diarrhea, or changes in appetite. Report any tarry stools or unusual bleeding.",
+            "Trazodone": "May cause sedation, lethargy, and gastrointestinal upset.",
+            "Gabapentin": "Common side effects include sedation and mild incoordination.",
+            "pimobendan (Vetmedin)": "This is a medication which increases the heart's pumping ability and dilates blood vessels (decreasing the workload on the heart). Side effects are rare but can include GI upset.",
+            "clopidogrel (Plavix)": "This is a blood thinner medication that inhibits platelet function. This medication is generally well tolerated, but side effects include GI upset and increased risk of bleeding. *This medication is bitter when cut.* Cover in an empty gel capsule or hide completely in a treat to mask bitter taste.",
+            "doxycycline": "May cause diarrhea, vomiting, and loss of appetite.",
+            "enrofloxacin": "This is an antibiotic. Side effects include vomiting and diarrhea. This medication is best given on an empty stomach. If GI upset occurs, you may give with small amount of food.",
+            "sucralfate": "Side effects are rare"
+        },
+        proviableNote: "Important note: PASTE:\nGIVE 2 TO 3 TIMES DAILY FOR THE FOLLOWING WEIGHT RANGES:\nDogs 21-50 lbs: 3-4 mL\nDogs > 50 lbs: 5 mL\nPaste should be given for 48 to 72 hours.\nCAPSULES:\nGIVE ONE CAPSULE BY MOUTH ONCE DAILY UNTIL FINISHED.",
+        onMedChange: () => {
+            const med = document.getElementById('out_med_select').value;
+            const otherGroup = document.getElementById('out_med_other_group');
+            const sideEffects = document.getElementById('out_side_effects');
+            const proviableGroup = document.getElementById('out_proviable_paste_group');
+            const concGroup = document.getElementById('out_conc_group');
+            const concGrid = document.getElementById('out_conc_grid');
+            const doseFreqGroup = document.getElementById('out_dose_freq_group');
+            const durationGroup = document.getElementById('out_duration_group');
+            const nextDoseGroup = document.getElementById('out_next_dose_group');
+            const sideEffectsGroup = document.getElementById('out_side_effects_group');
+            const isMirtazipine = med === "Mirtazipine";
+
+            [otherGroup, concGrid, doseFreqGroup, durationGroup, nextDoseGroup, sideEffectsGroup].forEach(el => {
+                if (el) el.classList.remove('hidden');
+            });
+
+            if (isMirtazipine) {
+                [otherGroup, concGrid, doseFreqGroup, durationGroup, nextDoseGroup, sideEffectsGroup].forEach(el => {
+                    if (el) el.classList.add('hidden');
+                });
+                proviableGroup.classList.add('hidden');
+                concGroup.classList.add('hidden');
+                document.getElementById('out_proviable_paste_ml').value = "";
+                document.getElementById('out_conc_value').value = "";
+                sideEffects.value = "";
+                return;
+            }
+
+            if (med === "Other") {
+                otherGroup.classList.remove('hidden');
+                sideEffects.value = "No predefined side effects available for custom medication.";
+            } else {
+                otherGroup.classList.add('hidden');
+                if (med === "Proviable Forte Kit") {
+                    sideEffects.value = Calculators.OutpatientMeds.proviableNote;
+                } else {
+                    sideEffects.value = Calculators.OutpatientMeds.sideEffects[med] || "";
+                }
+            }
+
+            if (med === "Proviable Forte Kit") {
+                proviableGroup.classList.remove('hidden');
+                concGroup.classList.add('hidden');
+                document.getElementById('out_conc_value').value = "";
+            } else {
+                proviableGroup.classList.add('hidden');
+                concGroup.classList.remove('hidden');
+                document.getElementById('out_proviable_paste_ml').value = "";
+            }
+        },
+        toggleDuration: () => {
+            const untilDirected = document.getElementById('out_until_directed');
+            const untilGone = document.getElementById('out_until_gone');
+            const duration = document.getElementById('out_duration');
+
+            if (untilDirected.checked) {
+                untilGone.checked = false;
+                duration.disabled = true;
+                duration.value = "";
+            } else if (untilGone.checked) {
+                untilDirected.checked = false;
+                duration.disabled = true;
+                duration.value = "";
+            } else {
+                duration.disabled = false;
+            }
+        },
+        generate: () => {
+            const medSelect = document.getElementById('out_med_select');
+            const med = medSelect.value;
+            if (med === "Mirtazipine") {
+                let text = "**Mirtazapine Transdermal solution - 5 grams -** Apply a 1.5 cm strip on the skin of the inner ear every 24 hours as needed for appetite stimulation\n";
+                text += "  - The most common side effects of this medication in cats are agitation, vocalization, restlessness, irritation of the ear, and vomiting. If you notice any of these signs, please contact MSU-CVM or your veterinarian. *Please give this medication 30-45 minutes before giving food*";
+                document.getElementById('out_med_text_output').value = text;
+                Calculators.OutpatientMeds.lastRes = text;
+                Utils.showResult('out_med_result');
+                return;
+            }
+            const other = Utils.getText('out_med_other').trim();
+            const medName = (med === "Other") ? other : med;
+            const concVal = Utils.getText('out_conc_value').trim();
+            const concUnit = document.getElementById('out_conc_unit').value;
+            const doseAmount = Utils.getText('out_dose_amount').trim();
+            const doseUnit = document.getElementById('out_dose_unit').value;
+            const frequency = Utils.getText('out_frequency').trim();
+            const duration = Utils.getText('out_duration').trim();
+            const untilDirected = document.getElementById('out_until_directed').checked;
+            const untilGone = document.getElementById('out_until_gone').checked;
+            const nextDose = Utils.getText('out_next_dose').trim();
+            const pasteDose = Utils.getText('out_proviable_paste_ml').trim();
+
+            if (!medName) { alert("Please select or enter a medication name."); return; }
+            if (med !== "Proviable Forte Kit" && !concVal) { alert("Please enter the concentration."); return; }
+            if (!doseAmount) { alert("Please enter the dose amount."); return; }
+            if (!frequency) { alert("Please enter the frequency."); return; }
+            if (!untilDirected && !untilGone && !duration) { alert("Please enter the duration or select a duration option."); return; }
+            if (!nextDose) { alert("Please enter when the next dose is due."); return; }
+            if (med === "Proviable Forte Kit" && !pasteDose) { alert("Please enter the paste mL per dose for Proviable Forte Kit."); return; }
+
+            let durationText = "";
+            if (untilDirected) durationText = "until otherwise directed";
+            else if (untilGone) durationText = "until gone";
+            else durationText = `${duration} days`;
+
+            let text = "";
+            if (med === "Proviable Forte Kit") {
+                text = `**${medName}:** `;
+            } else {
+                text = `**${medName} (${concVal} ${concUnit}):** `;
+            }
+            text += `Please give ${doseAmount} ${doseUnit} by mouth ${frequency} times per day for ${durationText}\n`;
+            text += `  - **Next Dose Due:** ${nextDose}\n`;
+
+            if (med === "Proviable Forte Kit") {
+                text += `  - **Paste:** ${pasteDose} mL per dose\n`;
+                text += `  - **Important Note:** ${Calculators.OutpatientMeds.proviableNote.replace(/\n/g, " ")}\n`;
+            }
+
+            const se = Utils.getText('out_side_effects').trim();
+            if (med !== "Other" && se) {
+                text += `  - ${se}\n`;
+            }
+
+            document.getElementById('out_med_text_output').value = text;
+            Calculators.OutpatientMeds.lastRes = text;
+            Utils.showResult('out_med_result');
+        },
+        reset: () => {
+            document.getElementById('out_med_select').value = "Ondansetron";
+            document.getElementById('out_med_other').value = "";
+            document.getElementById('out_conc_value').value = "";
+            document.getElementById('out_conc_unit').value = "mg";
+            document.getElementById('out_dose_amount').value = "";
+            document.getElementById('out_dose_unit').value = "tablet(s)";
+            document.getElementById('out_frequency').value = "";
+            document.getElementById('out_duration').value = "";
+            document.getElementById('out_until_directed').checked = false;
+            document.getElementById('out_until_gone').checked = false;
+            document.getElementById('out_next_dose').value = "";
+            document.getElementById('out_proviable_paste_ml').value = "";
+            document.getElementById('out_med_text_output').value = "";
+            document.getElementById('out_duration').disabled = false;
+            Utils.hideResult('out_med_result');
+            Calculators.OutpatientMeds.onMedChange();
+        },
+        copy: () => Utils.copy(Calculators.OutpatientMeds.lastRes, document.querySelector('#outpatient_meds .copy-btn'))
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        Calculators.NutritionSupport.init();
+        Calculators.Consent.reset();
+        Calculators.HospPlan.reset();
+        Calculators.OutpatientMeds.reset();
+        Calculators.Sedation.reset();
+        Calculators.ROX.reset();
+        Calculators.RuleOf20.init();
+        Utils.hideResult('k_supp_result');
+    });
+    </script>
+</body>
 </html>
