@@ -424,6 +424,113 @@
         }
         .checkbox-item input[type="checkbox"] { margin-top: 0.2rem; }
 
+        .selection-section {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: #fcfdfd;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .selection-section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .selection-count {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .selection-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.5rem 0 0.85rem;
+        }
+
+        .mini-btn {
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: var(--text-main);
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.18s ease;
+        }
+
+        .mini-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.7rem;
+        }
+
+        .option-tile {
+            position: relative;
+            display: block;
+            cursor: pointer;
+        }
+
+        .option-tile input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .option-tile-body {
+            min-height: 64px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #fff;
+            padding: 0.85rem 0.95rem;
+            font-size: 0.94rem;
+            font-weight: 600;
+            line-height: 1.35;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            transition: all 0.18s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .option-tile:hover .option-tile-body {
+            border-color: var(--primary);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+            transform: translateY(-1px);
+        }
+
+        .option-tile input[type="checkbox"]:checked + .option-tile-body {
+            border-color: #81c784;
+            background: #e8f5e9;
+            color: #1b5e20;
+            box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.12);
+        }
+
+        .option-tile input[type="checkbox"]:focus-visible + .option-tile-body {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.18);
+        }
+
+        .selection-summary {
+            margin-top: 0.85rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
         .rule-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -469,10 +576,27 @@
             min-height: 80px;
         }
 
+        .app-footer {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem 2rem;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        .app-footer-inner {
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.9rem;
+            text-align: center;
+            line-height: 1.6;
+        }
+
         /* Mobile */
         @media (max-width: 600px) {
             .app-header { padding: 0 1rem; }
             #content-area { padding: 1rem; }
+            .app-footer { padding: 0 1rem 1rem; }
             .custom-diet-row { flex-direction: column; align-items: stretch; }
             .btn-add-diet { margin-top: 0.5rem; }
             .inline-row { flex-direction: column; align-items: stretch; }
@@ -488,6 +612,11 @@
             padding: 1rem 1.25rem;
             background: #fff;
             margin-bottom: 1.5rem;
+        }
+
+        .protocol-block.is-focused {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(27, 94, 32, 0.12);
         }
 
         .protocol-block h3 {
@@ -565,6 +694,10 @@
                         <h3>Hospitalization Plan</h3>
                         <p>Build a treatment and diagnostic plan for hospitalized patients.</p>
                     </div>
+                    <div class="tool-card" onclick="switchTab('outpatient_meds')">
+                        <h3>Outpatient Medications</h3>
+                        <p>Generate discharge medication instructions with side effects and timing.</p>
+                    </div>
                 </div>
             </div>
 
@@ -585,7 +718,11 @@
                     </div>
                     <div class="tool-card" onclick="switchTab('vampire')">
                         <h3>Blood Draw Volume</h3>
-                        <p>Calculate safe blood draw limits based on weight.</p>
+                        <p>Calculate safe blood draw limits and estimate cumulative blood loss from testing.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('bsa')">
+                        <h3>BSA Calculator</h3>
+                        <p>Estimate body surface area by species and weight, with quick chart lookup.</p>
                     </div>
                     <div class="tool-card" onclick="switchTab('edd')">
                         <h3>EDD (LVDd)</h3>
@@ -600,6 +737,30 @@
                     <div class="tool-card" onclick="switchTab('treatment_contingencies')">
                         <h3>Treatment Sheet Contingencies</h3>
                         <p>Insulin, potassium, pressor, and heparin CRI protocols.</p>
+                    </div>
+                    <div class="tool-card" onclick="openTreatmentBlock('tx_insulin')">
+                        <h3>Insulin Monitoring</h3>
+                        <p>Open insulin monitoring protocols directly.</p>
+                    </div>
+                    <div class="tool-card" onclick="openTreatmentBlock('tx_potassium_table')">
+                        <h3>Potassium Table</h3>
+                        <p>Jump straight to the potassium supplementation reference table.</p>
+                    </div>
+                    <div class="tool-card" onclick="openTreatmentBlock('tx_potassium_calc')">
+                        <h3>Potassium Calculator</h3>
+                        <p>Open the potassium supplementation calculator directly.</p>
+                    </div>
+                    <div class="tool-card" onclick="openTreatmentBlock('tx_pressor')">
+                        <h3>Pressor Monitoring</h3>
+                        <p>Jump to the norepinephrine sliding-scale instructions.</p>
+                    </div>
+                    <div class="tool-card" onclick="openTreatmentBlock('tx_amlodipine')">
+                        <h3>Amlodipine Loading</h3>
+                        <p>Open the hypertension loading and maintenance guidance.</p>
+                    </div>
+                    <div class="tool-card" onclick="openTreatmentBlock('tx_heparin')">
+                        <h3>Heparin CRI</h3>
+                        <p>Jump directly to the heparin titration protocol.</p>
                     </div>
                 </div>
             </div>
@@ -974,17 +1135,41 @@
                 <button class="reset-btn" onclick="Calculators.Vampire.reset()">Reset</button>
             </div>
             <div class="calc-form">
-                <div class="form-group">
-                    <label>Species</label>
-                    <select id="vamp_species">
-                        <option value="Dog">Dog</option>
-                        <option value="Cat">Cat</option>
-                    </select>
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Species</label>
+                        <select id="vamp_species">
+                            <option value="Dog">Dog</option>
+                            <option value="Cat">Cat</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="vamp_weight" placeholder="e.g. 3.68" step="0.01">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Weight (kg)</label>
-                    <input type="number" id="vamp_weight" placeholder="e.g. 3.68" step="0.01">
+
+                <div class="subsection-card" style="margin-top:1rem;">
+                    <h3 style="margin-top:0;">Blood Loss Estimator</h3>
+                    <div class="helper-text" style="margin-top:0;">Optional: estimate sample volume removed from repeated testing.</div>
+                    <div class="calc-grid" style="margin-top:1rem;">
+                        <div class="form-group">
+                            <label>CBC/Chemistry Runs</label>
+                            <input type="number" id="vamp_cbc_runs" placeholder="e.g. 3" step="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Blood Gas Runs</label>
+                            <input type="number" id="vamp_gas_runs" placeholder="e.g. 2" step="1" min="0">
+                        </div>
+                    </div>
+                    <div class="checklist">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="vamp_vector_panel">
+                            Vector borne panel
+                        </label>
+                    </div>
                 </div>
+
                 <button class="calculate-btn" onclick="Calculators.Vampire.calculate()">Calculate Safe Volumes</button>
             </div>
 
@@ -992,6 +1177,48 @@
                 <h3 style="margin-bottom:0.5rem; color:var(--primary);">Safe Blood Volumes</h3>
                 <textarea id="vamp_text_output" class="text-output-box" readonly></textarea>
                 <button class="copy-btn" onclick="Calculators.Vampire.copy()">Copy Results</button>
+            </div>
+        </section>
+
+        <!-- BODY SURFACE AREA (BSA) CALCULATOR -->
+        <section id="bsa" class="calculator-section">
+            <div class="calc-header">
+                <h2>Body Surface Area Calculator</h2>
+                <button class="reset-btn" onclick="Calculators.BSA.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Species</label>
+                        <select id="bsa_species" onchange="Calculators.BSA.updateChart()">
+                            <option value="Dog">Dog</option>
+                            <option value="Cat">Cat</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="bsa_weight" placeholder="e.g. 12.5" step="0.1" min="0.1">
+                    </div>
+                </div>
+                <div class="button-row">
+                    <button class="calculate-btn" type="button" onclick="Calculators.BSA.calculate()">Calculate BSA</button>
+                    <button class="calculate-btn" type="button" onclick="Calculators.BSA.toggleChart()">Show Chart</button>
+                </div>
+            </div>
+
+            <div id="bsa_result" class="result-box hidden">
+                <h3 style="margin-bottom:0.5rem; color:var(--primary);">BSA Result</h3>
+                <div class="result-row"><span>Species</span><strong id="bsa_species_result">--</strong></div>
+                <div class="result-row"><span>Weight</span><strong id="bsa_weight_result">--</strong></div>
+                <div class="result-row"><span>BSA</span><strong id="bsa_value_result">--</strong></div>
+                <div class="result-row"><span>Equation</span><strong id="bsa_equation_result">--</strong></div>
+                <button class="copy-btn" onclick="Calculators.BSA.copy()">Copy Result</button>
+            </div>
+
+            <div id="bsa_chart" class="result-box hidden">
+                <h3 style="margin-bottom:0.5rem; color:var(--primary);">Reference Chart</h3>
+                <p class="small-text" id="bsa_chart_label" style="color:var(--text-muted); margin-bottom:0.5rem;"></p>
+                <textarea id="bsa_chart_output" class="text-output-box" readonly></textarea>
             </div>
         </section>
 
@@ -1492,23 +1719,53 @@
             <div class="calc-form">
                 <div class="form-group">
                     <label>Select complications</label>
-                    <div class="checklist">
-                        <label class="checkbox-item"><input type="checkbox" id="consent_test" checked> Diagnostic Tests</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_sedation" checked> Sedation and Anesthesia</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_hospitalization"> Hospitalization</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_transfusion"> Blood and Plasma Transfusions</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_fna"> Fine Needle Aspirates</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_ucath"> Cystoscopy and Urethral Catheterization</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_hfno"> High Flow Nasal Oxygen</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_ventilation"> Mechanical Ventilation</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_surgery"> Surgical Procedures</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_brachy"> Brachycephaly</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_ngt"> Nasogastric Tube Placement</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_ect"> Dialysis and Hemoperfusion</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_ile"> Intralipid Therapy</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_vomiting"> Emesis</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_chest_tube"> Chest Tube Placement</label>
-                        <label class="checkbox-item"><input type="checkbox" id="consent_long_line"> Central Catheter Placement</label>
+                    <div class="selection-toolbar">
+                        <button class="mini-btn" type="button" onclick="Calculators.Consent.applyPreset('recommended')">Recommended Defaults</button>
+                        <button class="mini-btn" type="button" onclick="Calculators.Consent.setAll(true)">Select All</button>
+                        <button class="mini-btn" type="button" onclick="Calculators.Consent.setAll(false)">Clear All</button>
+                    </div>
+                    <div class="selection-section">
+                        <div class="selection-section-title">
+                            <strong>Current Selection</strong>
+                            <span class="selection-count" id="consent_count">0 selected</span>
+                        </div>
+                        <div class="selection-summary" id="consent_summary">No complications selected.</div>
+                    </div>
+                    <div class="selection-section">
+                        <div class="selection-section-title"><strong>Diagnostics and Core Hospital Risks</strong></div>
+                        <div class="option-grid">
+                            <label class="option-tile"><input type="checkbox" id="consent_test" checked><span class="option-tile-body">Diagnostic Tests</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_sedation" checked><span class="option-tile-body">Sedation and Anesthesia</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_hospitalization"><span class="option-tile-body">Hospitalization</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_transfusion"><span class="option-tile-body">Blood and Plasma Transfusions</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_vomiting"><span class="option-tile-body">Emesis</span></label>
+                        </div>
+                    </div>
+                    <div class="selection-section">
+                        <div class="selection-section-title"><strong>Procedures, Tubes, and Catheters</strong></div>
+                        <div class="option-grid">
+                            <label class="option-tile"><input type="checkbox" id="consent_fna"><span class="option-tile-body">Fine Needle Aspirates</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_ucath"><span class="option-tile-body">Cystoscopy and Urethral Catheterization</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_surgery"><span class="option-tile-body">Surgical Procedures</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_ngt"><span class="option-tile-body">Nasogastric Tube Placement</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_chest_tube"><span class="option-tile-body">Chest Tube Placement</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_long_line"><span class="option-tile-body">Central Catheter Placement</span></label>
+                        </div>
+                    </div>
+                    <div class="selection-section">
+                        <div class="selection-section-title"><strong>Respiratory and Advanced Support</strong></div>
+                        <div class="option-grid">
+                            <label class="option-tile"><input type="checkbox" id="consent_hfno"><span class="option-tile-body">High Flow Nasal Oxygen</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_ventilation"><span class="option-tile-body">Mechanical Ventilation</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_ect"><span class="option-tile-body">Dialysis and Hemoperfusion</span></label>
+                            <label class="option-tile"><input type="checkbox" id="consent_ile"><span class="option-tile-body">Intralipid Therapy</span></label>
+                        </div>
+                    </div>
+                    <div class="selection-section">
+                        <div class="selection-section-title"><strong>Patient-Specific Risk Modifier</strong></div>
+                        <div class="option-grid">
+                            <label class="option-tile"><input type="checkbox" id="consent_brachy"><span class="option-tile-body">Brachycephaly</span></label>
+                        </div>
                     </div>
                 </div>
                 <button class="calculate-btn" onclick="Calculators.Consent.generate()">Generate Consent Text</button>
@@ -1527,24 +1784,51 @@
                 <button class="reset-btn" onclick="Calculators.HospPlan.reset()">Reset</button>
             </div>
             <div class="calc-form">
+                <div class="selection-toolbar" style="margin-top:0;">
+                    <button class="mini-btn" type="button" onclick="Calculators.HospPlan.applyPreset('standard')">Standard Inpatient Defaults</button>
+                    <button class="mini-btn" type="button" onclick="Calculators.HospPlan.applyPreset('icu')">ICU Defaults</button>
+                    <button class="mini-btn" type="button" onclick="Calculators.HospPlan.setAll(true)">Select All</button>
+                    <button class="mini-btn" type="button" onclick="Calculators.HospPlan.setAll(false)">Clear All</button>
+                </div>
                 <div class="calc-grid">
                     <div>
-                        <div class="form-group">
-                            <label>Treatment options</label>
-                            <div class="checklist">
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_hosp" checked> Hospitalization</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_iv_catheter" checked> IV catheter placement</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_iv_fluids"> IV fluids</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_antibiotic"> Antibiotic therapy</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_pain"> Pain management</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_ng_tube"> Nasogastric tube placement</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_cvc"> Central venous catheter placement</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_oxygen"> Oxygen supplementation</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_hf_oxygen"> High flow oxygen</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_mech_vent"> Mechanical ventilation</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_dialysis"> Dialysis/hemoperfusion</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_as_needed" checked> Treatments as needed</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_treat_antiemetic"> Antiemetic therapy</label>
+                        <div class="selection-section">
+                            <div class="selection-section-title">
+                                <strong>Treatments</strong>
+                                <span class="selection-count" id="hosplan_treat_count">0 selected</span>
+                            </div>
+                            <div class="selection-toolbar">
+                                <button class="mini-btn" type="button" onclick="Calculators.HospPlan.setGroup('treatments', true)">Select All Treatments</button>
+                                <button class="mini-btn" type="button" onclick="Calculators.HospPlan.setGroup('treatments', false)">Clear Treatments</button>
+                            </div>
+                            <div class="selection-summary" id="hosplan_treat_summary">No treatments selected.</div>
+                        </div>
+                        <div class="selection-section">
+                            <div class="selection-section-title"><strong>Core Supportive Care</strong></div>
+                            <div class="option-grid">
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_hosp" checked><span class="option-tile-body">Hospitalization</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_iv_fluids"><span class="option-tile-body">IV fluids</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_antibiotic"><span class="option-tile-body">Antibiotic therapy</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_pain"><span class="option-tile-body">Pain management</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_antiemetic"><span class="option-tile-body">Antiemetic therapy</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_as_needed" checked><span class="option-tile-body">Treatments as needed</span></label>
+                            </div>
+                        </div>
+                        <div class="selection-section">
+                            <div class="selection-section-title"><strong>Access and Procedures</strong></div>
+                            <div class="option-grid">
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_iv_catheter" checked><span class="option-tile-body">IV catheter placement</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_ng_tube"><span class="option-tile-body">Nasogastric tube placement</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_cvc"><span class="option-tile-body">Central venous catheter placement</span></label>
+                            </div>
+                        </div>
+                        <div class="selection-section">
+                            <div class="selection-section-title"><strong>Respiratory and Advanced Support</strong></div>
+                            <div class="option-grid">
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_oxygen"><span class="option-tile-body">Oxygen supplementation</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_hf_oxygen"><span class="option-tile-body">High flow oxygen</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_mech_vent"><span class="option-tile-body">Mechanical ventilation</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_treat_dialysis"><span class="option-tile-body">Dialysis/hemoperfusion</span></label>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1553,20 +1837,36 @@
                         </div>
                     </div>
                     <div>
-                        <div class="form-group">
-                            <label>Diagnostic options</label>
-                            <div class="checklist">
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_cbc"> Complete blood count</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_chemistry"> Serum chemistry</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_coags"> Coagulation panel</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_blood_type"> Blood Typing</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_abd_xray"> Abdominal radiographs</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_chest_xray"> Thoracic radiographs</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_ua"> Urinalysis</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_fna"> Fine needle aspirate</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_ultrasound"> Abdominal ultrasound</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_ct"> CT scan</label>
-                                <label class="checkbox-item"><input type="checkbox" id="hosplan_diag_serial" checked> Serial diagnostics as needed</label>
+                        <div class="selection-section">
+                            <div class="selection-section-title">
+                                <strong>Diagnostics</strong>
+                                <span class="selection-count" id="hosplan_diag_count">0 selected</span>
+                            </div>
+                            <div class="selection-toolbar">
+                                <button class="mini-btn" type="button" onclick="Calculators.HospPlan.setGroup('diagnostics', true)">Select All Diagnostics</button>
+                                <button class="mini-btn" type="button" onclick="Calculators.HospPlan.setGroup('diagnostics', false)">Clear Diagnostics</button>
+                            </div>
+                            <div class="selection-summary" id="hosplan_diag_summary">No diagnostics selected.</div>
+                        </div>
+                        <div class="selection-section">
+                            <div class="selection-section-title"><strong>Labwork and Monitoring</strong></div>
+                            <div class="option-grid">
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_cbc"><span class="option-tile-body">Complete blood count</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_chemistry"><span class="option-tile-body">Serum chemistry</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_coags"><span class="option-tile-body">Coagulation panel</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_blood_type"><span class="option-tile-body">Blood Typing</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_ua"><span class="option-tile-body">Urinalysis</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_serial" checked><span class="option-tile-body">Serial diagnostics as needed</span></label>
+                            </div>
+                        </div>
+                        <div class="selection-section">
+                            <div class="selection-section-title"><strong>Imaging and Sampling</strong></div>
+                            <div class="option-grid">
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_abd_xray"><span class="option-tile-body">Abdominal radiographs</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_chest_xray"><span class="option-tile-body">Thoracic radiographs</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_ultrasound"><span class="option-tile-body">Abdominal ultrasound</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_ct"><span class="option-tile-body">CT scan</span></label>
+                                <label class="option-tile"><input type="checkbox" id="hosplan_diag_fna"><span class="option-tile-body">Fine needle aspirate</span></label>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1720,7 +2020,7 @@
                 <button class="reset-btn" onclick="goHome()">Back</button>
             </div>
 
-            <div class="protocol-block">
+            <div class="protocol-block" id="tx_insulin">
                 <h3>Insulin Monitoring</h3>
                 <h4>Protocol 1</h4>
                 <table class="protocol-table">
@@ -1772,7 +2072,7 @@
                 <button class="copy-btn" onclick="Calculators.Treatment.copy('insulin_protocol_2', this)">Copy Protocol 2</button>
             </div>
 
-            <div class="protocol-block">
+            <div class="protocol-block" id="tx_potassium_table">
                 <h3>Potassium Supplementation</h3>
                 <table class="protocol-table">
                     <thead>
@@ -1819,7 +2119,7 @@
                 <button class="copy-btn" onclick="Calculators.Treatment.copy('potassium_table', this)">Copy Potassium Supplementation</button>
             </div>
 
-            <div class="protocol-block">
+            <div class="protocol-block" id="tx_potassium_calc">
                 <h3>Potassium Supplementation Calculator</h3>
                 <div class="form-group">
                     <div class="radio-group">
@@ -1905,7 +2205,7 @@
                 </div>
             </div>
 
-            <div class="protocol-block">
+            <div class="protocol-block" id="tx_pressor">
                 <h3>Pressor Monitoring (Norepinephrine Sliding Scale)</h3>
                 <h4>Oscillometric Monitoring</h4>
                 <ul class="protocol-list">
@@ -1924,7 +2224,7 @@
                 <button class="copy-btn" onclick="Calculators.Treatment.copy('pressor_doppler', this)">Copy Doppler</button>
             </div>
 
-            <div class="protocol-block">
+            <div class="protocol-block" id="tx_amlodipine">
                 <h3>Amlodipine Loading</h3>
                 <h4>Cat</h4>
                 <ul class="protocol-list">
@@ -1951,7 +2251,7 @@
                 <button class="copy-btn" onclick="Calculators.Treatment.copy('amlodipine_loading', this)">Copy Amlodipine Loading</button>
             </div>
 
-            <div class="protocol-block">
+            <div class="protocol-block" id="tx_heparin">
                 <h3>Heparin CRI - Titration Protocol</h3>
                 <ul class="protocol-list">
                     <li>80 U/kg bolus over 2 min, then 600 U/kg/day (25 U/kg/hr)</li>
@@ -2006,9 +2306,20 @@
 
     </main>
 
+    <footer class="app-footer">
+        <div class="app-footer-inner" id="app_footer_meta">
+            Version -- | Last Updated -- | Created by: Joseph Evans, DVM
+        </div>
+    </footer>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
     window.Calculators = window.Calculators || {};
+    const APP_META = {
+        version: "1.4.0",
+        lastUpdated: "2026-03-25",
+        signature: "Created by: Joseph Evans, DVM"
+    };
 
     // --- NAVIGATION LOGIC ---
     function switchTab(id) {
@@ -2031,6 +2342,22 @@
 
     function goHome() {
         switchTab('home');
+    }
+
+    function openTreatmentBlock(blockId) {
+        switchTab('treatment_contingencies');
+        window.requestAnimationFrame(() => {
+            const block = document.getElementById(blockId);
+            if (!block) return;
+            document.querySelectorAll('#treatment_contingencies .protocol-block').forEach(el => {
+                el.classList.remove('is-focused');
+            });
+            block.classList.add('is-focused');
+            block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            window.setTimeout(() => {
+                block.classList.remove('is-focused');
+            }, 2200);
+        });
     }
 
     const Utils = {
@@ -2530,6 +2857,42 @@
 
     // --- VAMPIRE (Blood Draw) ---
     Calculators.Vampire = {
+        formatMlValue: (value) => {
+            const rounded = Math.round(value * 10) / 10;
+            return Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1);
+        },
+        estimateDraw: () => {
+            const cbc = Utils.getValue('vamp_cbc_runs');
+            const gas = Utils.getValue('vamp_gas_runs');
+            const vector = document.getElementById('vamp_vector_panel').checked;
+            const cbcRuns = cbc === null ? 0 : cbc;
+            const gasRuns = gas === null ? 0 : gas;
+
+            if (cbcRuns < 0 || gasRuns < 0) {
+                alert("Enter valid non-negative test counts.");
+                return "__invalid__";
+            }
+            if (!Number.isInteger(cbcRuns) || !Number.isInteger(gasRuns)) {
+                alert("Use whole numbers for test counts.");
+                return "__invalid__";
+            }
+            if (cbcRuns === 0 && gasRuns === 0 && !vector) {
+                return "";
+            }
+
+            const minTotal = (cbcRuns * 0.5) + (gasRuns * 0.3) + (vector ? 1.0 : 0);
+            const maxTotal = (cbcRuns * 1.0) + (gasRuns * 1.0) + (vector ? 2.5 : 0);
+            const details = [];
+            if (cbcRuns > 0) details.push(`  CBC/Chemistry: ${cbcRuns} run(s) at 0.5-1.0 mL each`);
+            if (gasRuns > 0) details.push(`  Blood gas: ${gasRuns} run(s) at 0.3-1.0 mL each`);
+            if (vector) details.push(`  Vector borne panel: 1.0-2.5 mL`);
+
+            return {
+                min: Calculators.Vampire.formatMlValue(minTotal),
+                max: Calculators.Vampire.formatMlValue(maxTotal),
+                details: details.join("\n")
+            };
+        },
         calculate: () => {
             const species = document.getElementById('vamp_species').value;
             const weight = Utils.getValue('vamp_weight');
@@ -2551,9 +2914,15 @@
                 sddLower = Math.floor(rawSddLower); sddUpper = Math.ceil(rawSddUpper);
                 swdLower = Math.floor(rawSwdLower); swdUpper = Math.ceil(rawSwdUpper);
             }
+            const estimatedDraw = Calculators.Vampire.estimateDraw();
+            if (estimatedDraw === "__invalid__") return;
             let result = `1. Total Blood Volume:\t${tbvLower} - ${tbvUpper} mL\n`;
             result += `2. Safe Daily Draw (1%):\t${sddLower} - ${sddUpper} mL\n`;
             result += `3. Safe Weekly Draw (7.5%):\t${swdLower} - ${swdUpper} mL\n\n`;
+            if (estimatedDraw) {
+                result += `Estimated Blood Drawn:\t${estimatedDraw.min} - ${estimatedDraw.max} mL\n`;
+                result += `${estimatedDraw.details}\n\n`;
+            }
             result += `Note: TBV is whole mL. Safe draws are whole mL for >5kg animals,\nand precise to 1 decimal place for <=5kg animals.`;
             document.getElementById('vamp_text_output').value = result;
             Calculators.Vampire.lastRes = result;
@@ -2561,10 +2930,152 @@
         },
         reset: () => {
             document.getElementById('vamp_weight').value = '';
+            document.getElementById('vamp_cbc_runs').value = '';
+            document.getElementById('vamp_gas_runs').value = '';
+            document.getElementById('vamp_vector_panel').checked = false;
             document.getElementById('vamp_text_output').value = '';
             Utils.hideResult('vamp_result');
         },
         copy: () => Utils.copy(Calculators.Vampire.lastRes, document.querySelector('#vampire .copy-btn'))
+    };
+
+    // --- BODY SURFACE AREA (BSA) ---
+    Calculators.BSA = {
+        coefficients: {
+            Dog: 0.101,
+            Cat: 0.100
+        },
+        charts: {
+            Dog: `Weight (kg)    BSA (m2)
+0.5            0.064
+1.0            0.101
+1.5            0.132
+2.0            0.160
+2.5            0.186
+3.0            0.210
+3.5            0.233
+4.0            0.255
+4.5            0.275
+5.0            0.295
+6.0            0.333
+7.0            0.370
+8.0            0.404
+9.0            0.437
+10.0           0.469
+11.0           0.500
+12.0           0.529
+13.0           0.558
+14.0           0.587
+15.0           0.614
+16.0           0.641
+17.0           0.668
+18.0           0.694
+19.0           0.719
+20.0           0.744
+21.0           0.769
+22.0           0.793
+23.0           0.817
+24.0           0.840
+25.0           0.864
+26.0           0.886
+27.0           0.909
+28.0           0.931
+29.0           0.953
+30.0           0.975
+31.0           0.997
+32.0           1.018
+33.0           1.039
+34.0           1.060
+35.0           1.081
+36.0           1.101
+37.0           1.121
+38.0           1.142
+39.0           1.162
+40.0           1.181
+41.0           1.201
+42.0           1.220
+43.0           1.240
+44.0           1.259
+45.0           1.278
+46.0           1.297
+47.0           1.315
+48.0           1.334
+49.0           1.352
+50.0           1.371
+51.0           1.389
+52.0           1.407
+53.0           1.425
+54.0           1.443
+55.0           1.461`,
+            Cat: `Weight (kg)    BSA (m2)
+0.5            0.063
+1.0            0.100
+1.5            0.131
+2.0            0.159
+2.5            0.184
+3.0            0.208
+3.5            0.231
+4.0            0.252
+4.5            0.273
+5.0            0.292
+5.5            0.312
+6.0            0.330
+6.5            0.348
+7.0            0.366
+7.5            0.383
+8.0            0.400
+8.5            0.416
+9.0            0.433
+9.5            0.449
+10.0           0.464
+10.5           0.479
+11.0           0.495
+11.5           0.509
+12.0           0.524`
+        },
+        lastRes: "",
+        calculate: () => {
+            const species = document.getElementById('bsa_species').value;
+            const weight = Utils.getValue('bsa_weight');
+            if (weight === null || weight <= 0 || weight < 0.1 || weight > 100) {
+                alert("Please enter a valid weight between 0.1 and 100 kg.");
+                return;
+            }
+            const coeff = Calculators.BSA.coefficients[species];
+            const bsa = coeff * Math.pow(weight, 2 / 3);
+            const equation = species === "Dog"
+                ? "BSA = 0.101 x (kg)^(2/3)"
+                : "BSA = 0.100 x (kg)^(2/3)";
+            Utils.setText('bsa_species_result', species);
+            Utils.setText('bsa_weight_result', `${weight.toFixed(2)} kg`);
+            Utils.setText('bsa_value_result', `${bsa.toFixed(3)} m2`);
+            Utils.setText('bsa_equation_result', equation);
+            Calculators.BSA.lastRes = `${species} ${weight.toFixed(2)} kg | BSA = ${bsa.toFixed(3)} m2`;
+            Utils.showResult('bsa_result');
+        },
+        updateChart: () => {
+            const species = document.getElementById('bsa_species').value;
+            document.getElementById('bsa_chart_label').innerText = `${species} reference chart`;
+            document.getElementById('bsa_chart_output').value = Calculators.BSA.charts[species];
+        },
+        toggleChart: () => {
+            Calculators.BSA.updateChart();
+            document.getElementById('bsa_chart').classList.toggle('hidden');
+        },
+        reset: () => {
+            document.getElementById('bsa_species').value = "Dog";
+            document.getElementById('bsa_weight').value = "";
+            Utils.setText('bsa_species_result', '--');
+            Utils.setText('bsa_weight_result', '--');
+            Utils.setText('bsa_value_result', '--');
+            Utils.setText('bsa_equation_result', '--');
+            document.getElementById('bsa_chart').classList.add('hidden');
+            document.getElementById('bsa_chart_output').value = "";
+            document.getElementById('bsa_chart_label').innerText = "";
+            Utils.hideResult('bsa_result');
+            Calculators.BSA.lastRes = "";
+        },
+        copy: () => Utils.copy(Calculators.BSA.lastRes, document.querySelector('#bsa .copy-btn'))
     };
 
     // --- EDD (LVDd) ---
@@ -3272,6 +3783,59 @@
             { id: "consent_chest_tube", text: "Complications associated with chest tube placement (hemorrhage, infection, accidental lung or vascular injury, tube misplacement or blockage, and dislodgement, localized pain and swelling at the insertion site, subcutaneous emphysema, persistent pneumothorax, re-expansion pulmonary edema, and respiratory distress, which may necessitate additional interventions or extended supportive care)." },
             { id: "consent_long_line", text: "Complications associated with central line placement (complications associated with sedation, clot formation, bleeding, inappropriate placement, damage to vessels, infection and inflammation)." }
         ],
+        labels: {
+            consent_test: "Diagnostic tests",
+            consent_sedation: "Sedation and anesthesia",
+            consent_hospitalization: "Hospitalization",
+            consent_transfusion: "Blood and plasma transfusions",
+            consent_fna: "Fine needle aspirates",
+            consent_ucath: "Cystoscopy and urethral catheterization",
+            consent_hfno: "High Flow Nasal Oxygen",
+            consent_ventilation: "Mechanical ventilation",
+            consent_surgery: "Surgical procedures",
+            consent_brachy: "Brachycephaly",
+            consent_ngt: "Nasogastric tube placement",
+            consent_ect: "Dialysis and hemoperfusion",
+            consent_ile: "Intralipid therapy",
+            consent_vomiting: "Emesis",
+            consent_chest_tube: "Chest tube placement",
+            consent_long_line: "Central catheter placement"
+        },
+        recommendedIds: ["consent_test", "consent_sedation"],
+        selectedLabels: () => Calculators.Consent.data
+            .filter(item => {
+                const cb = document.getElementById(item.id);
+                return cb && cb.checked;
+            })
+            .map(item => Calculators.Consent.labels[item.id] || item.id),
+        updateUI: () => {
+            const selected = Calculators.Consent.selectedLabels();
+            Utils.setText('consent_count', `${selected.length} selected`);
+            Utils.setText('consent_summary', selected.length ? selected.join(", ") : "No complications selected.");
+        },
+        setAll: (checked) => {
+            Calculators.Consent.data.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb) cb.checked = checked;
+            });
+            Calculators.Consent.updateUI();
+        },
+        applyPreset: (preset) => {
+            if (preset === "recommended") {
+                Calculators.Consent.data.forEach(item => {
+                    const cb = document.getElementById(item.id);
+                    if (cb) cb.checked = Calculators.Consent.recommendedIds.includes(item.id);
+                });
+            }
+            Calculators.Consent.updateUI();
+        },
+        init: () => {
+            Calculators.Consent.data.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb) cb.addEventListener('change', Calculators.Consent.updateUI);
+            });
+            Calculators.Consent.updateUI();
+        },
         generate: () => {
             let output = "";
             Calculators.Consent.data.forEach(item => {
@@ -3284,16 +3848,10 @@
             Utils.showResult('consent_result');
         },
         reset: () => {
-            document.getElementById('consent_test').checked = true;
-            document.getElementById('consent_sedation').checked = true;
-            Calculators.Consent.data.forEach(item => {
-                if (item.id !== "consent_test" && item.id !== "consent_sedation") {
-                    const cb = document.getElementById(item.id);
-                    if (cb) cb.checked = false;
-                }
-            });
+            Calculators.Consent.applyPreset('recommended');
             document.getElementById('consent_text_output').value = "";
             Utils.hideResult('consent_result');
+            Calculators.Consent.updateUI();
         },
         copy: () => Utils.copy(Calculators.Consent.lastRes, document.querySelector('#consent .copy-btn'))
     };
@@ -3328,8 +3886,69 @@
             { id: "hosplan_diag_ct", text: "CT scan" },
             { id: "hosplan_diag_serial", text: "Serial diagnostics as needed" }
         ],
+        standardTreatmentIds: ["hosplan_treat_hosp", "hosplan_treat_iv_catheter", "hosplan_treat_as_needed"],
+        standardDiagnosticIds: ["hosplan_diag_serial"],
+        icuTreatmentIds: [
+            "hosplan_treat_hosp", "hosplan_treat_iv_catheter", "hosplan_treat_iv_fluids",
+            "hosplan_treat_pain", "hosplan_treat_oxygen", "hosplan_treat_cvc", "hosplan_treat_as_needed"
+        ],
+        icuDiagnosticIds: [
+            "hosplan_diag_cbc", "hosplan_diag_chemistry", "hosplan_diag_coags",
+            "hosplan_diag_blood_type", "hosplan_diag_ua", "hosplan_diag_serial", "hosplan_diag_chest_xray"
+        ],
         joinList: (items) => items.join(", "),
         parseLines: (value) => value.split("\n").map(s => s.trim()).filter(Boolean),
+        selectedFrom: (items) => items.filter(item => {
+            const cb = document.getElementById(item.id);
+            return cb && cb.checked;
+        }).map(item => item.text),
+        updateUI: () => {
+            const treatments = Calculators.HospPlan.selectedFrom(Calculators.HospPlan.treatments);
+            const diagnostics = Calculators.HospPlan.selectedFrom(Calculators.HospPlan.diagnostics);
+            Utils.setText('hosplan_treat_count', `${treatments.length} selected`);
+            Utils.setText('hosplan_diag_count', `${diagnostics.length} selected`);
+            Utils.setText('hosplan_treat_summary', treatments.length ? treatments.join(", ") : "No treatments selected.");
+            Utils.setText('hosplan_diag_summary', diagnostics.length ? diagnostics.join(", ") : "No diagnostics selected.");
+        },
+        setGroup: (group, checked) => {
+            const items = group === 'treatments' ? Calculators.HospPlan.treatments : Calculators.HospPlan.diagnostics;
+            items.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb) cb.checked = checked;
+            });
+            Calculators.HospPlan.updateUI();
+        },
+        setAll: (checked) => {
+            Calculators.HospPlan.treatments.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb) cb.checked = checked;
+            });
+            Calculators.HospPlan.diagnostics.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb) cb.checked = checked;
+            });
+            Calculators.HospPlan.updateUI();
+        },
+        applyPreset: (preset) => {
+            const treatmentIds = preset === 'icu' ? Calculators.HospPlan.icuTreatmentIds : Calculators.HospPlan.standardTreatmentIds;
+            const diagnosticIds = preset === 'icu' ? Calculators.HospPlan.icuDiagnosticIds : Calculators.HospPlan.standardDiagnosticIds;
+            Calculators.HospPlan.treatments.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb) cb.checked = treatmentIds.includes(item.id);
+            });
+            Calculators.HospPlan.diagnostics.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb) cb.checked = diagnosticIds.includes(item.id);
+            });
+            Calculators.HospPlan.updateUI();
+        },
+        init: () => {
+            [...Calculators.HospPlan.treatments, ...Calculators.HospPlan.diagnostics].forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb) cb.addEventListener('change', Calculators.HospPlan.updateUI);
+            });
+            Calculators.HospPlan.updateUI();
+        },
         generate: () => {
             const selectedTreatments = [];
             const selectedDiagnostics = [];
@@ -3377,22 +3996,14 @@
             Utils.showResult('hosplan_result');
         },
         reset: () => {
-            Calculators.HospPlan.treatments.forEach(item => {
-                const cb = document.getElementById(item.id);
-                if (!cb) return;
-                cb.checked = ["hosplan_treat_hosp", "hosplan_treat_iv_catheter", "hosplan_treat_as_needed"].includes(item.id);
-            });
-            Calculators.HospPlan.diagnostics.forEach(item => {
-                const cb = document.getElementById(item.id);
-                if (!cb) return;
-                cb.checked = item.id === "hosplan_diag_serial";
-            });
+            Calculators.HospPlan.applyPreset('standard');
             document.getElementById('hosplan_additional').value = "";
             document.getElementById('hosplan_misc').value = "";
             document.getElementById('hosplan_consult').value = "";
             document.getElementById('hosplan_transfer').value = "";
             document.getElementById('hosplan_text_output').value = "";
             Utils.hideResult('hosplan_result');
+            Calculators.HospPlan.updateUI();
         },
         copy: () => Utils.copy(Calculators.HospPlan.lastRes, document.querySelector('#hosplan .copy-btn'))
     };
@@ -3734,13 +4345,20 @@ Maintenance Instructions:
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
         Calculators.NutritionSupport.init();
+        Calculators.Consent.init();
         Calculators.Consent.reset();
+        Calculators.HospPlan.init();
         Calculators.HospPlan.reset();
         Calculators.OutpatientMeds.reset();
         Calculators.Sedation.reset();
+        Calculators.BSA.reset();
         Calculators.ROX.reset();
         Calculators.RuleOf20.init();
         Utils.hideResult('k_supp_result');
+        const footer = document.getElementById('app_footer_meta');
+        if (footer) {
+            footer.innerText = `Version ${APP_META.version} | Last Updated ${APP_META.lastUpdated} | ${APP_META.signature}`;
+        }
     });
     </script>
 </body>
