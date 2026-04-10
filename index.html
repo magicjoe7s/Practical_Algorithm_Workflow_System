@@ -762,6 +762,14 @@
                         <h3>Heparin CRI</h3>
                         <p>Jump directly to the heparin titration protocol.</p>
                     </div>
+                    <div class="tool-card" onclick="openTreatmentBlock('tx_urine_output')">
+                        <h3>Urine Output</h3>
+                        <p>Open the urine output contingency and prompt for the interval.</p>
+                    </div>
+                    <div class="tool-card" onclick="openTreatmentBlock('tx_pain_score')">
+                        <h3>Pain Score</h3>
+                        <p>Jump directly to the pain score contingency.</p>
+                    </div>
                 </div>
             </div>
 
@@ -795,6 +803,10 @@
                     <div class="tool-card" onclick="switchTab('att')">
                         <h3>Animal Trauma Triage</h3>
                         <p>Score perfusion, cardiac, respiratory, and other systems.</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('dogibat')">
+                        <h3>DOGiBAT Score</h3>
+                        <p>Canine ITP bleeding assessment with site-by-site severity scoring.</p>
                     </div>
                     <div class="tool-card" onclick="switchTab('rule_of_20')">
                         <h3>Kirby's Rule of 20</h3>
@@ -1710,6 +1722,97 @@
             </div>
         </section>
 
+        <!-- DOGIBAT SCORE -->
+        <section id="dogibat" class="calculator-section">
+            <div class="calc-header">
+                <h2>DOGiBAT Score</h2>
+                <button class="reset-btn" onclick="Calculators.DOGiBAT.reset()">Reset</button>
+            </div>
+            <div class="calc-form">
+                <p class="small-text" style="margin-bottom: 1rem;">Canine ITP Bleeding Assessment Tool. Each category defaults to the lowest grade.</p>
+                <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Skin</label>
+                        <select id="dogibat_skin">
+                            <option value="0">0 - No</option>
+                            <option value="1">1 - Petechiae/ecchymoses at a single site</option>
+                            <option value="2">2 - Petechiae/ecchymoses at &gt;1 anatomic site</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Catheter/venipuncture/other cutaneous bleed</label>
+                        <select id="dogibat_catheter_bleed">
+                            <option value="0">0 - No</option>
+                            <option value="1">1 - Self-limiting and &lt;5 minutes</option>
+                            <option value="2">2 - &gt;5 minutes and/or requires intervention to control</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Oral mucosa</label>
+                        <select id="dogibat_oral_mucosa">
+                            <option value="0">0 - No</option>
+                            <option value="1">1 - Petechiae</option>
+                            <option value="2">2 - Frank hemorrhage</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Intraocular</label>
+                        <select id="dogibat_intraocular">
+                            <option value="0">0 - No</option>
+                            <option value="1">1 - Funduscopic</option>
+                            <option value="2">2 - Hyphema</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Epistaxis</label>
+                        <select id="dogibat_epistaxis">
+                            <option value="0">0 - No</option>
+                            <option value="1">1 - Unilateral and &lt;5 minutes</option>
+                            <option value="2">2 - Bilateral or &gt;5 minutes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Gastrointestinal</label>
+                        <select id="dogibat_gastrointestinal">
+                            <option value="0">0 - Occult blood negative</option>
+                            <option value="1">1 - Occult blood positive</option>
+                            <option value="2">2 - Hematemesis, hematochezia, or melena</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Urinary</label>
+                        <select id="dogibat_urinary">
+                            <option value="0">0 - No</option>
+                            <option value="1">1 - Microscopic (dipstick)</option>
+                            <option value="2">2 - Macroscopic</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Pulmonary hemorrhage (suspected/observed)</label>
+                        <select id="dogibat_pulmonary_hemorrhage">
+                            <option value="0">0 - No</option>
+                            <option value="2">2 - Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Intracranial hemorrhage (suspected/observed)</label>
+                        <select id="dogibat_intracranial_hemorrhage">
+                            <option value="0">0 - No</option>
+                            <option value="2">2 - Yes</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="Calculators.DOGiBAT.calculate()">Calculate DOGiBAT</button>
+            </div>
+            <div id="dogibat_result" class="result-box hidden">
+                <div class="result-row"><span>DOGiBAT Score:</span><strong id="dogibat_total">--</strong></div>
+                <div class="result-row"><span>Severity:</span><strong id="dogibat_severity">--</strong></div>
+                <div id="dogibat_alert" class="alert-box normal">No active bleeding detected</div>
+                <textarea id="dogibat_text_output" class="text-output-box" readonly></textarea>
+                <button class="copy-btn" onclick="Calculators.DOGiBAT.copy()">Copy Results</button>
+            </div>
+        </section>
+
         <!-- INFORMED CONSENT -->
         <section id="consent" class="calculator-section">
             <div class="calc-header">
@@ -2263,6 +2366,22 @@
                     <li>If close to baseline, give a 20-30 U/kg bolus to bump without increasing CRI rate</li>
                 </ul>
                 <button class="copy-btn" onclick="Calculators.Treatment.copy('heparin_cri', this)">Copy Heparin CRI</button>
+            </div>
+
+            <div class="protocol-block" id="tx_urine_output">
+                <h3>Urine Output</h3>
+                <p class="helper-text">Prompts once for the look-back and replacement interval, then copies the contingency text.</p>
+                <button class="copy-btn" onclick="Calculators.Treatment.copyUrineOutput(this)">Copy Urine Output Contingency</button>
+            </div>
+
+            <div class="protocol-block" id="tx_pain_score">
+                <h3>Pain Score</h3>
+                <ul class="protocol-list">
+                    <li>Perform an NCSU pain score.</li>
+                    <li>If any individual score is greater than 3 or the cumulative score is greater than 6, administer pain medications scheduled at this hour.</li>
+                    <li>If the patient does not meet these criteria, pain medications can be skipped.</li>
+                </ul>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('pain_score', this)">Copy Pain Score Contingency</button>
             </div>
         </section>
 
@@ -3763,6 +3882,160 @@
         copy: () => Utils.copy(Calculators.ATT.lastRes, document.querySelector('#att .copy-btn'))
     };
 
+    // --- DOGIBAT ---
+    Calculators.DOGiBAT = {
+        categories: [
+            {
+                key: 'skin',
+                label: 'Skin',
+                options: [
+                    { text: '0 - No', score: 0 },
+                    { text: '1 - Petechiae/ecchymoses at a single site', score: 1 },
+                    { text: '2 - Petechiae/ecchymoses at >1 anatomic site', score: 2 }
+                ]
+            },
+            {
+                key: 'catheter_bleed',
+                label: 'Catheter/venipuncture/other cutaneous bleed',
+                options: [
+                    { text: '0 - No', score: 0 },
+                    { text: '1 - Self-limiting and <5 minutes', score: 1 },
+                    { text: '2 - >5 minutes and/or requires intervention to control', score: 2 }
+                ]
+            },
+            {
+                key: 'oral_mucosa',
+                label: 'Oral mucosa',
+                options: [
+                    { text: '0 - No', score: 0 },
+                    { text: '1 - Petechiae', score: 1 },
+                    { text: '2 - Frank hemorrhage', score: 2 }
+                ]
+            },
+            {
+                key: 'intraocular',
+                label: 'Intraocular',
+                options: [
+                    { text: '0 - No', score: 0 },
+                    { text: '1 - Funduscopic', score: 1 },
+                    { text: '2 - Hyphema', score: 2 }
+                ]
+            },
+            {
+                key: 'epistaxis',
+                label: 'Epistaxis',
+                options: [
+                    { text: '0 - No', score: 0 },
+                    { text: '1 - Unilateral and <5 minutes', score: 1 },
+                    { text: '2 - Bilateral or >5 minutes', score: 2 }
+                ]
+            },
+            {
+                key: 'gastrointestinal',
+                label: 'Gastrointestinal',
+                options: [
+                    { text: '0 - Occult blood negative', score: 0 },
+                    { text: '1 - Occult blood positive', score: 1 },
+                    { text: '2 - Hematemesis, hematochezia, or melena', score: 2 }
+                ]
+            },
+            {
+                key: 'urinary',
+                label: 'Urinary',
+                options: [
+                    { text: '0 - No', score: 0 },
+                    { text: '1 - Microscopic (dipstick)', score: 1 },
+                    { text: '2 - Macroscopic', score: 2 }
+                ]
+            },
+            {
+                key: 'pulmonary_hemorrhage',
+                label: 'Pulmonary hemorrhage (suspected/observed)',
+                options: [
+                    { text: '0 - No', score: 0 },
+                    { text: '2 - Yes', score: 2 }
+                ]
+            },
+            {
+                key: 'intracranial_hemorrhage',
+                label: 'Intracranial hemorrhage (suspected/observed)',
+                options: [
+                    { text: '0 - No', score: 0 },
+                    { text: '2 - Yes', score: 2 }
+                ]
+            }
+        ],
+        lastRes: "",
+        getSeverity: (total) => {
+            if (total === 0) return { label: 'No active bleeding detected', cls: 'normal' };
+            if (total <= 3) return { label: 'Mild bleeding', cls: 'warning' };
+            if (total <= 7) return { label: 'Moderate bleeding', cls: 'warning' };
+            return { label: 'Severe bleeding', cls: 'critical' };
+        },
+        buildSummary: (total, severity, selectedResults) => {
+            let summary = `DOGiBAT Score: ${total}\n`;
+            summary += `Severity: ${severity}\n`;
+            summary += `Breakdown:\n`;
+            selectedResults.forEach((result) => {
+                summary += `- ${result.label}: ${result.text}\n`;
+            });
+            return summary.trim();
+        },
+        calculate: () => {
+            const selectedResults = [];
+            let total = 0;
+
+            for (const category of Calculators.DOGiBAT.categories) {
+                const select = document.getElementById(`dogibat_${category.key}`);
+                if (!select) {
+                    alert(`Configuration error: Missing control for ${category.label}`);
+                    return;
+                }
+
+                const selectedOption = category.options[select.selectedIndex];
+                if (!selectedOption) {
+                    alert(`Invalid selection for ${category.label}`);
+                    select.focus();
+                    return;
+                }
+
+                total += selectedOption.score;
+                selectedResults.push({
+                    label: category.label,
+                    text: selectedOption.text,
+                    score: selectedOption.score
+                });
+            }
+
+            const severity = Calculators.DOGiBAT.getSeverity(total);
+            Utils.setText('dogibat_total', String(total));
+            Utils.setText('dogibat_severity', severity.label);
+
+            const alertBox = document.getElementById('dogibat_alert');
+            alertBox.innerText = severity.label;
+            alertBox.className = `alert-box ${severity.cls}`;
+
+            const summary = Calculators.DOGiBAT.buildSummary(total, severity.label, selectedResults);
+            document.getElementById('dogibat_text_output').value = summary;
+            Calculators.DOGiBAT.lastRes = summary;
+            Utils.showResult('dogibat_result');
+        },
+        reset: () => {
+            document.querySelectorAll('#dogibat select').forEach((select) => {
+                select.selectedIndex = 0;
+            });
+            Utils.setText('dogibat_total', '--');
+            Utils.setText('dogibat_severity', '--');
+            const alertBox = document.getElementById('dogibat_alert');
+            alertBox.innerText = 'No active bleeding detected';
+            alertBox.className = 'alert-box normal';
+            document.getElementById('dogibat_text_output').value = '';
+            Calculators.DOGiBAT.lastRes = "";
+            Utils.hideResult('dogibat_result');
+        },
+        copy: () => Utils.copy(Calculators.DOGiBAT.lastRes, document.querySelector('#dogibat .copy-btn'))
+    };
+
     // --- INFORMED CONSENT ---
     Calculators.Consent = {
         data: [
@@ -4051,6 +4324,8 @@ Record total volume infused in treatment notes (mandatory)
 > 1.5 x baseline: minus 300 U/kg/day (-12.5 U/kg/hr)
 > 2 x baseline: stop for 1 hr or -500 U/kg/day (20 U/kg/hr)
 If close to baseline, give 20-30 U/kg bolus to bump without increasing CRI rate`,
+            pain_score:
+`Please perform an NCSU pain score. If any individual score is >3 or if the cumulative score is >6, please administer pain medications scheduled at this hour. If patient does not meet these criteria, pain medications can be skipped.`,
             amlodipine_loading:
 `Amlodipine Loading
 Cat:
@@ -4079,6 +4354,23 @@ Maintenance Instructions:
             const text = Calculators.Treatment.protocolText[key];
             if (!text) { alert("Protocol not found."); return; }
             Utils.copy(text, btn);
+        },
+        buildUrineOutputText: (hoursValue) =>
+            `Please calculate urine output over the past ${hoursValue} hours in ml/hr. Then adjust replacement fluids (LRS/Normasol-R/Plasmalyte) to match this rate for the next ${hoursValue} hours. If urine production is >5 ml/kg/hr or no urine has been produced in >2 hours, please contact primary clinician.`,
+        copyUrineOutput: (btn) => {
+            const response = window.prompt(
+                "Enter the number of hours to use for both the look-back and replacement interval.",
+                "4"
+            );
+            if (response === null) return;
+
+            const hoursValue = response.trim();
+            if (!/^\d+(\.\d+)?$/.test(hoursValue) || Number(hoursValue) <= 0) {
+                alert("Please enter a valid positive number of hours.");
+                return;
+            }
+
+            Utils.copy(Calculators.Treatment.buildUrineOutputText(hoursValue), btn);
         },
         calcK: () => {
             const level = document.getElementById('k_supp_level').value;
@@ -4353,6 +4645,7 @@ Maintenance Instructions:
         Calculators.Sedation.reset();
         Calculators.BSA.reset();
         Calculators.ROX.reset();
+        Calculators.DOGiBAT.reset();
         Calculators.RuleOf20.init();
         Utils.hideResult('k_supp_result');
         const footer = document.getElementById('app_footer_meta');
@@ -4363,3 +4656,4 @@ Maintenance Instructions:
     </script>
 </body>
 </html>
+
