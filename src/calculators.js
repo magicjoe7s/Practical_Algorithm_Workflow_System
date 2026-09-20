@@ -203,6 +203,52 @@
         return {total,required:c.n,meets,text:`${species} SIRS: ${total}/4 criteria (${meets?"meets":"does not meet"} ${c.n}/4 threshold)`};
     }
 
+    function evaluateCompass({ grades, temperature, unit = "C" }) {
+        if (!Array.isArray(grades) || grades.length !== 6 || grades.some(v => !Number.isInteger(v) || v < 0 || v > 3)) throw new RangeError("Complete all six COMPASS domains.");
+        const highest = Math.max(...grades);
+        let known = temperature !== null && temperature !== undefined && temperature !== "";
+        let critical = false;
+        if (known) {
+            if (!Number.isFinite(temperature) || !["C","F"].includes(unit)) throw new RangeError("Enter a valid temperature and unit.");
+            const c = unit === "C" ? temperature : (temperature - 32) * 5 / 9;
+            if (c <= 0 || c >= 60) throw new RangeError("Temperature is outside the supported range.");
+            critical = temperature >= (unit === "C" ? 41 : 105.8);
+        }
+        const labels = ["Ungraded - no listed clinical signs","Mild - Heat stress","Moderate - Heat exhaustion","Severe - Heatstroke"];
+        let label = labels[highest];
+        if (highest >= 2) label += " | " + (!known ? "temperature modifier unknown" : critical ? "critical temperature subgroup" : "triage temperature below critical threshold");
+        let management = highest === 1 ? "On-site active cooling, oral rehydration, rest; monitor for progression." : highest === 2 ? "Rapid cooling, IV fluid therapy and monitoring; hospitalise if the critical temperature criterion is met or the patient is not improving." : highest === 3 ? "Mandatory hospitalisation, aggressive cooling, IV fluids, full multi-organ support and monitoring (coagulation, renal, hepatic and CNS)." : "No grade can be assigned from the selected signs. Temperature alone does not diagnose HRI.";
+        if (highest === 2 && known && critical) management = "Moderate signs with critical temperature: escalate rapid effective cooling, IV fluids and diagnostics; hospitalise per the supplied management chart.";
+        if (highest === 3 && known && critical) management = "Highest-risk subgroup. " + management;
+        return { grade: highest, label, management, text: `VetCompass HRI Grade (2026): ${label}\nInterpretation: ${management}` };
+    }
+
+    function evaluateLepto({ illness, clinicopathCount, supportive = [], confirmatory = [], recentVaccine = false }) {
+        if (!Number.isInteger(clinicopathCount) || clinicopathCount < 0) throw new RangeError("Invalid clinicopathologic count.");
+        const clinicalMet = illness && clinicopathCount >= 2;
+        let classification, basis;
+        if (clinicalMet && confirmatory.length) { classification="Confirmed"; basis=`compatible systemic illness within 2 weeks, ${clinicopathCount} clinicopathologic abnormalities, and ${confirmatory.join(", ")}`; }
+        else if (clinicalMet && supportive.length) { classification="Probable"; basis=`compatible systemic illness within 2 weeks, ${clinicopathCount} clinicopathologic abnormalities, and ${supportive.join(", ")}`; }
+        else if (clinicalMet) { classification="Clinical criteria met; not yet Probable or Confirmed"; basis=`compatible systemic illness within 2 weeks and ${clinicopathCount} clinicopathologic abnormalities, but no supportive or confirmatory laboratory criterion selected`; }
+        else { classification="Clinical criteria not met"; const m=[]; if(!illness)m.push("compatible systemic illness within the past 2 weeks is not selected"); if(clinicopathCount<2)m.push(`${clinicopathCount}/2 required clinicopathologic abnormalities selected`); basis=m.join("; "); }
+        let text=`ACVIM leptospirosis case definition: ${classification} - ${basis}.`;
+        if(recentVaccine && supportive.some(x=>/MAT|IgM/i.test(x))) text+=" Caution: recent vaccination can affect IgM or single-MAT interpretation.";
+        if(recentVaccine && [...supportive,...confirmatory].some(x=>/PCR|NAAT/i.test(x))) text+=" Vaccination does not explain a positive PCR/NAAT result.";
+        return {classification,text};
+    }
+
+    function evaluateDuke({ pathology = false, majorCount, minorCount, rejections = [] }) {
+        if (![majorCount,minorCount].every(Number.isInteger)) throw new RangeError("Invalid Duke criteria counts.");
+        let classification="Rejected",basis="criteria threshold not met";
+        if(rejections.length) basis="explicit rejection criteria selected: "+rejections.join("; ");
+        else if(pathology){classification="Definite";basis="valvular pathology";}
+        else if(majorCount>=2){classification="Definite";basis=`${majorCount} major criteria`;}
+        else if(majorCount>=1&&minorCount>=2){classification="Definite";basis=`1 major and ${minorCount} minor criteria`;}
+        else if(majorCount>=1&&minorCount>=1){classification="Possible";basis="1 major and 1 minor criterion";}
+        else if(minorCount>=3){classification="Possible";basis=`${minorCount} minor criteria`;}
+        return {classification,basis,text:`Modified Duke classification: ${classification} - ${basis}.`};
+    }
+
     return Object.freeze({
         calculateBsa,
         calculateCaps,
@@ -213,6 +259,9 @@
         calculatePhs,
         calculateSirs,
         calculateSnakeBite,
-        calculateSofa
+        calculateSofa,
+        evaluateCompass,
+        evaluateDuke,
+        evaluateLepto
     });
 });
