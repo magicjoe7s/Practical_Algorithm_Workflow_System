@@ -2513,6 +2513,22 @@
                 <button class="copy-btn" onclick="Calculators.Treatment.copy('heparin_cri', this)">Copy Heparin CRI</button>
             </div>
 
+            <div class="protocol-block" id="tx_oxygen">
+                <h3>Oxygen Titration</h3>
+                <ul class="protocol-list">
+                    <li>SpO₂ &gt;97%: decrease oxygen by 10%</li>
+                    <li>SpO₂ 93–96%: maintain oxygen concentration</li>
+                    <li>SpO₂ &lt;92%: increase oxygen by 10%</li>
+                </ul>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('oxygen_titration', this)">Copy Oxygen Titration</button>
+            </div>
+
+            <div class="protocol-block" id="tx_bleach_bath">
+                <h3>Bleach Bath</h3>
+                <p class="helper-text">1:100 dilution. Do not use full-strength bleach.</p>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('bleach_bath', this)">Copy Bleach Bath Instructions</button>
+            </div>
+
             <div class="protocol-block" id="tx_urine_output">
                 <h3>Urine Output</h3>
                 <p class="helper-text">Prompts once for the look-back and replacement interval, then copies the contingency text.</p>
@@ -4575,6 +4591,13 @@ Record total volume infused in treatment notes (mandatory)
 If close to baseline, give 20-30 U/kg bolus to bump without increasing CRI rate`,
             pain_score:
 `Please perform an NCSU pain score. If any individual score is >3 or if the cumulative score is >6, please administer pain medications scheduled at this hour. If patient does not meet these criteria, pain medications can be skipped.`,
+            oxygen_titration:
+`Perform SpO₂ check. Titrate O₂ % based on the below instructions:
+SpO₂ >97% → decrease O₂ by 10%
+SpO₂ 93-96% → maintain O₂ concentration
+SpO₂ <92% → increase O₂ by 10%`,
+            bleach_bath:
+`BLEACH BATH 1:100 dilution DO NOT USE FULL STRENGTH BLEACH: Dilute 1/2 tsp (2.5mls) of bleach into 1 cup of water. Please wear gloves and apply the diluted bleach with a cotton ball, soft cloth or sponge or by a form of bath onto the skin/wound Solutions are only good for 24 hours once mixed, please discard after each use.`,
             amlodipine_loading:
 `Amlodipine Loading
 Cat:
