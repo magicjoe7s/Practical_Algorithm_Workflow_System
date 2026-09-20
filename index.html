@@ -741,6 +741,56 @@
             color: var(--text-muted);
         }
 
+        .field-error {
+            margin: 0.75rem 0;
+            padding: 0.75rem 0.9rem;
+            border: 1px solid #C62828;
+            border-radius: var(--radius);
+            background: #FFEBEE;
+            color: #8E0000;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 600px) {
+            .home-grid { grid-template-columns: 1fr; gap: 0.9rem; }
+            .tool-card { min-height: auto; }
+            .result-row { align-items: flex-start; gap: 0.75rem; }
+            button, .tool-card[role="button"] { min-height: 44px; }
+        }
+
+        @media print {
+            body { display: block; background: #FFFFFF; color: #000000; }
+            .app-header,
+            .app-footer,
+            .skip-link,
+            #home,
+            button,
+            .copy-btn,
+            .reset-btn,
+            .privacy-note,
+            .tool-search,
+            .helper-text { display: none !important; }
+            #content-area { max-width: none; padding: 0; }
+            .calculator-section.active {
+                display: block !important;
+                border: 0;
+                box-shadow: none;
+                padding: 0;
+            }
+            .result-box {
+                break-inside: avoid;
+                border-color: #777;
+                background: #FFFFFF;
+            }
+            .text-output-box {
+                min-height: 0;
+                overflow: visible;
+                border: 0;
+                resize: none;
+            }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 scroll-behavior: auto !important;
@@ -2669,6 +2719,37 @@
         hideResult: (id) => {
             document.getElementById(id).classList.add('hidden');
         },
+        clearError: (sectionId) => {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            section.querySelectorAll('.field-error').forEach(error => error.remove());
+            section.querySelectorAll('[aria-invalid="true"]').forEach(control => {
+                control.removeAttribute('aria-invalid');
+                control.removeAttribute('aria-describedby');
+            });
+        },
+        showError: (sectionId, message, focusId) => {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            Utils.clearError(sectionId);
+            const error = document.createElement('div');
+            error.id = `${sectionId}_error`;
+            error.className = 'field-error';
+            error.setAttribute('role', 'alert');
+            error.textContent = message;
+            const calculateButton = section.querySelector('.calculate-btn');
+            if (calculateButton) {
+                calculateButton.insertAdjacentElement('beforebegin', error);
+            } else {
+                section.prepend(error);
+            }
+            const control = focusId ? document.getElementById(focusId) : null;
+            if (control) {
+                control.setAttribute('aria-invalid', 'true');
+                control.setAttribute('aria-describedby', error.id);
+                control.focus();
+            }
+        },
         copy: async (text, btn) => {
             try {
                 await navigator.clipboard.writeText(text);
@@ -3044,6 +3125,7 @@
             const health = document.getElementById('flu_health').value;
             const species = document.getElementById('flu_species').value;
             const weight = Utils.getValue('flu_weight');
+            Utils.clearError('fluids');
 
             try {
                 const calculation = PAWSCore.calculateFluidRate({ health, species, weight });
@@ -3051,12 +3133,14 @@
                 Calculators.Fluids.lastRes = calculation.text;
                 Utils.showResult('flu_result');
             } catch (error) {
-                alert(error.message);
+                Utils.hideResult('flu_result');
+                Utils.showError('fluids', error.message, 'flu_weight');
             }
         },
         reset: () => {
             document.getElementById('flu_weight').value = '';
             document.getElementById('flu_text_output').value = '';
+            Utils.clearError('fluids');
             Utils.hideResult('flu_result');
         },
         copy: () => Utils.copy(Calculators.Fluids.lastRes, document.querySelector('#fluids .copy-btn'))
@@ -3316,6 +3400,7 @@
         calculate: () => {
             const species = document.getElementById('bsa_species').value;
             const weight = Utils.getValue('bsa_weight');
+            Utils.clearError('bsa');
 
             try {
                 const calculation = PAWSCore.calculateBsa({ species, weight });
@@ -3326,7 +3411,8 @@
                 Calculators.BSA.lastRes = calculation.text;
                 Utils.showResult('bsa_result');
             } catch (error) {
-                alert(error.message);
+                Utils.hideResult('bsa_result');
+                Utils.showError('bsa', error.message, 'bsa_weight');
             }
         },
         updateChart: () => {
@@ -3348,6 +3434,7 @@
             document.getElementById('bsa_chart').classList.add('hidden');
             document.getElementById('bsa_chart_output').value = "";
             document.getElementById('bsa_chart_label').innerText = "";
+            Utils.clearError('bsa');
             Utils.hideResult('bsa_result');
             Calculators.BSA.lastRes = "";
         },
@@ -3630,19 +3717,17 @@
     // --- GLASGOW ---
     Calculators.Glasgow = {
         calculate: () => {
-            const m = Utils.getValue('gcs_motor');
-            const b = Utils.getValue('gcs_brain');
-            const l = Utils.getValue('gcs_loc');
-            const total = m + b + l;
-            let prog = total >= 15 ? "GOOD" : (total >= 9 ? "GUARDED" : "POOR/GRAVE");
-            let surv = total >= 15 ? "~90%" : (total >= 9 ? "~50%" : "<25-50%");
-            let color = total >= 15 ? "normal" : (total >= 9 ? "warning" : "critical");
-            Utils.setText('gcs_total', `${total} / 18`);
+            const calculation = PAWSCore.calculateGlasgow({
+                motor: Utils.getValue('gcs_motor'),
+                brainstem: Utils.getValue('gcs_brain'),
+                consciousness: Utils.getValue('gcs_loc')
+            });
+            Utils.setText('gcs_total', `${calculation.total} / 18`);
             const alert = document.getElementById('gcs_prognosis');
-            alert.innerText = `${prog} Prognosis (${surv} Survival)`;
-            alert.className = `alert-box ${color}`;
+            alert.innerText = `${calculation.prognosis} Prognosis (${calculation.survival} Survival)`;
+            alert.className = `alert-box ${calculation.severity}`;
             Utils.showResult('gcs_result');
-            Calculators.Glasgow.lastRes = `Glasgow Coma Scale: ${total}/18\nPrognosis: ${prog} (${surv})`;
+            Calculators.Glasgow.lastRes = calculation.text;
         },
         reset: () => {
             document.querySelectorAll('#glasgow select').forEach(s => s.selectedIndex = 0);
@@ -3654,21 +3739,27 @@
     // --- FSI ---
     Calculators.FSI = {
         calculate: () => {
-            const hr = Utils.getValue('fsi_hr');
-            const sbp = Utils.getValue('fsi_sbp');
-            if(!hr || !sbp) { alert("Enter HR and SBP"); return; }
-            const idx = (hr/sbp).toFixed(2);
-            let int = idx < 1.0 ? "Low (Bradycardia?)" : (idx <= 1.6 ? "Normal (1.47±0.2)" : "SHOCK LIKELY (>1.6)");
-            let cls = idx > 1.6 ? "critical" : "normal";
-            Utils.setText('fsi_val', idx);
-            const div = document.getElementById('fsi_interpretation');
-            div.innerText = int;
-            div.className = `alert-box ${cls}`;
-            Utils.showResult('fsi_result');
-            Calculators.FSI.lastRes = `Feline Shock Index: ${idx}\n${int} (HR:${hr}, SBP:${sbp})`;
+            Utils.clearError('fsi');
+            try {
+                const calculation = PAWSCore.calculateFelineShockIndex({
+                    heartRate: Utils.getValue('fsi_hr'),
+                    systolicBloodPressure: Utils.getValue('fsi_sbp')
+                });
+                Utils.setText('fsi_val', calculation.index);
+                const div = document.getElementById('fsi_interpretation');
+                div.innerText = calculation.interpretation;
+                div.className = `alert-box ${calculation.severity}`;
+                Utils.showResult('fsi_result');
+                Calculators.FSI.lastRes = calculation.text;
+            } catch (error) {
+                Utils.hideResult('fsi_result');
+                const focusId = Utils.getValue('fsi_hr') ? 'fsi_sbp' : 'fsi_hr';
+                Utils.showError('fsi', error.message, focusId);
+            }
         },
         reset: () => {
             document.querySelectorAll('#fsi input').forEach(i => i.value = '');
+            Utils.clearError('fsi');
             Utils.hideResult('fsi_result');
         },
         copy: () => Utils.copy(Calculators.FSI.lastRes, document.querySelector('#fsi .copy-btn'))
@@ -3750,16 +3841,17 @@
     // --- SOFA ---
     Calculators.SOFA = {
         calculate: () => {
-            const r = Utils.getValue('sofa_resp');
-            const c = Utils.getValue('sofa_coag');
-            const l = Utils.getValue('sofa_liver');
-            const cv = Utils.getValue('sofa_cv');
-            const cns = Utils.getValue('sofa_cns');
-            const ren = Utils.getValue('sofa_renal');
-            const total = r + c + l + cv + cns + ren;
-            Utils.setText('sofa_total', `${total} / 24`);
+            const calculation = PAWSCore.calculateSofa({
+                respiratory: Utils.getValue('sofa_resp'),
+                coagulation: Utils.getValue('sofa_coag'),
+                liver: Utils.getValue('sofa_liver'),
+                cardiovascular: Utils.getValue('sofa_cv'),
+                cns: Utils.getValue('sofa_cns'),
+                renal: Utils.getValue('sofa_renal')
+            });
+            Utils.setText('sofa_total', `${calculation.total} / 24`);
             Utils.showResult('sofa_result');
-            Calculators.SOFA.lastRes = `SOFA Score: ${total}/24\n(Resp:${r}, Coag:${c}, Liv:${l}, CV:${cv}, CNS:${cns}, Ren:${ren})`;
+            Calculators.SOFA.lastRes = calculation.text;
         },
         reset: () => {
             document.querySelectorAll('#sofa select').forEach(s => s.selectedIndex = 0);
