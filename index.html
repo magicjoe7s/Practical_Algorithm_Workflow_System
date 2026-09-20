@@ -665,6 +665,117 @@
             background: var(--input-bg);
             color: var(--text-main);
         }
+        /* --- PORTED CALCULATOR FORMS --- */
+        .ported-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        .ported-form > h3 {
+            margin: 0.35rem 0 -0.35rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 2px solid #E8F5E9;
+            color: var(--primary);
+            font-size: 1.05rem;
+        }
+
+        .ported-form .calc-grid {
+            align-items: start;
+        }
+
+        .ported-form .form-group {
+            height: 100%;
+            margin-bottom: 0;
+            padding: 0.85rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: #FCFDFD;
+        }
+
+        .ported-form .form-group label {
+            min-height: 2.4em;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .ported-form input[type="checkbox"] {
+            width: 1.15rem;
+            min-width: 1.15rem;
+            height: 1.15rem;
+            margin: 0;
+            accent-color: var(--primary);
+        }
+
+        .ported-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            min-height: 52px;
+            padding: 0.8rem 0.95rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: #FFFFFF;
+            cursor: pointer;
+            font-weight: 600;
+            line-height: 1.35;
+        }
+
+        .ported-toggle:hover {
+            border-color: var(--primary);
+            background: #F7FBF7;
+        }
+
+        .ported-group {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #FCFDFD;
+        }
+
+        .ported-group-title {
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .ported-form details {
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: #FFFFFF;
+        }
+
+        .ported-form details summary {
+            padding: 0.85rem 1rem;
+            background: #F5F7F8;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .ported-form details[open] summary {
+            border-bottom: 1px solid var(--border-color);
+            background: #E8F5E9;
+        }
+
+        .ported-form details .checkbox-item {
+            margin: 0.65rem 0.9rem;
+        }
+
+        .ported-result-title {
+            margin-bottom: 0.4rem;
+            color: var(--primary);
+        }
+
+        .ported-result-note {
+            margin-bottom: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
         /* --- ACCESSIBILITY & LOCAL-ONLY UX --- */
         .skip-link {
             position: fixed;
@@ -970,23 +1081,23 @@
             </div>
         </section>
 
-        <section id="caps" class="calculator-section"><div class="calc-header"><h2>CAPS / sCAPS</h2><button class="reset-btn" onclick="Calculators.AHK.reset('caps')">Reset</button></div><div class="calc-form" id="caps_form"></div><div id="caps_result" class="result-box hidden"><textarea id="caps_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('caps',this)">Copy Results</button></div></section>
+        <section id="caps" class="calculator-section"><div class="calc-header"><h2>CAPS / sCAPS</h2><button class="reset-btn" onclick="Calculators.AHK.reset('caps')">Reset</button></div><div class="calc-form ported-form" id="caps_form"></div><div id="caps_result" class="result-box hidden"><h3 class="ported-result-title">CAPS Result</h3><p class="ported-result-note">Review the score and interpretation before copying.</p><textarea id="caps_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('caps',this)">Copy Results</button></div></section>
 
-        <section id="psyllium" class="calculator-section"><div class="calc-header"><h2>Psyllium Dose</h2><button class="reset-btn" onclick="Calculators.AHK.reset('psyllium')">Reset</button></div><div class="calc-form" id="psyllium_form"></div><div id="psyllium_result" class="result-box hidden"><textarea id="psyllium_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('psyllium',this)">Copy Results</button></div></section>
+        <section id="psyllium" class="calculator-section"><div class="calc-header"><h2>Psyllium Dose</h2><button class="reset-btn" onclick="Calculators.AHK.reset('psyllium')">Reset</button></div><div class="calc-form ported-form" id="psyllium_form"></div><div id="psyllium_result" class="result-box hidden"><h3 class="ported-result-title">Psyllium Instructions</h3><p class="ported-result-note">Formatted for copying into discharge instructions.</p><textarea id="psyllium_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('psyllium',this)">Copy Results</button></div></section>
 
-        <section id="phs" class="calculator-section"><div class="calc-header"><h2>Pulmonary Hypertension Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('phs')">Reset</button></div><div class="calc-form" id="phs_form"></div><div id="phs_result" class="result-box hidden"><textarea id="phs_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('phs',this)">Copy Results</button></div></section>
+        <section id="phs" class="calculator-section"><div class="calc-header"><h2>Pulmonary Hypertension Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('phs')">Reset</button></div><div class="calc-form ported-form" id="phs_form"></div><div id="phs_result" class="result-box hidden"><h3 class="ported-result-title">Pulmonary Hypertension Result</h3><textarea id="phs_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('phs',this)">Copy Results</button></div></section>
 
-        <section id="snakebite" class="calculator-section"><div class="calc-header"><h2>Snake Bite Severity Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('snakebite')">Reset</button></div><div class="calc-form" id="snakebite_form"></div><div id="snakebite_result" class="result-box hidden"><textarea id="snakebite_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('snakebite',this)">Copy Results</button></div></section>
+        <section id="snakebite" class="calculator-section"><div class="calc-header"><h2>Snake Bite Severity Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('snakebite')">Reset</button></div><div class="calc-form ported-form" id="snakebite_form"></div><div id="snakebite_result" class="result-box hidden"><h3 class="ported-result-title">Snake Bite Severity Result</h3><textarea id="snakebite_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('snakebite',this)">Copy Results</button></div></section>
 
-        <section id="sirs" class="calculator-section"><div class="calc-header"><h2>SIRS</h2><button class="reset-btn" onclick="Calculators.AHK.reset('sirs')">Reset</button></div><div class="calc-form" id="sirs_form"></div><div id="sirs_result" class="result-box hidden"><textarea id="sirs_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('sirs',this)">Copy Results</button></div></section>
+        <section id="sirs" class="calculator-section"><div class="calc-header"><h2>SIRS</h2><button class="reset-btn" onclick="Calculators.AHK.reset('sirs')">Reset</button></div><div class="calc-form ported-form" id="sirs_form"></div><div id="sirs_result" class="result-box hidden"><h3 class="ported-result-title">SIRS Result</h3><textarea id="sirs_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('sirs',this)">Copy Results</button></div></section>
 
-        <section id="compass" class="calculator-section"><div class="calc-header"><h2>COMPASS Heat-Related Illness</h2><button class="reset-btn" onclick="Calculators.AHK.reset('compass')">Reset</button></div><div class="calc-form" id="compass_form"></div><div id="compass_result" class="result-box hidden"><textarea id="compass_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('compass',this)">Copy Results</button></div></section>
+        <section id="compass" class="calculator-section"><div class="calc-header"><h2>COMPASS Heat-Related Illness</h2><button class="reset-btn" onclick="Calculators.AHK.reset('compass')">Reset</button></div><div class="calc-form ported-form" id="compass_form"></div><div id="compass_result" class="result-box hidden"><h3 class="ported-result-title">COMPASS Result</h3><textarea id="compass_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('compass',this)">Copy Results</button></div></section>
 
-        <section id="lepto" class="calculator-section"><div class="calc-header"><h2>ACVIM Leptospirosis Case Definition</h2><button class="reset-btn" onclick="Calculators.AHK.reset('lepto')">Reset</button></div><div class="calc-form" id="lepto_form"></div><div id="lepto_result" class="result-box hidden"><textarea id="lepto_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('lepto',this)">Copy Results</button></div></section>
+        <section id="lepto" class="calculator-section"><div class="calc-header"><h2>ACVIM Leptospirosis Case Definition</h2><button class="reset-btn" onclick="Calculators.AHK.reset('lepto')">Reset</button></div><div class="calc-form ported-form" id="lepto_form"></div><div id="lepto_result" class="result-box hidden"><h3 class="ported-result-title">Leptospirosis Classification</h3><textarea id="lepto_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('lepto',this)">Copy Results</button></div></section>
 
-        <section id="duke" class="calculator-section"><div class="calc-header"><h2>Modified Duke Criteria</h2><button class="reset-btn" onclick="Calculators.AHK.reset('duke')">Reset</button></div><div class="calc-form" id="duke_form"></div><div id="duke_result" class="result-box hidden"><textarea id="duke_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('duke',this)">Copy Results</button></div></section>
+        <section id="duke" class="calculator-section"><div class="calc-header"><h2>Modified Duke Criteria</h2><button class="reset-btn" onclick="Calculators.AHK.reset('duke')">Reset</button></div><div class="calc-form ported-form" id="duke_form"></div><div id="duke_result" class="result-box hidden"><h3 class="ported-result-title">Modified Duke Classification</h3><textarea id="duke_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('duke',this)">Copy Results</button></div></section>
 
-        <section id="sepsis" class="calculator-section"><div class="calc-header"><h2>Sepsis Organ Dysfunction Assessment</h2><button class="reset-btn" onclick="Calculators.AHK.reset('sepsis')">Reset</button></div><div class="calc-form" id="sepsis_form"></div><div id="sepsis_result" class="result-box hidden"><textarea id="sepsis_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('sepsis',this)">Copy Results</button></div></section>
+        <section id="sepsis" class="calculator-section"><div class="calc-header"><h2>Sepsis Organ Dysfunction Assessment</h2><button class="reset-btn" onclick="Calculators.AHK.reset('sepsis')">Reset</button></div><div class="calc-form ported-form" id="sepsis_form"></div><div id="sepsis_result" class="result-box hidden"><h3 class="ported-result-title">Sepsis Assessment</h3><p class="ported-result-note">Decision-support summary; not a validated mortality score.</p><textarea id="sepsis_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('sepsis',this)">Copy Results</button></div></section>
 
         <!-- NUTRITION SUPPORT -->
         <section id="nutrition_support" class="calculator-section">
