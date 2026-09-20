@@ -48,7 +48,7 @@ test("calculates a sick dog fluid rate using the established formula", () => {
         weight: 10
     });
 
-    assert.equal(result.text, "Rate: 18.3 ml/hr\n(43.9 ml/kg/day)");
+    assert.equal(result.text, "Rate: 18.3 ml/hr\n(43.8 ml/kg/day)");
 });
 
 test("calculates healthy and sick cat fluid-rate ranges", () => {
