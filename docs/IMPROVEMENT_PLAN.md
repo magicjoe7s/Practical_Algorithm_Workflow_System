@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This plan assesses the repository as it exists on the `main` branch and proposes an incremental path that improves clinical safety, maintainability, usability, privacy, and delivery without silently changing established outputs.
+This plan proposes an incremental path that improves clinical safety, maintainability, usability, privacy, and delivery without silently changing established outputs. PAWS will remain a local-only calculation and workflow tool for colleagues; case sharing, accounts, backend persistence, analytics, and patient-data synchronization are out of scope.
 
 ## Baseline assessment
 
@@ -68,15 +68,13 @@ This does not require a backend. A small bundler is optional; native ES modules 
 
 ### Phase 0 — establish safety and ownership
 
-- Designate `index.html` as the only canonical application entry point.
-- Decide whether to delete `veterinary_calculators.html`, make it redirect to `index.html`, or generate it from the same source.
-- Inventory every calculator, unit, constant, threshold, text protocol, and medication entry.
-- Record the source, source version/date, clinical owner, and last-reviewed date for each item.
-- Create golden test cases from independently verified calculations.
+- Keep `index.html` as the only canonical application entry point.
+- Keep `veterinary_calculators.html` as a compatibility redirect so existing bookmarks continue to work.
+- Expand golden test cases for established calculations without changing their outputs.
 - Define supported browsers, intended users, deployment environment, and whether patient-identifying data is permitted.
 - Add a visible disclaimer, privacy statement, version, and clinical review date.
 
-**Exit criteria:** every clinical module has an owner and source; high-risk formulas have independent expected-result fixtures; duplicate-source policy is decided.
+**Exit criteria:** high-risk formulas have independent expected-result fixtures and the application has only one implementation source.
 
 ### Phase 1 — test before restructuring
 
@@ -133,30 +131,17 @@ This does not require a backend. A small bundler is optional; native ES modules 
 
 **Exit criteria:** users can understand where an answer came from and recognize invalid or high-risk input.
 
-### Phase 5 — decide on persistence and authentication
+### Phase 5 — preserve the local-only privacy model
 
-Choose one model explicitly.
+- Keep calculations and working state in browser memory.
+- Do not add accounts, case sharing, analytics, patient-data storage, or automatic network requests.
+- Keep the on-screen statement explaining that entered information is not transmitted or retained.
+- Keep exports and clipboard actions user-initiated.
+- Do not encode patient values in URLs.
+- If audience restriction is ever required, use institutional controls at the hosting layer without adding case storage to PAWS.
+- Review every new dependency or integration for unexpected network behavior.
 
-#### Option A: local-only, privacy-first
-
-- Keep all calculations in the browser.
-- Do not store patient identifiers.
-- Add an on-screen statement explaining that data is not transmitted or retained.
-- Host behind institutional access controls if audience restriction is required.
-- Keep exports user-initiated.
-
-#### Option B: authenticated application
-
-Only choose this if saved cases, synchronization, user roles, or clinical-system integrations are required.
-
-- Use institutional OIDC/SAML through a trusted backend or access gateway.
-- Use secure, `HttpOnly`, `SameSite` session cookies; do not store bearer tokens in browser storage.
-- Enforce authorization server-side for every operation.
-- Encrypt transport and stored data.
-- Define retention/deletion rules, audit logging, backup policy, incident response, and role-based access.
-- Perform privacy, security, and institutional compliance review before accepting patient data.
-
-**Exit criteria:** the data classification and threat model are approved before persistence or integrations ship.
+**Exit criteria:** automated checks and manual review confirm that normal PAWS workflows make no application data requests and persist no patient information.
 
 ### Phase 6 — delivery and governance
 
@@ -199,14 +184,13 @@ High-value behavioral improvements:
 
 ## Suggested implementation order for the next pull requests
 
-1. Clinical inventory and reference document
-2. Test harness plus golden cases for two representative calculators
-3. Canonical-entry decision and duplicate-file removal/redirect
-4. Shared validation and rendering utilities
-5. Calculator-by-calculator extraction with no-output-change tests
-6. Accessibility and navigation pass
-7. Clinical provenance UI and release workflow
-8. Optional product features chosen from actual user feedback
+1. Expand the existing test harness to additional calculators
+2. Continue calculator-by-calculator extraction with no-output-change tests
+3. Add shared validation and rendering utilities
+4. Complete the accessibility and navigation pass
+5. Improve responsive and print layouts
+6. Add privacy regression checks that prohibit storage and network calls
+7. Add optional local-only features chosen from colleague feedback
 
 ## Non-goals for this baseline pull request
 
