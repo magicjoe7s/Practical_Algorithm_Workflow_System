@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PAWS provides local-only veterinary clinical calculators and workflow tools.">
+    <meta name="theme-color" content="#1B5E20">
     <title>NCSU (Network for Clinical Support &amp; Utility) - PAWS (Practical Algorithm &amp; Workflow System)</title>
     <style>
         /* --- THEME CSS --- */
@@ -663,9 +665,254 @@
             background: var(--input-bg);
             color: var(--text-main);
         }
+        /* --- PORTED CALCULATOR FORMS --- */
+        .ported-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        .ported-form > h3 {
+            margin: 0.35rem 0 -0.35rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 2px solid #E8F5E9;
+            color: var(--primary);
+            font-size: 1.05rem;
+        }
+
+        .ported-form .calc-grid {
+            align-items: start;
+        }
+
+        .ported-form .form-group {
+            height: 100%;
+            margin-bottom: 0;
+            padding: 0.85rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: #FCFDFD;
+        }
+
+        .ported-form .form-group label {
+            min-height: 2.4em;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .ported-form input[type="checkbox"] {
+            width: 1.15rem;
+            min-width: 1.15rem;
+            height: 1.15rem;
+            margin: 0;
+            accent-color: var(--primary);
+        }
+
+        .ported-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            min-height: 52px;
+            padding: 0.8rem 0.95rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: #FFFFFF;
+            cursor: pointer;
+            font-weight: 600;
+            line-height: 1.35;
+        }
+
+        .ported-toggle:hover {
+            border-color: var(--primary);
+            background: #F7FBF7;
+        }
+
+        .ported-group {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #FCFDFD;
+        }
+
+        .ported-group-title {
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .ported-form details {
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: #FFFFFF;
+        }
+
+        .ported-form details summary {
+            padding: 0.85rem 1rem;
+            background: #F5F7F8;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .ported-form details[open] summary {
+            border-bottom: 1px solid var(--border-color);
+            background: #E8F5E9;
+        }
+
+        .ported-form details .checkbox-item {
+            margin: 0.65rem 0.9rem;
+        }
+
+        .ported-result-title {
+            margin-bottom: 0.4rem;
+            color: var(--primary);
+        }
+
+        .ported-result-note {
+            margin-bottom: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* --- ACCESSIBILITY & LOCAL-ONLY UX --- */
+        .skip-link {
+            position: fixed;
+            left: 1rem;
+            top: 0.5rem;
+            z-index: 1000;
+            padding: 0.65rem 0.9rem;
+            border-radius: var(--radius);
+            background: #FFFFFF;
+            color: var(--primary);
+            box-shadow: var(--shadow);
+            transform: translateY(-150%);
+        }
+
+        .skip-link:focus { transform: translateY(0); }
+
+        .privacy-note {
+            max-width: 760px;
+            margin: 1rem auto 1.25rem;
+            padding: 0.85rem 1rem;
+            border: 1px solid #A5D6A7;
+            border-radius: var(--radius);
+            background: #F1F8E9;
+            color: #1B5E20;
+            line-height: 1.45;
+        }
+
+        .tool-search {
+            max-width: 620px;
+            margin: 0 auto 2rem;
+            text-align: left;
+        }
+
+        .tool-search label {
+            display: block;
+            margin-bottom: 0.45rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .tool-search input {
+            width: 100%;
+            padding: 0.8rem 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .tool-search input:focus,
+        .tool-card:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 3px solid #FFB300;
+            outline-offset: 3px;
+        }
+
+        .tool-card[role="button"] { cursor: pointer; }
+
+        .search-status {
+            min-height: 1.25rem;
+            margin-top: 0.4rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .search-empty {
+            margin: 0 auto 2rem;
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .field-error {
+            margin: 0.75rem 0;
+            padding: 0.75rem 0.9rem;
+            border: 1px solid #C62828;
+            border-radius: var(--radius);
+            background: #FFEBEE;
+            color: #8E0000;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 600px) {
+            .home-grid { grid-template-columns: 1fr; gap: 0.9rem; }
+            .tool-card { min-height: auto; }
+            .result-row { align-items: flex-start; gap: 0.75rem; }
+            button, .tool-card[role="button"] { min-height: 44px; }
+        }
+
+        @media print {
+            body { display: block; background: #FFFFFF; color: #000000; }
+            .app-header,
+            .app-footer,
+            .skip-link,
+            #home,
+            button,
+            .copy-btn,
+            .reset-btn,
+            .privacy-note,
+            .tool-search,
+            .helper-text { display: none !important; }
+            #content-area { max-width: none; padding: 0; }
+            .calculator-section.active {
+                display: block !important;
+                border: 0;
+                box-shadow: none;
+                padding: 0;
+            }
+            .result-box {
+                break-inside: avoid;
+                border-color: #777;
+                background: #FFFFFF;
+            }
+            .text-output-box {
+                min-height: 0;
+                overflow: visible;
+                border: 0;
+                resize: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#content-area">Skip to tools</a>
 
     <header class="app-header">
         <div class="header-left">
@@ -681,6 +928,15 @@
             <div class="welcome-header">
                 <h2>PAWS (Practical Algorithm &amp; Workflow System)</h2>
                 <p>Select a tool to begin</p>
+                <div class="privacy-note" role="note">
+                    <strong>Local-only by design.</strong> Calculations happen in this browser. PAWS does not upload, save, or share entered information. Copying a result places it on this device's clipboard.
+                </div>
+                <div class="tool-search">
+                    <label for="tool_search">Find a tool</label>
+                    <input id="tool_search" type="search" placeholder="Search calculators, scores, medications, or workflows" autocomplete="off">
+                    <div id="tool_search_status" class="search-status" role="status" aria-live="polite"></div>
+                </div>
+                <p id="tool_search_empty" class="search-empty hidden">No tools match that search.</p>
             </div>
             
             <div class="home-section">
@@ -727,6 +983,10 @@
                     <div class="tool-card" onclick="switchTab('edd')">
                         <h3>EDD (LVDd)</h3>
                         <p>Estimate normal LVDd range by weight (optional measured EDD).</p>
+                    </div>
+                    <div class="tool-card" onclick="switchTab('phs')">
+                        <h3>Pulmonary Hypertension Score</h3>
+                        <p>Score five focused cardiac ultrasound domains using clearly defined findings.</p>
                     </div>
                 </div>
             </div>
@@ -776,6 +1036,13 @@
             <div class="home-section">
                 <div class="home-section-title">Prognostic Calculators</div>
                 <div class="home-grid">
+                    <div class="tool-card" onclick="switchTab('caps')"><h3>CAPS / sCAPS</h3><p>Canine acute pancreatitis severity scoring.</p></div>
+                    <div class="tool-card" onclick="switchTab('snakebite')"><h3>Snake Bite Severity</h3><p>Six-domain envenomation severity assessment.</p></div>
+                    <div class="tool-card" onclick="switchTab('sirs')"><h3>SIRS</h3><p>Species-specific canine and feline SIRS screening.</p></div>
+                    <div class="tool-card" onclick="switchTab('compass')"><h3>COMPASS Heat Illness</h3><p>Canine heat-related illness grading and temperature modifier.</p></div>
+                    <div class="tool-card" onclick="switchTab('lepto')"><h3>Leptospirosis Criteria</h3><p>ACVIM clinical, probable, and confirmed case definition.</p></div>
+                    <div class="tool-card" onclick="switchTab('duke')"><h3>Modified Duke Criteria</h3><p>Definite, possible, or rejected endocarditis classification.</p></div>
+                    <div class="tool-card" onclick="switchTab('sepsis')"><h3>Sepsis Assessment</h3><p>Eight-system organ dysfunction and septic-shock concern.</p></div>
                     <div class="tool-card" onclick="switchTab('apple')">
                         <h3>APPLE Score</h3>
                         <p>Acute Patient Physiologic and Laboratory Evaluation (Fast & Full models).</p>
@@ -815,6 +1082,22 @@
                 </div>
             </div>
         </section>
+
+        <section id="caps" class="calculator-section"><div class="calc-header"><h2>CAPS / sCAPS</h2><button class="reset-btn" onclick="Calculators.AHK.reset('caps')">Reset</button></div><div class="calc-form ported-form" id="caps_form"></div><div id="caps_result" class="result-box hidden"><h3 class="ported-result-title">CAPS Result</h3><p class="ported-result-note">Review the score and interpretation before copying.</p><textarea id="caps_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('caps',this)">Copy Results</button></div></section>
+
+        <section id="phs" class="calculator-section"><div class="calc-header"><h2>Pulmonary Hypertension Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('phs')">Reset</button></div><div class="calc-form ported-form"><p class="ported-result-note">Select the finding that best matches each focused cardiac ultrasound domain. Each choice shows its point value.</p><div id="phs_form"></div></div><div id="phs_result" class="result-box hidden"><h3 class="ported-result-title">Pulmonary Hypertension Result</h3><textarea id="phs_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('phs',this)">Copy Results</button></div></section>
+
+        <section id="snakebite" class="calculator-section"><div class="calc-header"><h2>Snake Bite Severity Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('snakebite')">Reset</button></div><div class="calc-form ported-form" id="snakebite_form"></div><div id="snakebite_result" class="result-box hidden"><h3 class="ported-result-title">Snake Bite Severity Result</h3><textarea id="snakebite_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('snakebite',this)">Copy Results</button></div></section>
+
+        <section id="sirs" class="calculator-section"><div class="calc-header"><h2>SIRS</h2><button class="reset-btn" onclick="Calculators.AHK.reset('sirs')">Reset</button></div><div class="calc-form ported-form" id="sirs_form"></div><div id="sirs_result" class="result-box hidden"><h3 class="ported-result-title">SIRS Result</h3><textarea id="sirs_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('sirs',this)">Copy Results</button></div></section>
+
+        <section id="compass" class="calculator-section"><div class="calc-header"><h2>COMPASS Heat-Related Illness</h2><button class="reset-btn" onclick="Calculators.AHK.reset('compass')">Reset</button></div><div class="calc-form ported-form" id="compass_form"></div><div id="compass_result" class="result-box hidden"><h3 class="ported-result-title">COMPASS Result</h3><textarea id="compass_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('compass',this)">Copy Results</button></div></section>
+
+        <section id="lepto" class="calculator-section"><div class="calc-header"><h2>ACVIM Leptospirosis Case Definition</h2><button class="reset-btn" onclick="Calculators.AHK.reset('lepto')">Reset</button></div><div class="calc-form ported-form" id="lepto_form"></div><div id="lepto_result" class="result-box hidden"><h3 class="ported-result-title">Leptospirosis Classification</h3><textarea id="lepto_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('lepto',this)">Copy Results</button></div></section>
+
+        <section id="duke" class="calculator-section"><div class="calc-header"><h2>Modified Duke Criteria</h2><button class="reset-btn" onclick="Calculators.AHK.reset('duke')">Reset</button></div><div class="calc-form ported-form" id="duke_form"></div><div id="duke_result" class="result-box hidden"><h3 class="ported-result-title">Modified Duke Classification</h3><textarea id="duke_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('duke',this)">Copy Results</button></div></section>
+
+        <section id="sepsis" class="calculator-section"><div class="calc-header"><h2>Sepsis Organ Dysfunction Assessment</h2><button class="reset-btn" onclick="Calculators.AHK.reset('sepsis')">Reset</button></div><div class="calc-form ported-form" id="sepsis_form"></div><div id="sepsis_result" class="result-box hidden"><h3 class="ported-result-title">Sepsis Assessment</h3><p class="ported-result-note">Decision-support summary; not a validated mortality score.</p><textarea id="sepsis_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('sepsis',this)">Copy Results</button></div></section>
 
         <!-- NUTRITION SUPPORT -->
         <section id="nutrition_support" class="calculator-section">
@@ -1583,11 +1866,15 @@
         <!-- FELINE SHOCK INDEX -->
         <section id="fsi" class="calculator-section">
             <div class="calc-header">
-                <h2>Feline Shock Index</h2>
+                <h2>Shock Index</h2>
                 <button class="reset-btn" onclick="Calculators.FSI.reset()">Reset</button>
             </div>
             <div class="calc-form">
                 <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Species</label>
+                        <select id="fsi_species"><option value="Cat">Cat</option><option value="Dog">Dog</option></select>
+                    </div>
                     <div class="form-group">
                         <label>Heart Rate (bpm)</label>
                         <input type="number" id="fsi_hr" placeholder="e.g. 180">
@@ -1717,7 +2004,7 @@
             </div>
             <div id="att_result" class="result-box hidden">
                 <div class="result-row"><span>Total Score:</span><strong id="att_total">-- / 18</strong></div>
-                <div class="small-text" style="text-align: center;">Higher scores indicate decreased likelihood of survival.</div>
+                <div id="att_interpretation" class="small-text" style="text-align: center;">Higher scores indicate decreased likelihood of survival.</div>
                 <button class="copy-btn" onclick="Calculators.ATT.copy()">Copy Results</button>
             </div>
         </section>
@@ -2028,6 +2315,23 @@
                 <div class="form-group hidden" id="out_med_other_group">
                     <label>Enter Medication Name</label>
                     <input type="text" id="out_med_other">
+                </div>
+
+                <div id="out_psyllium_group" class="hidden">
+                    <p class="ported-result-note">Enter the patient information to calculate introductory and maintenance psyllium dosing.</p>
+                    <div class="calc-grid">
+                        <div class="form-group">
+                            <label for="out_psyllium_species">Species</label>
+                            <select id="out_psyllium_species">
+                                <option value="Dog">Dog</option>
+                                <option value="Cat">Cat</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="out_psyllium_weight">Weight (kg)</label>
+                            <input id="out_psyllium_weight" type="number" min="0.1" step="0.1" placeholder="e.g. 12.5">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="calc-grid" id="out_conc_grid">
@@ -2368,6 +2672,22 @@
                 <button class="copy-btn" onclick="Calculators.Treatment.copy('heparin_cri', this)">Copy Heparin CRI</button>
             </div>
 
+            <div class="protocol-block" id="tx_oxygen">
+                <h3>Oxygen Titration</h3>
+                <ul class="protocol-list">
+                    <li>SpO₂ &gt;97%: decrease oxygen by 10%</li>
+                    <li>SpO₂ 93–96%: maintain oxygen concentration</li>
+                    <li>SpO₂ &lt;92%: increase oxygen by 10%</li>
+                </ul>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('oxygen_titration', this)">Copy Oxygen Titration</button>
+            </div>
+
+            <div class="protocol-block" id="tx_bleach_bath">
+                <h3>Bleach Bath</h3>
+                <p class="helper-text">1:100 dilution. Do not use full-strength bleach.</p>
+                <button class="copy-btn" onclick="Calculators.Treatment.copy('bleach_bath', this)">Copy Bleach Bath Instructions</button>
+            </div>
+
             <div class="protocol-block" id="tx_urine_output">
                 <h3>Urine Output</h3>
                 <p class="helper-text">Prompts once for the look-back and replacement interval, then copies the contingency text.</p>
@@ -2431,6 +2751,9 @@
         </div>
     </footer>
 
+    <script src="src/sepsis.js"></script>
+    <script src="src/calculators.js"></script>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
     window.Calculators = window.Calculators || {};
@@ -2461,6 +2784,78 @@
 
     function goHome() {
         switchTab('home');
+    }
+
+    function initHomeSearch() {
+        const input = document.getElementById('tool_search');
+        const status = document.getElementById('tool_search_status');
+        const empty = document.getElementById('tool_search_empty');
+        if (!input || !status || !empty) return;
+
+        const cards = Array.from(document.querySelectorAll('#home .tool-card'));
+        const sections = Array.from(document.querySelectorAll('#home .home-section'));
+
+        const filterTools = () => {
+            const query = input.value.trim().toLocaleLowerCase();
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const isVisible = !query || card.textContent.toLocaleLowerCase().includes(query);
+                card.classList.toggle('hidden', !isVisible);
+                if (isVisible) visibleCount += 1;
+            });
+
+            sections.forEach(section => {
+                const hasVisibleCard = Array.from(section.querySelectorAll('.tool-card'))
+                    .some(card => !card.classList.contains('hidden'));
+                section.classList.toggle('hidden', !hasVisibleCard);
+            });
+
+            empty.classList.toggle('hidden', visibleCount !== 0);
+            status.textContent = query
+                ? `${visibleCount} tool${visibleCount === 1 ? '' : 's'} found`
+                : `${cards.length} tools available`;
+        };
+
+        input.addEventListener('input', filterTools);
+        filterTools();
+    }
+
+    function enhanceAccessibility() {
+        document.querySelectorAll('.tool-card[onclick]').forEach(card => {
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+            card.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    card.click();
+                }
+            });
+        });
+
+        document.querySelectorAll('.form-group').forEach(group => {
+            const label = group.querySelector('label');
+            const control = group.querySelector('input, select, textarea');
+            if (label && control && control.id && !label.htmlFor) {
+                label.htmlFor = control.id;
+            }
+        });
+
+        document.querySelectorAll('.result-box').forEach(result => {
+            result.setAttribute('role', 'status');
+            result.setAttribute('aria-live', 'polite');
+        });
+
+        document.querySelectorAll('.calculator-section h2').forEach(heading => {
+            heading.setAttribute('tabindex', '-1');
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && !document.getElementById('home').classList.contains('active')) {
+                goHome();
+                document.getElementById('tool_search')?.focus();
+            }
+        });
     }
 
     function openTreatmentBlock(blockId) {
@@ -2499,6 +2894,37 @@
         },
         hideResult: (id) => {
             document.getElementById(id).classList.add('hidden');
+        },
+        clearError: (sectionId) => {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            section.querySelectorAll('.field-error').forEach(error => error.remove());
+            section.querySelectorAll('[aria-invalid="true"]').forEach(control => {
+                control.removeAttribute('aria-invalid');
+                control.removeAttribute('aria-describedby');
+            });
+        },
+        showError: (sectionId, message, focusId) => {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            Utils.clearError(sectionId);
+            const error = document.createElement('div');
+            error.id = `${sectionId}_error`;
+            error.className = 'field-error';
+            error.setAttribute('role', 'alert');
+            error.textContent = message;
+            const calculateButton = section.querySelector('.calculate-btn');
+            if (calculateButton) {
+                calculateButton.insertAdjacentElement('beforebegin', error);
+            } else {
+                section.prepend(error);
+            }
+            const control = focusId ? document.getElementById(focusId) : null;
+            if (control) {
+                control.setAttribute('aria-invalid', 'true');
+                control.setAttribute('aria-describedby', error.id);
+                control.focus();
+            }
         },
         copy: async (text, btn) => {
             try {
@@ -2875,28 +3301,22 @@
             const health = document.getElementById('flu_health').value;
             const species = document.getElementById('flu_species').value;
             const weight = Utils.getValue('flu_weight');
-            if (!weight || weight <= 0) { alert("Please enter valid weight > 0"); return; }
-            let result = "";
-            if (species === "Dog") {
-                const rate = health === "Healthy" 
-                    ? (140 * Math.pow(weight, 0.73)) / 24
-                    : (97 * Math.pow(weight, 0.655)) / 24;
-                const ratePerDay = (rate * 24) / weight;
-                result = `Rate: ${rate.toFixed(1)} ml/hr\n(${ratePerDay.toFixed(1)} ml/kg/day)`;
-            } else { 
-                const minRate = health === "Healthy" ? (30 * weight) / 24 : (20 * weight) / 24;
-                const maxRate = health === "Healthy" ? (70 * weight) / 24 : (35 * weight) / 24;
-                const minDay = (minRate * 24) / weight;
-                const maxDay = (maxRate * 24) / weight;
-                result = `Rate: ${minRate.toFixed(1)} - ${maxRate.toFixed(1)} ml/hr\n(${minDay.toFixed(1)} - ${maxDay.toFixed(1)} ml/kg/day)`;
+            Utils.clearError('fluids');
+
+            try {
+                const calculation = PAWSCore.calculateFluidRate({ health, species, weight });
+                document.getElementById('flu_text_output').value = calculation.text;
+                Calculators.Fluids.lastRes = calculation.text;
+                Utils.showResult('flu_result');
+            } catch (error) {
+                Utils.hideResult('flu_result');
+                Utils.showError('fluids', error.message, 'flu_weight');
             }
-            document.getElementById('flu_text_output').value = result;
-            Calculators.Fluids.lastRes = result;
-            Utils.showResult('flu_result');
         },
         reset: () => {
             document.getElementById('flu_weight').value = '';
             document.getElementById('flu_text_output').value = '';
+            Utils.clearError('fluids');
             Utils.hideResult('flu_result');
         },
         copy: () => Utils.copy(Calculators.Fluids.lastRes, document.querySelector('#fluids .copy-btn'))
@@ -3156,21 +3576,20 @@
         calculate: () => {
             const species = document.getElementById('bsa_species').value;
             const weight = Utils.getValue('bsa_weight');
-            if (weight === null || weight <= 0 || weight < 0.1 || weight > 100) {
-                alert("Please enter a valid weight between 0.1 and 100 kg.");
-                return;
+            Utils.clearError('bsa');
+
+            try {
+                const calculation = PAWSCore.calculateBsa({ species, weight });
+                Utils.setText('bsa_species_result', calculation.species);
+                Utils.setText('bsa_weight_result', `${calculation.weight.toFixed(2)} kg`);
+                Utils.setText('bsa_value_result', `${calculation.bsa.toFixed(3)} m2`);
+                Utils.setText('bsa_equation_result', calculation.equation);
+                Calculators.BSA.lastRes = calculation.text;
+                Utils.showResult('bsa_result');
+            } catch (error) {
+                Utils.hideResult('bsa_result');
+                Utils.showError('bsa', error.message, 'bsa_weight');
             }
-            const coeff = Calculators.BSA.coefficients[species];
-            const bsa = coeff * Math.pow(weight, 2 / 3);
-            const equation = species === "Dog"
-                ? "BSA = 0.101 x (kg)^(2/3)"
-                : "BSA = 0.100 x (kg)^(2/3)";
-            Utils.setText('bsa_species_result', species);
-            Utils.setText('bsa_weight_result', `${weight.toFixed(2)} kg`);
-            Utils.setText('bsa_value_result', `${bsa.toFixed(3)} m2`);
-            Utils.setText('bsa_equation_result', equation);
-            Calculators.BSA.lastRes = `${species} ${weight.toFixed(2)} kg | BSA = ${bsa.toFixed(3)} m2`;
-            Utils.showResult('bsa_result');
         },
         updateChart: () => {
             const species = document.getElementById('bsa_species').value;
@@ -3191,6 +3610,7 @@
             document.getElementById('bsa_chart').classList.add('hidden');
             document.getElementById('bsa_chart_output').value = "";
             document.getElementById('bsa_chart_label').innerText = "";
+            Utils.clearError('bsa');
             Utils.hideResult('bsa_result');
             Calculators.BSA.lastRes = "";
         },
@@ -3473,19 +3893,17 @@
     // --- GLASGOW ---
     Calculators.Glasgow = {
         calculate: () => {
-            const m = Utils.getValue('gcs_motor');
-            const b = Utils.getValue('gcs_brain');
-            const l = Utils.getValue('gcs_loc');
-            const total = m + b + l;
-            let prog = total >= 15 ? "GOOD" : (total >= 9 ? "GUARDED" : "POOR/GRAVE");
-            let surv = total >= 15 ? "~90%" : (total >= 9 ? "~50%" : "<25-50%");
-            let color = total >= 15 ? "normal" : (total >= 9 ? "warning" : "critical");
-            Utils.setText('gcs_total', `${total} / 18`);
+            const calculation = PAWSCore.calculateGlasgow({
+                motor: Utils.getValue('gcs_motor'),
+                brainstem: Utils.getValue('gcs_brain'),
+                consciousness: Utils.getValue('gcs_loc')
+            });
+            Utils.setText('gcs_total', `${calculation.total} / 18`);
             const alert = document.getElementById('gcs_prognosis');
-            alert.innerText = `${prog} Prognosis (${surv} Survival)`;
-            alert.className = `alert-box ${color}`;
+            alert.innerText = `${calculation.prognosis} Prognosis (${calculation.survival} Survival)\n${calculation.recommendation}`;
+            alert.className = `alert-box ${calculation.severity}`;
             Utils.showResult('gcs_result');
-            Calculators.Glasgow.lastRes = `Glasgow Coma Scale: ${total}/18\nPrognosis: ${prog} (${surv})`;
+            Calculators.Glasgow.lastRes = calculation.text;
         },
         reset: () => {
             document.querySelectorAll('#glasgow select').forEach(s => s.selectedIndex = 0);
@@ -3497,21 +3915,28 @@
     // --- FSI ---
     Calculators.FSI = {
         calculate: () => {
-            const hr = Utils.getValue('fsi_hr');
-            const sbp = Utils.getValue('fsi_sbp');
-            if(!hr || !sbp) { alert("Enter HR and SBP"); return; }
-            const idx = (hr/sbp).toFixed(2);
-            let int = idx < 1.0 ? "Low (Bradycardia?)" : (idx <= 1.6 ? "Normal (1.47±0.2)" : "SHOCK LIKELY (>1.6)");
-            let cls = idx > 1.6 ? "critical" : "normal";
-            Utils.setText('fsi_val', idx);
-            const div = document.getElementById('fsi_interpretation');
-            div.innerText = int;
-            div.className = `alert-box ${cls}`;
-            Utils.showResult('fsi_result');
-            Calculators.FSI.lastRes = `Feline Shock Index: ${idx}\n${int} (HR:${hr}, SBP:${sbp})`;
+            Utils.clearError('fsi');
+            try {
+                const calculation = PAWSCore.calculateShockIndex({
+                    species: document.getElementById('fsi_species').value,
+                    heartRate: Utils.getValue('fsi_hr'),
+                    systolicBloodPressure: Utils.getValue('fsi_sbp')
+                });
+                Utils.setText('fsi_val', calculation.index);
+                const div = document.getElementById('fsi_interpretation');
+                div.innerText = calculation.interpretation;
+                div.className = `alert-box ${calculation.severity}`;
+                Utils.showResult('fsi_result');
+                Calculators.FSI.lastRes = calculation.text;
+            } catch (error) {
+                Utils.hideResult('fsi_result');
+                const focusId = Utils.getValue('fsi_hr') ? 'fsi_sbp' : 'fsi_hr';
+                Utils.showError('fsi', error.message, focusId);
+            }
         },
         reset: () => {
             document.querySelectorAll('#fsi input').forEach(i => i.value = '');
+            Utils.clearError('fsi');
             Utils.hideResult('fsi_result');
         },
         copy: () => Utils.copy(Calculators.FSI.lastRes, document.querySelector('#fsi .copy-btn'))
@@ -3593,16 +4018,17 @@
     // --- SOFA ---
     Calculators.SOFA = {
         calculate: () => {
-            const r = Utils.getValue('sofa_resp');
-            const c = Utils.getValue('sofa_coag');
-            const l = Utils.getValue('sofa_liver');
-            const cv = Utils.getValue('sofa_cv');
-            const cns = Utils.getValue('sofa_cns');
-            const ren = Utils.getValue('sofa_renal');
-            const total = r + c + l + cv + cns + ren;
-            Utils.setText('sofa_total', `${total} / 24`);
+            const calculation = PAWSCore.calculateSofa({
+                respiratory: Utils.getValue('sofa_resp'),
+                coagulation: Utils.getValue('sofa_coag'),
+                liver: Utils.getValue('sofa_liver'),
+                cardiovascular: Utils.getValue('sofa_cv'),
+                cns: Utils.getValue('sofa_cns'),
+                renal: Utils.getValue('sofa_renal')
+            });
+            Utils.setText('sofa_total', `${calculation.total} / 24`);
             Utils.showResult('sofa_result');
-            Calculators.SOFA.lastRes = `SOFA Score: ${total}/24\n(Resp:${r}, Coag:${c}, Liv:${l}, CV:${cv}, CNS:${cns}, Ren:${ren})`;
+            Calculators.SOFA.lastRes = calculation.text;
         },
         reset: () => {
             document.querySelectorAll('#sofa select').forEach(s => s.selectedIndex = 0);
@@ -3871,9 +4297,12 @@
             const neuro = Utils.getValue('att_neuro');
             const species = document.getElementById('att_species').value;
             const total = perf + card + resp + eye + skel + neuro;
+            const cutoff = species === 'dog' ? 6 : 5;
+            const interpretation = total >= cutoff ? `Higher risk (score ≥ ${cutoff})` : `Lower risk (score < ${cutoff})`;
             Utils.setText('att_total', `${total} / 18`);
+            Utils.setText('att_interpretation', interpretation + '. Higher scores indicate decreased likelihood of survival.');
             Utils.showResult('att_result');
-            Calculators.ATT.lastRes = `ATT Score (${species}): ${total}/18\n(Perf:${perf}, Card:${card}, Resp:${resp}, Eye:${eye}, Skel:${skel}, Neuro:${neuro})`;
+            Calculators.ATT.lastRes = `ATT Score (${species}): ${total}/18 — ${interpretation}\n(Perf:${perf}, Card:${card}, Resp:${resp}, Eye:${eye}, Skel:${skel}, Neuro:${neuro})`;
         },
         reset: () => {
             document.querySelectorAll('#att select').forEach(s => s.selectedIndex = 0);
@@ -4326,6 +4755,13 @@ Record total volume infused in treatment notes (mandatory)
 If close to baseline, give 20-30 U/kg bolus to bump without increasing CRI rate`,
             pain_score:
 `Please perform an NCSU pain score. If any individual score is >3 or if the cumulative score is >6, please administer pain medications scheduled at this hour. If patient does not meet these criteria, pain medications can be skipped.`,
+            oxygen_titration:
+`Perform SpO₂ check. Titrate O₂ % based on the below instructions:
+SpO₂ >97% → decrease O₂ by 10%
+SpO₂ 93-96% → maintain O₂ concentration
+SpO₂ <92% → increase O₂ by 10%`,
+            bleach_bath:
+`BLEACH BATH 1:100 dilution DO NOT USE FULL STRENGTH BLEACH: Dilute 1/2 tsp (2.5mls) of bleach into 1 cup of water. Please wear gloves and apply the diluted bleach with a cotton ball, soft cloth or sponge or by a form of bath onto the skin/wound Solutions are only good for 24 hours once mixed, please discard after each use.`,
             amlodipine_loading:
 `Amlodipine Loading
 Cat:
@@ -4488,24 +4924,25 @@ Maintenance Instructions:
         onMedChange: () => {
             const med = document.getElementById('out_med_select').value;
             const otherGroup = document.getElementById('out_med_other_group');
+            const psylliumGroup = document.getElementById('out_psyllium_group');
             const sideEffects = document.getElementById('out_side_effects');
             const proviableGroup = document.getElementById('out_proviable_paste_group');
             const concGroup = document.getElementById('out_conc_group');
-            const concGrid = document.getElementById('out_conc_grid');
-            const doseFreqGroup = document.getElementById('out_dose_freq_group');
-            const durationGroup = document.getElementById('out_duration_group');
-            const nextDoseGroup = document.getElementById('out_next_dose_group');
-            const sideEffectsGroup = document.getElementById('out_side_effects_group');
-            const isMirtazipine = med === "Mirtazipine";
+            const standardGroups = [
+                document.getElementById('out_conc_grid'),
+                document.getElementById('out_dose_freq_group'),
+                document.getElementById('out_duration_group'),
+                document.getElementById('out_next_dose_group'),
+                document.getElementById('out_side_effects_group')
+            ];
+            const isMirtazapine = med === "Mirtazipine";
+            const isPsyllium = med === "Psyllium";
 
-            [otherGroup, concGrid, doseFreqGroup, durationGroup, nextDoseGroup, sideEffectsGroup].forEach(el => {
-                if (el) el.classList.remove('hidden');
-            });
+            otherGroup.classList.add('hidden');
+            psylliumGroup.classList.toggle('hidden', !isPsyllium);
+            standardGroups.forEach(el => el.classList.toggle('hidden', isMirtazapine || isPsyllium));
 
-            if (isMirtazipine) {
-                [otherGroup, concGrid, doseFreqGroup, durationGroup, nextDoseGroup, sideEffectsGroup].forEach(el => {
-                    if (el) el.classList.add('hidden');
-                });
+            if (isMirtazapine || isPsyllium) {
                 proviableGroup.classList.add('hidden');
                 concGroup.classList.add('hidden');
                 document.getElementById('out_proviable_paste_ml').value = "";
@@ -4517,24 +4954,17 @@ Maintenance Instructions:
             if (med === "Other") {
                 otherGroup.classList.remove('hidden');
                 sideEffects.value = "No predefined side effects available for custom medication.";
+            } else if (med === "Proviable Forte Kit") {
+                sideEffects.value = Calculators.OutpatientMeds.proviableNote;
             } else {
-                otherGroup.classList.add('hidden');
-                if (med === "Proviable Forte Kit") {
-                    sideEffects.value = Calculators.OutpatientMeds.proviableNote;
-                } else {
-                    sideEffects.value = Calculators.OutpatientMeds.sideEffects[med] || "";
-                }
+                sideEffects.value = Calculators.OutpatientMeds.sideEffects[med] || "";
             }
 
-            if (med === "Proviable Forte Kit") {
-                proviableGroup.classList.remove('hidden');
-                concGroup.classList.add('hidden');
-                document.getElementById('out_conc_value').value = "";
-            } else {
-                proviableGroup.classList.add('hidden');
-                concGroup.classList.remove('hidden');
-                document.getElementById('out_proviable_paste_ml').value = "";
-            }
+            const isProviable = med === "Proviable Forte Kit";
+            proviableGroup.classList.toggle('hidden', !isProviable);
+            concGroup.classList.toggle('hidden', isProviable);
+            if (isProviable) document.getElementById('out_conc_value').value = "";
+            else document.getElementById('out_proviable_paste_ml').value = "";
         },
         toggleDuration: () => {
             const untilDirected = document.getElementById('out_until_directed');
@@ -4556,6 +4986,19 @@ Maintenance Instructions:
         generate: () => {
             const medSelect = document.getElementById('out_med_select');
             const med = medSelect.value;
+            if (med === "Psyllium") {
+                try {
+                    const species = document.getElementById('out_psyllium_species').value;
+                    const weight = Number(document.getElementById('out_psyllium_weight').value);
+                    const result = PAWSCore.calculatePsyllium({species, weight});
+                    document.getElementById('out_med_text_output').value = result.text;
+                    Calculators.OutpatientMeds.lastRes = result.text;
+                    Utils.showResult('out_med_result');
+                } catch (error) {
+                    alert(error.message);
+                }
+                return;
+            }
             if (med === "Mirtazipine") {
                 let text = "**Mirtazapine Transdermal solution - 5 grams -** Apply a 1.5 cm strip on the skin of the inner ear every 24 hours as needed for appetite stimulation\n";
                 text += "  - The most common side effects of this medication in cats are agitation, vocalization, restlessness, irritation of the ear, and vomiting. If you notice any of these signs, please contact MSU-CVM or your veterinarian. *Please give this medication 30-45 minutes before giving food*";
@@ -4626,6 +5069,8 @@ Maintenance Instructions:
             document.getElementById('out_until_gone').checked = false;
             document.getElementById('out_next_dose').value = "";
             document.getElementById('out_proviable_paste_ml').value = "";
+            document.getElementById('out_psyllium_species').value = "Dog";
+            document.getElementById('out_psyllium_weight').value = "";
             document.getElementById('out_med_text_output').value = "";
             document.getElementById('out_duration').disabled = false;
             Utils.hideResult('out_med_result');
@@ -4634,8 +5079,44 @@ Maintenance Instructions:
         copy: () => Utils.copy(Calculators.OutpatientMeds.lastRes, document.querySelector('#outpatient_meds .copy-btn'))
     };
 
+    // --- AHK REFERENCE CALCULATORS ---
+    Calculators.AHK = {
+        last: {},
+        field: (label, control) => `<div class="form-group"><label>${label}</label>${control}</div>`,
+        select: (id, values) => `<select id="${id}">${values.map(v => `<option value="${v[0]}">${v[1]}</option>`).join('')}</select>`,
+        checks: (id, items) => `<div id="${id}" class="option-grid">${items.map((x,i)=>`<label class="option-tile"><input type="checkbox" value="${i}" data-label="${x}"><span class="option-tile-body">${x}</span></label>`).join('')}</div>`,
+        toggle: (id, text) => `<label class="ported-toggle"><input id="${id}" type="checkbox"><span>${text}</span></label>`,
+        scoreFields: (prefix, names, values=[0,1,2,3,4]) => `<div class="calc-grid">${names.map((n,i)=>Calculators.AHK.field(n,Calculators.AHK.select(prefix+i,values.map(v=>[v,v])))).join('')}</div>`,
+        render: () => {
+            caps_form.innerHTML=Calculators.AHK.field("Scoring system",Calculators.AHK.select("caps_mode",[["CAPS","CAPS (Full)"],["sCAPS","sCAPS (Simplified)"]]))+`<div class="calc-grid">${Calculators.AHK.toggle("caps_sirs","SIRS present")}${Calculators.AHK.toggle("caps_coag","Coagulation disorder present")}${Calculators.AHK.field("Creatinine (mg/dL)",'<input id="caps_cr" type="number" step="0.1">')}${Calculators.AHK.field("Ionized calcium (mg/dL)",'<input id="caps_ca" type="number" step="0.1">')}${Calculators.AHK.field("Respiratory rate (sCAPS)",'<input id="caps_rr" type="number">')}</div><button class="calculate-btn" onclick="Calculators.AHK.calculate('caps')">Calculate</button>`;
+            const phsDomains = [
+                ["Right atrial / right ventricular enlargement", [[0,"0 — No right-heart enlargement"],[1,"1 — Right atrial or right ventricular enlargement"],[2,"2 — Right atrial and right ventricular enlargement"]]],
+                ["Right ventricular hypertrophy", [[0,"0 — Neither finding"],[1,"1 — RV free-wall hypertrophy or prominent papillary muscles"],[2,"2 — Both findings"]]],
+                ["Interventricular septal (IVS) flattening", [[0,"0 — No IVS flattening"],[2,"2 — IVS flattening present"]]],
+                ["Pulmonary artery enlargement", [[0,"0 — Neither finding"],[1,"1 — Pulmonary trunk or right pulmonary artery enlargement"],[2,"2 — Both findings"]]],
+                ["Right-sided congestive signs", [[0,"0 — No effusion; caudal vena cava normal"],[1,"1 — Effusion or distended/noncompliant caudal vena cava"],[2,"2 — Both findings"]]]
+            ];
+            phs_form.innerHTML = `<div class="calc-grid">${phsDomains.map((domain,i)=>Calculators.AHK.field(domain[0],Calculators.AHK.select("phs_"+i,domain[1]))).join('')}</div><button class="calculate-btn" onclick="Calculators.AHK.calculate('phs')">Calculate Score</button>`;
+            snakebite_form.innerHTML=Calculators.AHK.scoreFields("sss_",["Local wound","Hematologic","Cardiovascular","Respiratory","Gastrointestinal","Neurologic"])+`<button class="calculate-btn" onclick="Calculators.AHK.calculate('snakebite')">Calculate</button>`;
+            sirs_form.innerHTML=`<div class="calc-grid">${Calculators.AHK.field("Species",Calculators.AHK.select("sirs_species",[["Dog","Dog"],["Cat","Cat"]]))}${["Temperature °F","Heart rate","Respiratory rate","WBC /µL","Bands %"].map((x,i)=>Calculators.AHK.field(x,`<input id="sirs_${["t","h","r","w","b"][i]}" type="number" step="0.1">`)).join('')}</div><button class="calculate-btn" onclick="Calculators.AHK.calculate('sirs')">Calculate</button>`;
+            const comp=[["General signs / collapse",[0,1]],["Respiratory",[0,1,2]],["Gastrointestinal",[0,2,3]],["Neurologic",[0,2,3]],["Bleeding / coagulation",[0,3]],["Multi-organ dysfunction",[0,3]]];compass_form.innerHTML=`<div class="calc-grid">${comp.map((x,i)=>Calculators.AHK.field(x[0],Calculators.AHK.select("comp_"+i,x[1].map(v=>[v,v+" - "+["None","Mild","Moderate","Severe"][v]])))).join('')}${Calculators.AHK.field("Triage temperature (optional)",'<input id="comp_temp" type="number" step="0.1">')}${Calculators.AHK.field("Unit",Calculators.AHK.select("comp_unit",[["C","C"],["F","F"]]))}</div><button class="calculate-btn" onclick="Calculators.AHK.calculate('compass')">Evaluate</button>`;
+            const lc=["Neutrophilic leukocytosis","Thrombocytopenia","Biochemical AKI","Cholestatic hepatopathy","Biochemical pancreatitis","Increased CK","Normoglycemic glucosuria","Active urine sediment","Pulmonary hemorrhage imaging","Supportive abdominal ultrasound","Arrhythmia or increased troponin"],ls=["single MAT titer >=1:800","positive acute-phase IgM","positive urine NAAT/PCR","reference-laboratory darkfield visualization"],lf=["fourfold or greater MAT increase","positive blood NAAT/PCR","reference-laboratory organism isolation"];lepto_form.innerHTML=`${Calculators.AHK.toggle("lepto_ill","Compatible systemic illness within the past 2 weeks")}<h3>Clinicopathologic abnormalities</h3>${Calculators.AHK.checks("lepto_c",lc)}<h3>Supportive laboratory criteria</h3>${Calculators.AHK.checks("lepto_s",ls)}<h3>Confirmatory laboratory criteria</h3>${Calculators.AHK.checks("lepto_f",lf)}${Calculators.AHK.toggle("lepto_vax","Recent leptospirosis vaccination")}<button class="calculate-btn" onclick="Calculators.AHK.calculate('lepto')">Evaluate</button>`;
+            duke_form.innerHTML=`${Calculators.AHK.toggle("duke_path","Valvular pathology")}<h3>Major criteria</h3>${Calculators.AHK.checks("duke_m",["Positive echocardiogram lesion/abscess","New valvular insufficiency","Major blood-culture criterion"])}<h3>Minor criteria</h3>${Calculators.AHK.checks("duke_n",["Dog >15 kg","Fever","Subaortic stenosis","Thromboembolic disease","Immune-mediated disease","Minor blood-culture criterion","Bartonella serology >=1:1024"])}<h3>Rejection criteria</h3>${Calculators.AHK.checks("duke_r",["Firm alternative diagnosis","Resolution with <4 days treatment","No pathologic valvular evidence"])}<button class="calculate-btn" onclick="Calculators.AHK.calculate('duke')">Evaluate</button>`;
+            sepsis_form.innerHTML=`<div class="calc-grid">${Calculators.AHK.toggle("sep_inf","Known or suspected infection")}${Calculators.AHK.toggle("sep_res","Adequately resuscitated / hypovolemia addressed")}${Calculators.AHK.toggle("sep_shock","Clinician-adjudicated septic shock")}</div><div id="sep_organs"></div><button class="calculate-btn" onclick="Calculators.AHK.calculate('sepsis')">Evaluate</button>`;PAWSSepsis.definitions.forEach(d=>{const box=document.createElement("details");box.innerHTML=`<summary><strong>${d.name}</strong></summary><div class="option-grid">`+d.criteria.map(c=>`<label class="option-tile"><input class="sepcrit" data-organ="${d.key}" value="${c[0]}" type="checkbox"><span class="option-tile-body">${c[1]}</span></label>`).join('')+`</div><label class="ported-toggle"><input class="sepex" value="${d.key}" type="checkbox"><span>Exclude this organ from sepsis counts</span></label>`;sep_organs.append(box)});
+        },
+        chosen: id => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(x=>x.dataset.label||x.value),
+        value: id => {const e=document.getElementById(id);return e.value===""?NaN:Number(e.value)},
+        show: (id,result) => {Calculators.AHK.last[id]=result.text;document.getElementById(id+"_output").value=result.text;Utils.showResult(id+"_result")},
+        calculate: id => {try{let r;if(id==="caps")r=PAWSCore.calculateCaps({mode:caps_mode.value,sirs:caps_sirs.checked,coagulationDisorder:caps_coag.checked,creatinine:Calculators.AHK.value("caps_cr"),ionizedCalcium:Calculators.AHK.value("caps_ca"),respiratoryRate:Calculators.AHK.value("caps_rr")});if(id==="phs")r=PAWSCore.calculatePhs([0,1,2,3,4].map(i=>Calculators.AHK.value("phs_"+i)));if(id==="snakebite")r=PAWSCore.calculateSnakeBite([0,1,2,3,4,5].map(i=>Calculators.AHK.value("sss_"+i)));if(id==="sirs")r=PAWSCore.calculateSirs({species:sirs_species.value,temperature:Calculators.AHK.value("sirs_t"),heartRate:Calculators.AHK.value("sirs_h"),respiratoryRate:Calculators.AHK.value("sirs_r"),wbc:Calculators.AHK.value("sirs_w"),bands:Calculators.AHK.value("sirs_b")});if(id==="compass")r=PAWSCore.evaluateCompass({grades:[0,1,2,3,4,5].map(i=>Calculators.AHK.value("comp_"+i)),temperature:comp_temp.value===""?null:Calculators.AHK.value("comp_temp"),unit:comp_unit.value});if(id==="lepto")r=PAWSCore.evaluateLepto({illness:lepto_ill.checked,clinicopathCount:Calculators.AHK.chosen("lepto_c").length,supportive:Calculators.AHK.chosen("lepto_s"),confirmatory:Calculators.AHK.chosen("lepto_f"),recentVaccine:lepto_vax.checked});if(id==="duke")r=PAWSCore.evaluateDuke({pathology:duke_path.checked,majorCount:Calculators.AHK.chosen("duke_m").length,minorCount:Calculators.AHK.chosen("duke_n").length,rejections:Calculators.AHK.chosen("duke_r")});if(id==="sepsis"){const organs={},excluded={};document.querySelectorAll(".sepcrit:checked").forEach(x=>(organs[x.dataset.organ]??=[]).push(x.value));document.querySelectorAll(".sepex:checked").forEach(x=>excluded[x.value]=true);r=PAWSSepsis.evaluate({infection:sep_inf.checked,resuscitated:sep_res.checked,adjudicatedShock:sep_shock.checked,organs,excluded})}Calculators.AHK.show(id,r)}catch(e){Utils.showError(id,e.message)}},
+        reset: id => {Calculators.AHK.render();Utils.clearError(id);Utils.hideResult(id+"_result");document.getElementById(id+"_output").value=""},
+        copy: (id,btn) => Utils.copy(Calculators.AHK.last[id]||"",btn)
+    };
+
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
+        Calculators.AHK.render();
+        enhanceAccessibility();
+        initHomeSearch();
         Calculators.NutritionSupport.init();
         Calculators.Consent.init();
         Calculators.Consent.reset();
