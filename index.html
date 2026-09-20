@@ -1870,7 +1870,7 @@
             </div>
             <div id="att_result" class="result-box hidden">
                 <div class="result-row"><span>Total Score:</span><strong id="att_total">-- / 18</strong></div>
-                <div class="small-text" style="text-align: center;">Higher scores indicate decreased likelihood of survival.</div>
+                <div id="att_interpretation" class="small-text" style="text-align: center;">Higher scores indicate decreased likelihood of survival.</div>
                 <button class="copy-btn" onclick="Calculators.ATT.copy()">Copy Results</button>
             </div>
         </section>
@@ -4145,9 +4145,12 @@
             const neuro = Utils.getValue('att_neuro');
             const species = document.getElementById('att_species').value;
             const total = perf + card + resp + eye + skel + neuro;
+            const cutoff = species === 'dog' ? 6 : 5;
+            const interpretation = total >= cutoff ? `Higher risk (score ≥ ${cutoff})` : `Lower risk (score < ${cutoff})`;
             Utils.setText('att_total', `${total} / 18`);
+            Utils.setText('att_interpretation', interpretation + '. Higher scores indicate decreased likelihood of survival.');
             Utils.showResult('att_result');
-            Calculators.ATT.lastRes = `ATT Score (${species}): ${total}/18\n(Perf:${perf}, Card:${card}, Resp:${resp}, Eye:${eye}, Skel:${skel}, Neuro:${neuro})`;
+            Calculators.ATT.lastRes = `ATT Score (${species}): ${total}/18 — ${interpretation}\n(Perf:${perf}, Card:${card}, Resp:${resp}, Eye:${eye}, Skel:${skel}, Neuro:${neuro})`;
         },
         reset: () => {
             document.querySelectorAll('#att select').forEach(s => s.selectedIndex = 0);
