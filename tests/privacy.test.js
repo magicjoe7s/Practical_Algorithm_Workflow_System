@@ -7,7 +7,8 @@ const repositoryRoot = path.resolve(__dirname, "..");
 const applicationSources = [
     "index.html",
     "additional_calculators.html",
-    "src/calculators.js"
+    "src/calculators.js",
+    "src/sepsis.js"
 ].map(file => ({
     file,
     content: fs.readFileSync(path.join(repositoryRoot, file), "utf8")
