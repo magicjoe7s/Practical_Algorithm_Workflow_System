@@ -984,6 +984,10 @@
                         <h3>EDD (LVDd)</h3>
                         <p>Estimate normal LVDd range by weight (optional measured EDD).</p>
                     </div>
+                    <div class="tool-card" onclick="switchTab('phs')">
+                        <h3>Pulmonary Hypertension Score</h3>
+                        <p>Score five focused cardiac ultrasound domains using clearly defined findings.</p>
+                    </div>
                 </div>
             </div>
 
@@ -1033,8 +1037,6 @@
                 <div class="home-section-title">Prognostic Calculators</div>
                 <div class="home-grid">
                     <div class="tool-card" onclick="switchTab('caps')"><h3>CAPS / sCAPS</h3><p>Canine acute pancreatitis severity scoring.</p></div>
-                    <div class="tool-card" onclick="switchTab('psyllium')"><h3>Psyllium Dose</h3><p>Dog and cat introductory and maintenance dosing.</p></div>
-                    <div class="tool-card" onclick="switchTab('phs')"><h3>Pulmonary Hypertension Score</h3><p>Focused cardiac ultrasound score for dogs.</p></div>
                     <div class="tool-card" onclick="switchTab('snakebite')"><h3>Snake Bite Severity</h3><p>Six-domain envenomation severity assessment.</p></div>
                     <div class="tool-card" onclick="switchTab('sirs')"><h3>SIRS</h3><p>Species-specific canine and feline SIRS screening.</p></div>
                     <div class="tool-card" onclick="switchTab('compass')"><h3>COMPASS Heat Illness</h3><p>Canine heat-related illness grading and temperature modifier.</p></div>
@@ -1083,9 +1085,7 @@
 
         <section id="caps" class="calculator-section"><div class="calc-header"><h2>CAPS / sCAPS</h2><button class="reset-btn" onclick="Calculators.AHK.reset('caps')">Reset</button></div><div class="calc-form ported-form" id="caps_form"></div><div id="caps_result" class="result-box hidden"><h3 class="ported-result-title">CAPS Result</h3><p class="ported-result-note">Review the score and interpretation before copying.</p><textarea id="caps_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('caps',this)">Copy Results</button></div></section>
 
-        <section id="psyllium" class="calculator-section"><div class="calc-header"><h2>Psyllium Dose</h2><button class="reset-btn" onclick="Calculators.AHK.reset('psyllium')">Reset</button></div><div class="calc-form ported-form" id="psyllium_form"></div><div id="psyllium_result" class="result-box hidden"><h3 class="ported-result-title">Psyllium Instructions</h3><p class="ported-result-note">Formatted for copying into discharge instructions.</p><textarea id="psyllium_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('psyllium',this)">Copy Results</button></div></section>
-
-        <section id="phs" class="calculator-section"><div class="calc-header"><h2>Pulmonary Hypertension Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('phs')">Reset</button></div><div class="calc-form ported-form" id="phs_form"></div><div id="phs_result" class="result-box hidden"><h3 class="ported-result-title">Pulmonary Hypertension Result</h3><textarea id="phs_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('phs',this)">Copy Results</button></div></section>
+        <section id="phs" class="calculator-section"><div class="calc-header"><h2>Pulmonary Hypertension Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('phs')">Reset</button></div><div class="calc-form ported-form"><p class="ported-result-note">Select the finding that best matches each focused cardiac ultrasound domain. Each choice shows its point value.</p><div id="phs_form"></div></div><div id="phs_result" class="result-box hidden"><h3 class="ported-result-title">Pulmonary Hypertension Result</h3><textarea id="phs_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('phs',this)">Copy Results</button></div></section>
 
         <section id="snakebite" class="calculator-section"><div class="calc-header"><h2>Snake Bite Severity Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('snakebite')">Reset</button></div><div class="calc-form ported-form" id="snakebite_form"></div><div id="snakebite_result" class="result-box hidden"><h3 class="ported-result-title">Snake Bite Severity Result</h3><textarea id="snakebite_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('snakebite',this)">Copy Results</button></div></section>
 
@@ -2315,6 +2315,23 @@
                 <div class="form-group hidden" id="out_med_other_group">
                     <label>Enter Medication Name</label>
                     <input type="text" id="out_med_other">
+                </div>
+
+                <div id="out_psyllium_group" class="hidden">
+                    <p class="ported-result-note">Enter the patient information to calculate introductory and maintenance psyllium dosing.</p>
+                    <div class="calc-grid">
+                        <div class="form-group">
+                            <label for="out_psyllium_species">Species</label>
+                            <select id="out_psyllium_species">
+                                <option value="Dog">Dog</option>
+                                <option value="Cat">Cat</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="out_psyllium_weight">Weight (kg)</label>
+                            <input id="out_psyllium_weight" type="number" min="0.1" step="0.1" placeholder="e.g. 12.5">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="calc-grid" id="out_conc_grid">
@@ -4907,24 +4924,25 @@ Maintenance Instructions:
         onMedChange: () => {
             const med = document.getElementById('out_med_select').value;
             const otherGroup = document.getElementById('out_med_other_group');
+            const psylliumGroup = document.getElementById('out_psyllium_group');
             const sideEffects = document.getElementById('out_side_effects');
             const proviableGroup = document.getElementById('out_proviable_paste_group');
             const concGroup = document.getElementById('out_conc_group');
-            const concGrid = document.getElementById('out_conc_grid');
-            const doseFreqGroup = document.getElementById('out_dose_freq_group');
-            const durationGroup = document.getElementById('out_duration_group');
-            const nextDoseGroup = document.getElementById('out_next_dose_group');
-            const sideEffectsGroup = document.getElementById('out_side_effects_group');
-            const isMirtazipine = med === "Mirtazipine";
+            const standardGroups = [
+                document.getElementById('out_conc_grid'),
+                document.getElementById('out_dose_freq_group'),
+                document.getElementById('out_duration_group'),
+                document.getElementById('out_next_dose_group'),
+                document.getElementById('out_side_effects_group')
+            ];
+            const isMirtazapine = med === "Mirtazipine";
+            const isPsyllium = med === "Psyllium";
 
-            [otherGroup, concGrid, doseFreqGroup, durationGroup, nextDoseGroup, sideEffectsGroup].forEach(el => {
-                if (el) el.classList.remove('hidden');
-            });
+            otherGroup.classList.add('hidden');
+            psylliumGroup.classList.toggle('hidden', !isPsyllium);
+            standardGroups.forEach(el => el.classList.toggle('hidden', isMirtazapine || isPsyllium));
 
-            if (isMirtazipine) {
-                [otherGroup, concGrid, doseFreqGroup, durationGroup, nextDoseGroup, sideEffectsGroup].forEach(el => {
-                    if (el) el.classList.add('hidden');
-                });
+            if (isMirtazapine || isPsyllium) {
                 proviableGroup.classList.add('hidden');
                 concGroup.classList.add('hidden');
                 document.getElementById('out_proviable_paste_ml').value = "";
@@ -4936,24 +4954,17 @@ Maintenance Instructions:
             if (med === "Other") {
                 otherGroup.classList.remove('hidden');
                 sideEffects.value = "No predefined side effects available for custom medication.";
+            } else if (med === "Proviable Forte Kit") {
+                sideEffects.value = Calculators.OutpatientMeds.proviableNote;
             } else {
-                otherGroup.classList.add('hidden');
-                if (med === "Proviable Forte Kit") {
-                    sideEffects.value = Calculators.OutpatientMeds.proviableNote;
-                } else {
-                    sideEffects.value = Calculators.OutpatientMeds.sideEffects[med] || "";
-                }
+                sideEffects.value = Calculators.OutpatientMeds.sideEffects[med] || "";
             }
 
-            if (med === "Proviable Forte Kit") {
-                proviableGroup.classList.remove('hidden');
-                concGroup.classList.add('hidden');
-                document.getElementById('out_conc_value').value = "";
-            } else {
-                proviableGroup.classList.add('hidden');
-                concGroup.classList.remove('hidden');
-                document.getElementById('out_proviable_paste_ml').value = "";
-            }
+            const isProviable = med === "Proviable Forte Kit";
+            proviableGroup.classList.toggle('hidden', !isProviable);
+            concGroup.classList.toggle('hidden', isProviable);
+            if (isProviable) document.getElementById('out_conc_value').value = "";
+            else document.getElementById('out_proviable_paste_ml').value = "";
         },
         toggleDuration: () => {
             const untilDirected = document.getElementById('out_until_directed');
@@ -4975,6 +4986,19 @@ Maintenance Instructions:
         generate: () => {
             const medSelect = document.getElementById('out_med_select');
             const med = medSelect.value;
+            if (med === "Psyllium") {
+                try {
+                    const species = document.getElementById('out_psyllium_species').value;
+                    const weight = Number(document.getElementById('out_psyllium_weight').value);
+                    const result = PAWSCore.calculatePsyllium({species, weight});
+                    document.getElementById('out_med_text_output').value = result.text;
+                    Calculators.OutpatientMeds.lastRes = result.text;
+                    Utils.showResult('out_med_result');
+                } catch (error) {
+                    alert(error.message);
+                }
+                return;
+            }
             if (med === "Mirtazipine") {
                 let text = "**Mirtazapine Transdermal solution - 5 grams -** Apply a 1.5 cm strip on the skin of the inner ear every 24 hours as needed for appetite stimulation\n";
                 text += "  - The most common side effects of this medication in cats are agitation, vocalization, restlessness, irritation of the ear, and vomiting. If you notice any of these signs, please contact MSU-CVM or your veterinarian. *Please give this medication 30-45 minutes before giving food*";
@@ -5045,6 +5069,8 @@ Maintenance Instructions:
             document.getElementById('out_until_gone').checked = false;
             document.getElementById('out_next_dose').value = "";
             document.getElementById('out_proviable_paste_ml').value = "";
+            document.getElementById('out_psyllium_species').value = "Dog";
+            document.getElementById('out_psyllium_weight').value = "";
             document.getElementById('out_med_text_output').value = "";
             document.getElementById('out_duration').disabled = false;
             Utils.hideResult('out_med_result');
@@ -5063,8 +5089,14 @@ Maintenance Instructions:
         scoreFields: (prefix, names, values=[0,1,2,3,4]) => `<div class="calc-grid">${names.map((n,i)=>Calculators.AHK.field(n,Calculators.AHK.select(prefix+i,values.map(v=>[v,v])))).join('')}</div>`,
         render: () => {
             caps_form.innerHTML=Calculators.AHK.field("Scoring system",Calculators.AHK.select("caps_mode",[["CAPS","CAPS (Full)"],["sCAPS","sCAPS (Simplified)"]]))+`<div class="calc-grid">${Calculators.AHK.toggle("caps_sirs","SIRS present")}${Calculators.AHK.toggle("caps_coag","Coagulation disorder present")}${Calculators.AHK.field("Creatinine (mg/dL)",'<input id="caps_cr" type="number" step="0.1">')}${Calculators.AHK.field("Ionized calcium (mg/dL)",'<input id="caps_ca" type="number" step="0.1">')}${Calculators.AHK.field("Respiratory rate (sCAPS)",'<input id="caps_rr" type="number">')}</div><button class="calculate-btn" onclick="Calculators.AHK.calculate('caps')">Calculate</button>`;
-            psyllium_form.innerHTML=`<div class="calc-grid">${Calculators.AHK.field("Species",Calculators.AHK.select("psy_species",[["Dog","Dog"],["Cat","Cat"]]))}${Calculators.AHK.field("Weight (kg)",'<input id="psy_weight" type="number" step="0.1">')}</div><button class="calculate-btn" onclick="Calculators.AHK.calculate('psyllium')">Calculate</button>`;
-            phs_form.innerHTML=Calculators.AHK.scoreFields("phs_",["RA / RV enlargement","RV hypertrophy","IVS flattening","PA enlargement","Right-sided congestive signs"])+`<button class="calculate-btn" onclick="Calculators.AHK.calculate('phs')">Calculate</button>`;document.getElementById("phs_2").innerHTML='<option value="0">0</option><option value="2">2</option>';
+            const phsDomains = [
+                ["Right atrial / right ventricular enlargement", [[0,"0 — No right-heart enlargement"],[1,"1 — Right atrial or right ventricular enlargement"],[2,"2 — Right atrial and right ventricular enlargement"]]],
+                ["Right ventricular hypertrophy", [[0,"0 — Neither finding"],[1,"1 — RV free-wall hypertrophy or prominent papillary muscles"],[2,"2 — Both findings"]]],
+                ["Interventricular septal (IVS) flattening", [[0,"0 — No IVS flattening"],[2,"2 — IVS flattening present"]]],
+                ["Pulmonary artery enlargement", [[0,"0 — Neither finding"],[1,"1 — Pulmonary trunk or right pulmonary artery enlargement"],[2,"2 — Both findings"]]],
+                ["Right-sided congestive signs", [[0,"0 — No effusion; caudal vena cava normal"],[1,"1 — Effusion or distended/noncompliant caudal vena cava"],[2,"2 — Both findings"]]]
+            ];
+            phs_form.innerHTML = `<div class="calc-grid">${phsDomains.map((domain,i)=>Calculators.AHK.field(domain[0],Calculators.AHK.select("phs_"+i,domain[1]))).join('')}</div><button class="calculate-btn" onclick="Calculators.AHK.calculate('phs')">Calculate Score</button>`;
             snakebite_form.innerHTML=Calculators.AHK.scoreFields("sss_",["Local wound","Hematologic","Cardiovascular","Respiratory","Gastrointestinal","Neurologic"])+`<button class="calculate-btn" onclick="Calculators.AHK.calculate('snakebite')">Calculate</button>`;
             sirs_form.innerHTML=`<div class="calc-grid">${Calculators.AHK.field("Species",Calculators.AHK.select("sirs_species",[["Dog","Dog"],["Cat","Cat"]]))}${["Temperature °F","Heart rate","Respiratory rate","WBC /µL","Bands %"].map((x,i)=>Calculators.AHK.field(x,`<input id="sirs_${["t","h","r","w","b"][i]}" type="number" step="0.1">`)).join('')}</div><button class="calculate-btn" onclick="Calculators.AHK.calculate('sirs')">Calculate</button>`;
             const comp=[["General signs / collapse",[0,1]],["Respiratory",[0,1,2]],["Gastrointestinal",[0,2,3]],["Neurologic",[0,2,3]],["Bleeding / coagulation",[0,3]],["Multi-organ dysfunction",[0,3]]];compass_form.innerHTML=`<div class="calc-grid">${comp.map((x,i)=>Calculators.AHK.field(x[0],Calculators.AHK.select("comp_"+i,x[1].map(v=>[v,v+" - "+["None","Mild","Moderate","Severe"][v]])))).join('')}${Calculators.AHK.field("Triage temperature (optional)",'<input id="comp_temp" type="number" step="0.1">')}${Calculators.AHK.field("Unit",Calculators.AHK.select("comp_unit",[["C","C"],["F","F"]]))}</div><button class="calculate-btn" onclick="Calculators.AHK.calculate('compass')">Evaluate</button>`;
@@ -5075,7 +5107,7 @@ Maintenance Instructions:
         chosen: id => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(x=>x.dataset.label||x.value),
         value: id => {const e=document.getElementById(id);return e.value===""?NaN:Number(e.value)},
         show: (id,result) => {Calculators.AHK.last[id]=result.text;document.getElementById(id+"_output").value=result.text;Utils.showResult(id+"_result")},
-        calculate: id => {try{let r;if(id==="caps")r=PAWSCore.calculateCaps({mode:caps_mode.value,sirs:caps_sirs.checked,coagulationDisorder:caps_coag.checked,creatinine:Calculators.AHK.value("caps_cr"),ionizedCalcium:Calculators.AHK.value("caps_ca"),respiratoryRate:Calculators.AHK.value("caps_rr")});if(id==="psyllium")r=PAWSCore.calculatePsyllium({species:psy_species.value,weight:Calculators.AHK.value("psy_weight")});if(id==="phs")r=PAWSCore.calculatePhs([0,1,2,3,4].map(i=>Calculators.AHK.value("phs_"+i)));if(id==="snakebite")r=PAWSCore.calculateSnakeBite([0,1,2,3,4,5].map(i=>Calculators.AHK.value("sss_"+i)));if(id==="sirs")r=PAWSCore.calculateSirs({species:sirs_species.value,temperature:Calculators.AHK.value("sirs_t"),heartRate:Calculators.AHK.value("sirs_h"),respiratoryRate:Calculators.AHK.value("sirs_r"),wbc:Calculators.AHK.value("sirs_w"),bands:Calculators.AHK.value("sirs_b")});if(id==="compass")r=PAWSCore.evaluateCompass({grades:[0,1,2,3,4,5].map(i=>Calculators.AHK.value("comp_"+i)),temperature:comp_temp.value===""?null:Calculators.AHK.value("comp_temp"),unit:comp_unit.value});if(id==="lepto")r=PAWSCore.evaluateLepto({illness:lepto_ill.checked,clinicopathCount:Calculators.AHK.chosen("lepto_c").length,supportive:Calculators.AHK.chosen("lepto_s"),confirmatory:Calculators.AHK.chosen("lepto_f"),recentVaccine:lepto_vax.checked});if(id==="duke")r=PAWSCore.evaluateDuke({pathology:duke_path.checked,majorCount:Calculators.AHK.chosen("duke_m").length,minorCount:Calculators.AHK.chosen("duke_n").length,rejections:Calculators.AHK.chosen("duke_r")});if(id==="sepsis"){const organs={},excluded={};document.querySelectorAll(".sepcrit:checked").forEach(x=>(organs[x.dataset.organ]??=[]).push(x.value));document.querySelectorAll(".sepex:checked").forEach(x=>excluded[x.value]=true);r=PAWSSepsis.evaluate({infection:sep_inf.checked,resuscitated:sep_res.checked,adjudicatedShock:sep_shock.checked,organs,excluded})}Calculators.AHK.show(id,r)}catch(e){Utils.showError(id,e.message)}},
+        calculate: id => {try{let r;if(id==="caps")r=PAWSCore.calculateCaps({mode:caps_mode.value,sirs:caps_sirs.checked,coagulationDisorder:caps_coag.checked,creatinine:Calculators.AHK.value("caps_cr"),ionizedCalcium:Calculators.AHK.value("caps_ca"),respiratoryRate:Calculators.AHK.value("caps_rr")});if(id==="phs")r=PAWSCore.calculatePhs([0,1,2,3,4].map(i=>Calculators.AHK.value("phs_"+i)));if(id==="snakebite")r=PAWSCore.calculateSnakeBite([0,1,2,3,4,5].map(i=>Calculators.AHK.value("sss_"+i)));if(id==="sirs")r=PAWSCore.calculateSirs({species:sirs_species.value,temperature:Calculators.AHK.value("sirs_t"),heartRate:Calculators.AHK.value("sirs_h"),respiratoryRate:Calculators.AHK.value("sirs_r"),wbc:Calculators.AHK.value("sirs_w"),bands:Calculators.AHK.value("sirs_b")});if(id==="compass")r=PAWSCore.evaluateCompass({grades:[0,1,2,3,4,5].map(i=>Calculators.AHK.value("comp_"+i)),temperature:comp_temp.value===""?null:Calculators.AHK.value("comp_temp"),unit:comp_unit.value});if(id==="lepto")r=PAWSCore.evaluateLepto({illness:lepto_ill.checked,clinicopathCount:Calculators.AHK.chosen("lepto_c").length,supportive:Calculators.AHK.chosen("lepto_s"),confirmatory:Calculators.AHK.chosen("lepto_f"),recentVaccine:lepto_vax.checked});if(id==="duke")r=PAWSCore.evaluateDuke({pathology:duke_path.checked,majorCount:Calculators.AHK.chosen("duke_m").length,minorCount:Calculators.AHK.chosen("duke_n").length,rejections:Calculators.AHK.chosen("duke_r")});if(id==="sepsis"){const organs={},excluded={};document.querySelectorAll(".sepcrit:checked").forEach(x=>(organs[x.dataset.organ]??=[]).push(x.value));document.querySelectorAll(".sepex:checked").forEach(x=>excluded[x.value]=true);r=PAWSSepsis.evaluate({infection:sep_inf.checked,resuscitated:sep_res.checked,adjudicatedShock:sep_shock.checked,organs,excluded})}Calculators.AHK.show(id,r)}catch(e){Utils.showError(id,e.message)}},
         reset: id => {Calculators.AHK.render();Utils.clearError(id);Utils.hideResult(id+"_result");document.getElementById(id+"_output").value=""},
         copy: (id,btn) => Utils.copy(Calculators.AHK.last[id]||"",btn)
     };
