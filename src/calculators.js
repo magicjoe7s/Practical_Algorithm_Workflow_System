@@ -101,17 +101,28 @@
         }
 
         const total = motor + brainstem + consciousness;
-        const prognosis = total >= 15 ? "GOOD" : (total >= 9 ? "GUARDED" : "POOR/GRAVE");
-        const survival = total >= 15 ? "~90%" : (total >= 9 ? "~50%" : "<25-50%");
+        const prognosis = total >= 15 ? "Good" : (total >= 9 ? "Guarded" : "Grave");
+        const survival = total >= 15 ? ">95%" : (total >= 9 ? "50-95%" : "<50%");
         const severity = total >= 15 ? "normal" : (total >= 9 ? "warning" : "critical");
+        const recommendation = total >= 15
+            ? "Expected survival >95%. Continue monitoring neurological status every 4-6 hours. Most patients show improvement with supportive care."
+            : total >= 9
+            ? "Survival probability 50-95%. Intensive supportive care recommended. Monitor closely for deterioration. Consider advanced imaging (CT/MRI) and ICP monitoring if available."
+            : "Survival probability <50%. Critical care required. Discuss prognosis with owner. Consider palliative care options. Frequent reassessment recommended.";
 
         return {
-            total,
-            prognosis,
-            survival,
-            severity,
-            text: `Glasgow Coma Scale: ${total}/18\nPrognosis: ${prognosis} (${survival})`
+            total, prognosis, survival, severity, recommendation,
+            text: `Glasgow Coma Scale: ${total}/18\nPrognosis: ${prognosis} (${survival})\n${recommendation}`
         };
+    }
+
+    function calculateShockIndex({ species, heartRate, systolicBloodPressure }) {
+        if (!Number.isFinite(heartRate) || heartRate <= 0) throw new RangeError("Heart rate must be a number greater than 0.");
+        if (!Number.isFinite(systolicBloodPressure) || systolicBloodPressure <= 0) throw new RangeError("Systolic blood pressure must be a number greater than 0.");
+        if (species !== "Cat" && species !== "Dog") throw new RangeError("Species must be Dog or Cat.");
+        const index=(heartRate/systolicBloodPressure).toFixed(2),cutoff=species==="Cat"?1.54:1.1;
+        const interpretation=Number(index)>cutoff?`SHOCK LIKELY (>${cutoff})`:`Below shock cutoff (≤${cutoff})`;
+        return {index,interpretation,severity:Number(index)>cutoff?"critical":"normal",text:`${species} Shock Index: ${index}\n${interpretation} (HR:${heartRate}, SBP:${systolicBloodPressure})`};
     }
 
     function calculateFelineShockIndex({ heartRate, systolicBloodPressure }) {
@@ -258,6 +269,7 @@
         calculatePsyllium,
         calculatePhs,
         calculateSirs,
+        calculateShockIndex,
         calculateSnakeBite,
         calculateSofa,
         evaluateCompass,
