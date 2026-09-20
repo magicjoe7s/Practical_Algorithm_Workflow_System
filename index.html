@@ -921,10 +921,15 @@
             <div class="home-section">
                 <div class="home-section-title">Prognostic Calculators</div>
                 <div class="home-grid">
-                    <div class="tool-card" role="link" tabindex="0" onclick="window.location.href='additional_calculators.html'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='additional_calculators.html'}">
-                        <h3>Additional Calculators</h3>
-                        <p>CAPS/sCAPS, psyllium, pulmonary hypertension, snakebite, and SIRS tools ported from the AutoHotkey references.</p>
-                    </div>
+                    <div class="tool-card" onclick="switchTab('caps')"><h3>CAPS / sCAPS</h3><p>Canine acute pancreatitis severity scoring.</p></div>
+                    <div class="tool-card" onclick="switchTab('psyllium')"><h3>Psyllium Dose</h3><p>Dog and cat introductory and maintenance dosing.</p></div>
+                    <div class="tool-card" onclick="switchTab('phs')"><h3>Pulmonary Hypertension Score</h3><p>Focused cardiac ultrasound score for dogs.</p></div>
+                    <div class="tool-card" onclick="switchTab('snakebite')"><h3>Snake Bite Severity</h3><p>Six-domain envenomation severity assessment.</p></div>
+                    <div class="tool-card" onclick="switchTab('sirs')"><h3>SIRS</h3><p>Species-specific canine and feline SIRS screening.</p></div>
+                    <div class="tool-card" onclick="switchTab('compass')"><h3>COMPASS Heat Illness</h3><p>Canine heat-related illness grading and temperature modifier.</p></div>
+                    <div class="tool-card" onclick="switchTab('lepto')"><h3>Leptospirosis Criteria</h3><p>ACVIM clinical, probable, and confirmed case definition.</p></div>
+                    <div class="tool-card" onclick="switchTab('duke')"><h3>Modified Duke Criteria</h3><p>Definite, possible, or rejected endocarditis classification.</p></div>
+                    <div class="tool-card" onclick="switchTab('sepsis')"><h3>Sepsis Assessment</h3><p>Eight-system organ dysfunction and septic-shock concern.</p></div>
                     <div class="tool-card" onclick="switchTab('apple')">
                         <h3>APPLE Score</h3>
                         <p>Acute Patient Physiologic and Laboratory Evaluation (Fast & Full models).</p>
@@ -964,6 +969,24 @@
                 </div>
             </div>
         </section>
+
+        <section id="caps" class="calculator-section"><div class="calc-header"><h2>CAPS / sCAPS</h2><button class="reset-btn" onclick="Calculators.AHK.reset('caps')">Reset</button></div><div class="calc-form" id="caps_form"></div><div id="caps_result" class="result-box hidden"><textarea id="caps_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('caps',this)">Copy Results</button></div></section>
+
+        <section id="psyllium" class="calculator-section"><div class="calc-header"><h2>Psyllium Dose</h2><button class="reset-btn" onclick="Calculators.AHK.reset('psyllium')">Reset</button></div><div class="calc-form" id="psyllium_form"></div><div id="psyllium_result" class="result-box hidden"><textarea id="psyllium_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('psyllium',this)">Copy Results</button></div></section>
+
+        <section id="phs" class="calculator-section"><div class="calc-header"><h2>Pulmonary Hypertension Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('phs')">Reset</button></div><div class="calc-form" id="phs_form"></div><div id="phs_result" class="result-box hidden"><textarea id="phs_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('phs',this)">Copy Results</button></div></section>
+
+        <section id="snakebite" class="calculator-section"><div class="calc-header"><h2>Snake Bite Severity Score</h2><button class="reset-btn" onclick="Calculators.AHK.reset('snakebite')">Reset</button></div><div class="calc-form" id="snakebite_form"></div><div id="snakebite_result" class="result-box hidden"><textarea id="snakebite_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('snakebite',this)">Copy Results</button></div></section>
+
+        <section id="sirs" class="calculator-section"><div class="calc-header"><h2>SIRS</h2><button class="reset-btn" onclick="Calculators.AHK.reset('sirs')">Reset</button></div><div class="calc-form" id="sirs_form"></div><div id="sirs_result" class="result-box hidden"><textarea id="sirs_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('sirs',this)">Copy Results</button></div></section>
+
+        <section id="compass" class="calculator-section"><div class="calc-header"><h2>COMPASS Heat-Related Illness</h2><button class="reset-btn" onclick="Calculators.AHK.reset('compass')">Reset</button></div><div class="calc-form" id="compass_form"></div><div id="compass_result" class="result-box hidden"><textarea id="compass_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('compass',this)">Copy Results</button></div></section>
+
+        <section id="lepto" class="calculator-section"><div class="calc-header"><h2>ACVIM Leptospirosis Case Definition</h2><button class="reset-btn" onclick="Calculators.AHK.reset('lepto')">Reset</button></div><div class="calc-form" id="lepto_form"></div><div id="lepto_result" class="result-box hidden"><textarea id="lepto_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('lepto',this)">Copy Results</button></div></section>
+
+        <section id="duke" class="calculator-section"><div class="calc-header"><h2>Modified Duke Criteria</h2><button class="reset-btn" onclick="Calculators.AHK.reset('duke')">Reset</button></div><div class="calc-form" id="duke_form"></div><div id="duke_result" class="result-box hidden"><textarea id="duke_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('duke',this)">Copy Results</button></div></section>
+
+        <section id="sepsis" class="calculator-section"><div class="calc-header"><h2>Sepsis Organ Dysfunction Assessment</h2><button class="reset-btn" onclick="Calculators.AHK.reset('sepsis')">Reset</button></div><div class="calc-form" id="sepsis_form"></div><div id="sepsis_result" class="result-box hidden"><textarea id="sepsis_output" class="text-output-box" readonly></textarea><button class="copy-btn" onclick="Calculators.AHK.copy('sepsis',this)">Copy Results</button></div></section>
 
         <!-- NUTRITION SUPPORT -->
         <section id="nutrition_support" class="calculator-section">
@@ -2600,6 +2623,7 @@
         </div>
     </footer>
 
+    <script src="src/sepsis.js"></script>
     <script src="src/calculators.js"></script>
 
     <!-- JAVASCRIPT LOGIC -->
