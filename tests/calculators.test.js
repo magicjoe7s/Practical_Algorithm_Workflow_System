@@ -10,7 +10,10 @@ const {
     calculatePhs,
     calculateSirs,
     calculateSnakeBite,
-    calculateSofa
+    calculateSofa,
+    evaluateCompass,
+    evaluateDuke,
+    evaluateLepto
 } = require("../src/calculators.js");
 
 test("calculates dog BSA with the established coefficient and formatting", () => {
@@ -217,4 +220,17 @@ test("ports snakebite totals and high-domain caution", () => {
 test("ports canine and feline SIRS thresholds", () => {
     assert.equal(calculateSirs({species:"Dog",temperature:103,heartRate:150,respiratoryRate:20,wbc:10000,bands:0}).meets,true);
     assert.equal(calculateSirs({species:"Cat",temperature:101,heartRate:180,respiratoryRate:20,wbc:10000,bands:0}).meets,false);
+});
+
+test("ports COMPASS highest-grade and temperature modifier logic", () => {
+    const r=evaluateCompass({grades:[1,2,0,0,0,0],temperature:41,unit:"C"});
+    assert.equal(r.grade,2); assert.match(r.label,/critical temperature subgroup/);
+});
+test("ports ACVIM leptospirosis classifications", () => {
+    assert.equal(evaluateLepto({illness:true,clinicopathCount:2,supportive:["positive urine NAAT/PCR"]}).classification,"Probable");
+    assert.equal(evaluateLepto({illness:true,clinicopathCount:2,confirmatory:["positive blood NAAT/PCR"]}).classification,"Confirmed");
+});
+test("ports modified Duke thresholds and rejection precedence", () => {
+    assert.equal(evaluateDuke({majorCount:1,minorCount:2}).classification,"Definite");
+    assert.equal(evaluateDuke({pathology:true,majorCount:0,minorCount:0,rejections:["Alternative diagnosis"]}).classification,"Rejected");
 });
