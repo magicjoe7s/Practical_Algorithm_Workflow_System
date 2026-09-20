@@ -1732,11 +1732,15 @@
         <!-- FELINE SHOCK INDEX -->
         <section id="fsi" class="calculator-section">
             <div class="calc-header">
-                <h2>Feline Shock Index</h2>
+                <h2>Shock Index</h2>
                 <button class="reset-btn" onclick="Calculators.FSI.reset()">Reset</button>
             </div>
             <div class="calc-form">
                 <div class="calc-grid">
+                    <div class="form-group">
+                        <label>Species</label>
+                        <select id="fsi_species"><option value="Cat">Cat</option><option value="Dog">Dog</option></select>
+                    </div>
                     <div class="form-group">
                         <label>Heart Rate (bpm)</label>
                         <input type="number" id="fsi_hr" placeholder="e.g. 180">
@@ -3744,7 +3748,7 @@
             });
             Utils.setText('gcs_total', `${calculation.total} / 18`);
             const alert = document.getElementById('gcs_prognosis');
-            alert.innerText = `${calculation.prognosis} Prognosis (${calculation.survival} Survival)`;
+            alert.innerText = `${calculation.prognosis} Prognosis (${calculation.survival} Survival)\n${calculation.recommendation}`;
             alert.className = `alert-box ${calculation.severity}`;
             Utils.showResult('gcs_result');
             Calculators.Glasgow.lastRes = calculation.text;
@@ -3761,7 +3765,8 @@
         calculate: () => {
             Utils.clearError('fsi');
             try {
-                const calculation = PAWSCore.calculateFelineShockIndex({
+                const calculation = PAWSCore.calculateShockIndex({
+                    species: document.getElementById('fsi_species').value,
                     heartRate: Utils.getValue('fsi_hr'),
                     systolicBloodPressure: Utils.getValue('fsi_sbp')
                 });
