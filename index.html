@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PAWS provides local-only veterinary clinical calculators and workflow tools.">
+    <meta name="theme-color" content="#1B5E20">
     <title>NCSU (Network for Clinical Support &amp; Utility) - PAWS (Practical Algorithm &amp; Workflow System)</title>
     <style>
         /* --- THEME CSS --- */
@@ -663,9 +665,93 @@
             background: var(--input-bg);
             color: var(--text-main);
         }
+        /* --- ACCESSIBILITY & LOCAL-ONLY UX --- */
+        .skip-link {
+            position: fixed;
+            left: 1rem;
+            top: 0.5rem;
+            z-index: 1000;
+            padding: 0.65rem 0.9rem;
+            border-radius: var(--radius);
+            background: #FFFFFF;
+            color: var(--primary);
+            box-shadow: var(--shadow);
+            transform: translateY(-150%);
+        }
+
+        .skip-link:focus { transform: translateY(0); }
+
+        .privacy-note {
+            max-width: 760px;
+            margin: 1rem auto 1.25rem;
+            padding: 0.85rem 1rem;
+            border: 1px solid #A5D6A7;
+            border-radius: var(--radius);
+            background: #F1F8E9;
+            color: #1B5E20;
+            line-height: 1.45;
+        }
+
+        .tool-search {
+            max-width: 620px;
+            margin: 0 auto 2rem;
+            text-align: left;
+        }
+
+        .tool-search label {
+            display: block;
+            margin-bottom: 0.45rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .tool-search input {
+            width: 100%;
+            padding: 0.8rem 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .tool-search input:focus,
+        .tool-card:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 3px solid #FFB300;
+            outline-offset: 3px;
+        }
+
+        .tool-card[role="button"] { cursor: pointer; }
+
+        .search-status {
+            min-height: 1.25rem;
+            margin-top: 0.4rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .search-empty {
+            margin: 0 auto 2rem;
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#content-area">Skip to tools</a>
 
     <header class="app-header">
         <div class="header-left">
@@ -681,6 +767,15 @@
             <div class="welcome-header">
                 <h2>PAWS (Practical Algorithm &amp; Workflow System)</h2>
                 <p>Select a tool to begin</p>
+                <div class="privacy-note" role="note">
+                    <strong>Local-only by design.</strong> Calculations happen in this browser. PAWS does not upload, save, or share entered information. Copying a result places it on this device's clipboard.
+                </div>
+                <div class="tool-search">
+                    <label for="tool_search">Find a tool</label>
+                    <input id="tool_search" type="search" placeholder="Search calculators, scores, medications, or workflows" autocomplete="off">
+                    <div id="tool_search_status" class="search-status" role="status" aria-live="polite"></div>
+                </div>
+                <p id="tool_search_empty" class="search-empty hidden">No tools match that search.</p>
             </div>
             
             <div class="home-section">
@@ -2431,6 +2526,8 @@
         </div>
     </footer>
 
+    <script src="src/calculators.js"></script>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
     window.Calculators = window.Calculators || {};
@@ -2461,6 +2558,78 @@
 
     function goHome() {
         switchTab('home');
+    }
+
+    function initHomeSearch() {
+        const input = document.getElementById('tool_search');
+        const status = document.getElementById('tool_search_status');
+        const empty = document.getElementById('tool_search_empty');
+        if (!input || !status || !empty) return;
+
+        const cards = Array.from(document.querySelectorAll('#home .tool-card'));
+        const sections = Array.from(document.querySelectorAll('#home .home-section'));
+
+        const filterTools = () => {
+            const query = input.value.trim().toLocaleLowerCase();
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const isVisible = !query || card.textContent.toLocaleLowerCase().includes(query);
+                card.classList.toggle('hidden', !isVisible);
+                if (isVisible) visibleCount += 1;
+            });
+
+            sections.forEach(section => {
+                const hasVisibleCard = Array.from(section.querySelectorAll('.tool-card'))
+                    .some(card => !card.classList.contains('hidden'));
+                section.classList.toggle('hidden', !hasVisibleCard);
+            });
+
+            empty.classList.toggle('hidden', visibleCount !== 0);
+            status.textContent = query
+                ? `${visibleCount} tool${visibleCount === 1 ? '' : 's'} found`
+                : `${cards.length} tools available`;
+        };
+
+        input.addEventListener('input', filterTools);
+        filterTools();
+    }
+
+    function enhanceAccessibility() {
+        document.querySelectorAll('.tool-card[onclick]').forEach(card => {
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+            card.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    card.click();
+                }
+            });
+        });
+
+        document.querySelectorAll('.form-group').forEach(group => {
+            const label = group.querySelector('label');
+            const control = group.querySelector('input, select, textarea');
+            if (label && control && control.id && !label.htmlFor) {
+                label.htmlFor = control.id;
+            }
+        });
+
+        document.querySelectorAll('.result-box').forEach(result => {
+            result.setAttribute('role', 'status');
+            result.setAttribute('aria-live', 'polite');
+        });
+
+        document.querySelectorAll('.calculator-section h2').forEach(heading => {
+            heading.setAttribute('tabindex', '-1');
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && !document.getElementById('home').classList.contains('active')) {
+                goHome();
+                document.getElementById('tool_search')?.focus();
+            }
+        });
     }
 
     function openTreatmentBlock(blockId) {
@@ -2875,24 +3044,15 @@
             const health = document.getElementById('flu_health').value;
             const species = document.getElementById('flu_species').value;
             const weight = Utils.getValue('flu_weight');
-            if (!weight || weight <= 0) { alert("Please enter valid weight > 0"); return; }
-            let result = "";
-            if (species === "Dog") {
-                const rate = health === "Healthy" 
-                    ? (140 * Math.pow(weight, 0.73)) / 24
-                    : (97 * Math.pow(weight, 0.655)) / 24;
-                const ratePerDay = (rate * 24) / weight;
-                result = `Rate: ${rate.toFixed(1)} ml/hr\n(${ratePerDay.toFixed(1)} ml/kg/day)`;
-            } else { 
-                const minRate = health === "Healthy" ? (30 * weight) / 24 : (20 * weight) / 24;
-                const maxRate = health === "Healthy" ? (70 * weight) / 24 : (35 * weight) / 24;
-                const minDay = (minRate * 24) / weight;
-                const maxDay = (maxRate * 24) / weight;
-                result = `Rate: ${minRate.toFixed(1)} - ${maxRate.toFixed(1)} ml/hr\n(${minDay.toFixed(1)} - ${maxDay.toFixed(1)} ml/kg/day)`;
+
+            try {
+                const calculation = PAWSCore.calculateFluidRate({ health, species, weight });
+                document.getElementById('flu_text_output').value = calculation.text;
+                Calculators.Fluids.lastRes = calculation.text;
+                Utils.showResult('flu_result');
+            } catch (error) {
+                alert(error.message);
             }
-            document.getElementById('flu_text_output').value = result;
-            Calculators.Fluids.lastRes = result;
-            Utils.showResult('flu_result');
         },
         reset: () => {
             document.getElementById('flu_weight').value = '';
@@ -3156,21 +3316,18 @@
         calculate: () => {
             const species = document.getElementById('bsa_species').value;
             const weight = Utils.getValue('bsa_weight');
-            if (weight === null || weight <= 0 || weight < 0.1 || weight > 100) {
-                alert("Please enter a valid weight between 0.1 and 100 kg.");
-                return;
+
+            try {
+                const calculation = PAWSCore.calculateBsa({ species, weight });
+                Utils.setText('bsa_species_result', calculation.species);
+                Utils.setText('bsa_weight_result', `${calculation.weight.toFixed(2)} kg`);
+                Utils.setText('bsa_value_result', `${calculation.bsa.toFixed(3)} m2`);
+                Utils.setText('bsa_equation_result', calculation.equation);
+                Calculators.BSA.lastRes = calculation.text;
+                Utils.showResult('bsa_result');
+            } catch (error) {
+                alert(error.message);
             }
-            const coeff = Calculators.BSA.coefficients[species];
-            const bsa = coeff * Math.pow(weight, 2 / 3);
-            const equation = species === "Dog"
-                ? "BSA = 0.101 x (kg)^(2/3)"
-                : "BSA = 0.100 x (kg)^(2/3)";
-            Utils.setText('bsa_species_result', species);
-            Utils.setText('bsa_weight_result', `${weight.toFixed(2)} kg`);
-            Utils.setText('bsa_value_result', `${bsa.toFixed(3)} m2`);
-            Utils.setText('bsa_equation_result', equation);
-            Calculators.BSA.lastRes = `${species} ${weight.toFixed(2)} kg | BSA = ${bsa.toFixed(3)} m2`;
-            Utils.showResult('bsa_result');
         },
         updateChart: () => {
             const species = document.getElementById('bsa_species').value;
@@ -4636,6 +4793,8 @@ Maintenance Instructions:
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
+        enhanceAccessibility();
+        initHomeSearch();
         Calculators.NutritionSupport.init();
         Calculators.Consent.init();
         Calculators.Consent.reset();
