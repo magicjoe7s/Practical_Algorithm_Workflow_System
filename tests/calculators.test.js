@@ -2,7 +2,10 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
     calculateBsa,
-    calculateFluidRate
+    calculateFelineShockIndex,
+    calculateFluidRate,
+    calculateGlasgow,
+    calculateSofa
 } = require("../src/calculators.js");
 
 test("calculates dog BSA with the established coefficient and formatting", () => {
@@ -100,5 +103,91 @@ test("rejects unsupported species and health status", () => {
             weight: 2
         }),
         /Health status/
+    );
+});
+
+test("calculates Glasgow prognosis bands with established wording", () => {
+    assert.deepEqual(
+        calculateGlasgow({ motor: 6, brainstem: 6, consciousness: 6 }),
+        {
+            total: 18,
+            prognosis: "GOOD",
+            survival: "~90%",
+            severity: "normal",
+            text: "Glasgow Coma Scale: 18/18\nPrognosis: GOOD (~90%)"
+        }
+    );
+    assert.equal(
+        calculateGlasgow({ motor: 3, brainstem: 3, consciousness: 3 }).prognosis,
+        "GUARDED"
+    );
+    assert.equal(
+        calculateGlasgow({ motor: 1, brainstem: 1, consciousness: 1 }).prognosis,
+        "POOR/GRAVE"
+    );
+});
+
+test("rejects invalid Glasgow component scores", () => {
+    assert.throws(
+        () => calculateGlasgow({ motor: 0, brainstem: 6, consciousness: 6 }),
+        /1 to 6/
+    );
+});
+
+test("calculates feline shock index interpretation bands", () => {
+    assert.equal(
+        calculateFelineShockIndex({
+            heartRate: 180,
+            systolicBloodPressure: 120
+        }).text,
+        "Feline Shock Index: 1.50\nNormal (1.47±0.2) (HR:180, SBP:120)"
+    );
+    assert.equal(
+        calculateFelineShockIndex({
+            heartRate: 200,
+            systolicBloodPressure: 100
+        }).severity,
+        "critical"
+    );
+});
+
+test("rejects invalid feline shock index inputs", () => {
+    assert.throws(
+        () => calculateFelineShockIndex({
+            heartRate: 180,
+            systolicBloodPressure: 0
+        }),
+        /blood pressure/
+    );
+});
+
+test("calculates SOFA totals and preserves summary formatting", () => {
+    const result = calculateSofa({
+        respiratory: 1,
+        coagulation: 2,
+        liver: 3,
+        cardiovascular: 4,
+        cns: 1,
+        renal: 2
+    });
+
+    assert.equal(result.total, 13);
+    assert.equal(
+        result.text,
+        "SOFA Score: 13/24\n(Resp:1, Coag:2, Liv:3, CV:4, CNS:1, Ren:2)"
+    );
+});
+
+test("rejects invalid SOFA component scores", () => {
+    assert.throws(
+        () => calculateSofa({
+            respiratory: 5,
+            coagulation: 0,
+            liver: 0,
+            cardiovascular: 0,
+            cns: 0,
+            renal: 0
+        }),
+        /0 to 4/
     );
 });
