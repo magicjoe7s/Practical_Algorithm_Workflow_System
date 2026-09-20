@@ -9,6 +9,7 @@ const {
     calculatePsyllium,
     calculatePhs,
     calculateSirs,
+    calculateShockIndex,
     calculateSnakeBite,
     calculateSofa,
     evaluateCompass,
@@ -119,19 +120,20 @@ test("calculates Glasgow prognosis bands with established wording", () => {
         calculateGlasgow({ motor: 6, brainstem: 6, consciousness: 6 }),
         {
             total: 18,
-            prognosis: "GOOD",
-            survival: "~90%",
+            prognosis: "Good",
+            survival: ">95%",
             severity: "normal",
-            text: "Glasgow Coma Scale: 18/18\nPrognosis: GOOD (~90%)"
+            recommendation: "Expected survival >95%. Continue monitoring neurological status every 4-6 hours. Most patients show improvement with supportive care.",
+            text: "Glasgow Coma Scale: 18/18\nPrognosis: Good (>95%)\nExpected survival >95%. Continue monitoring neurological status every 4-6 hours. Most patients show improvement with supportive care."
         }
     );
     assert.equal(
         calculateGlasgow({ motor: 3, brainstem: 3, consciousness: 3 }).prognosis,
-        "GUARDED"
+        "Guarded"
     );
     assert.equal(
         calculateGlasgow({ motor: 1, brainstem: 1, consciousness: 1 }).prognosis,
-        "POOR/GRAVE"
+        "Grave"
     );
 });
 
@@ -234,3 +236,5 @@ test("ports modified Duke thresholds and rejection precedence", () => {
     assert.equal(evaluateDuke({majorCount:1,minorCount:2}).classification,"Definite");
     assert.equal(evaluateDuke({pathology:true,majorCount:0,minorCount:0,rejections:["Alternative diagnosis"]}).classification,"Rejected");
 });
+
+test("ports cat and dog shock index cutoffs",()=>{assert.equal(calculateShockIndex({species:"Cat",heartRate:160,systolicBloodPressure:100}).severity,"critical");assert.equal(calculateShockIndex({species:"Dog",heartRate:100,systolicBloodPressure:100}).severity,"normal")});
