@@ -2,9 +2,14 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
     calculateBsa,
+    calculateCaps,
     calculateFelineShockIndex,
     calculateFluidRate,
     calculateGlasgow,
+    calculatePsyllium,
+    calculatePhs,
+    calculateSirs,
+    calculateSnakeBite,
     calculateSofa
 } = require("../src/calculators.js");
 
@@ -190,4 +195,26 @@ test("rejects invalid SOFA component scores", () => {
         }),
         /0 to 4/
     );
+});
+
+test("ports CAPS and sCAPS thresholds from AutoHotkey", () => {
+    assert.equal(calculateCaps({mode:"CAPS",sirs:true,coagulationDisorder:true,creatinine:2,ionizedCalcium:4}).total,18);
+    assert.equal(calculateCaps({mode:"sCAPS",coagulationDisorder:false,creatinine:1,ionizedCalcium:5,respiratoryRate:24}).total,3);
+});
+test("ports psyllium dog and cat schedules", () => {
+    assert.match(calculatePsyllium({species:"Dog",weight:18}).text,/1–10 tablespoons/);
+    assert.match(calculatePsyllium({species:"Cat",weight:4}).text,/2–3 teaspoons/);
+});
+test("ports pulmonary hypertension interpretation bands", () => {
+    assert.equal(calculatePhs([0,0,0,0,0]).label,"Moderate-to-severe pre-capillary PH unlikely");
+    assert.equal(calculatePhs([2,2,2,2,2]).total,10);
+});
+test("ports snakebite totals and high-domain caution", () => {
+    const result=calculateSnakeBite([3,0,0,0,0,0]);
+    assert.equal(result.label,"Mild");
+    assert.equal(result.highDomain,true);
+});
+test("ports canine and feline SIRS thresholds", () => {
+    assert.equal(calculateSirs({species:"Dog",temperature:103,heartRate:150,respiratoryRate:20,wbc:10000,bands:0}).meets,true);
+    assert.equal(calculateSirs({species:"Cat",temperature:101,heartRate:180,respiratoryRate:20,wbc:10000,bands:0}).meets,false);
 });
