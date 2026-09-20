@@ -6,6 +6,7 @@ const path = require("node:path");
 const repositoryRoot = path.resolve(__dirname, "..");
 const applicationSources = [
     "index.html",
+    "additional_calculators.html",
     "src/calculators.js"
 ].map(file => ({
     file,
