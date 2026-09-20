@@ -94,8 +94,66 @@
         };
     }
 
+    function calculateGlasgow({ motor, brainstem, consciousness }) {
+        const scores = [motor, brainstem, consciousness];
+        if (scores.some(score => !Number.isInteger(score) || score < 1 || score > 6)) {
+            throw new RangeError("Each Glasgow component must be an integer from 1 to 6.");
+        }
+
+        const total = motor + brainstem + consciousness;
+        const prognosis = total >= 15 ? "GOOD" : (total >= 9 ? "GUARDED" : "POOR/GRAVE");
+        const survival = total >= 15 ? "~90%" : (total >= 9 ? "~50%" : "<25-50%");
+        const severity = total >= 15 ? "normal" : (total >= 9 ? "warning" : "critical");
+
+        return {
+            total,
+            prognosis,
+            survival,
+            severity,
+            text: `Glasgow Coma Scale: ${total}/18\nPrognosis: ${prognosis} (${survival})`
+        };
+    }
+
+    function calculateFelineShockIndex({ heartRate, systolicBloodPressure }) {
+        if (!Number.isFinite(heartRate) || heartRate <= 0) {
+            throw new RangeError("Heart rate must be a number greater than 0.");
+        }
+        if (!Number.isFinite(systolicBloodPressure) || systolicBloodPressure <= 0) {
+            throw new RangeError("Systolic blood pressure must be a number greater than 0.");
+        }
+
+        const index = (heartRate / systolicBloodPressure).toFixed(2);
+        const interpretation = index < 1.0
+            ? "Low (Bradycardia?)"
+            : (index <= 1.6 ? "Normal (1.47±0.2)" : "SHOCK LIKELY (>1.6)");
+        const severity = index > 1.6 ? "critical" : "normal";
+
+        return {
+            index,
+            interpretation,
+            severity,
+            text: `Feline Shock Index: ${index}\n${interpretation} (HR:${heartRate}, SBP:${systolicBloodPressure})`
+        };
+    }
+
+    function calculateSofa({ respiratory, coagulation, liver, cardiovascular, cns, renal }) {
+        const scores = [respiratory, coagulation, liver, cardiovascular, cns, renal];
+        if (scores.some(score => !Number.isInteger(score) || score < 0 || score > 4)) {
+            throw new RangeError("Each SOFA component must be an integer from 0 to 4.");
+        }
+
+        const total = scores.reduce((sum, score) => sum + score, 0);
+        return {
+            total,
+            text: `SOFA Score: ${total}/24\n(Resp:${respiratory}, Coag:${coagulation}, Liv:${liver}, CV:${cardiovascular}, CNS:${cns}, Ren:${renal})`
+        };
+    }
+
     return Object.freeze({
         calculateBsa,
-        calculateFluidRate
+        calculateFelineShockIndex,
+        calculateFluidRate,
+        calculateGlasgow,
+        calculateSofa
     });
 });
