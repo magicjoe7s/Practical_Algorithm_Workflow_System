@@ -8,7 +8,7 @@ The application is implemented as a self-contained HTML document:
 
 - `index.html` is the current entry point.
 - `veterinary_calculators.html` is a compatibility redirect to the canonical entry point.
-- Most CSS and workflow JavaScript remain embedded in `index.html`; tested shared calculations are beginning to move into `src/`.
+- Most CSS and workflow JavaScript remain embedded in `index.html`; BSA, Fluid Rate, Glasgow, Feline Shock Index, and SOFA calculations now use tested functions in `src/calculators.js`.
 - Calculations run locally in the browser.
 - There is no backend, account system, database, network API, or persistent browser storage.
 - Generated text is only transferred outside the page when a user explicitly copies it to the clipboard.
@@ -64,7 +64,7 @@ The test suite uses Node.js' built-in test runner and has no third-party runtime
 npm test
 ```
 
-Tests run automatically for pull requests and changes to `main`.
+Tests run automatically for pull requests and changes to `main`. Privacy regression tests also prevent accidental addition of browser persistence, form submission, or application network primitives to the runtime sources.
 
 ## Contribution approach
 
