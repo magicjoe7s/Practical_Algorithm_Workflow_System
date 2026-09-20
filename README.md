@@ -7,8 +7,8 @@ PAWS is a browser-based collection of veterinary clinical calculators, documenta
 The application is implemented as a self-contained HTML document:
 
 - `index.html` is the current entry point.
-- `veterinary_calculators.html` is an older duplicate that has drifted behind `index.html`.
-- CSS and JavaScript are embedded directly in each HTML file.
+- `veterinary_calculators.html` is a compatibility redirect to the canonical entry point.
+- Most CSS and workflow JavaScript remain embedded in `index.html`; tested shared calculations are beginning to move into `src/`.
 - Calculations run locally in the browser.
 - There is no backend, account system, database, network API, or persistent browser storage.
 - Generated text is only transferred outside the page when a user explicitly copies it to the clipboard.
@@ -49,13 +49,22 @@ Changes to clinical logic should be isolated from visual refactoring and reviewe
 
 ## Development direction
 
-The proposed improvement sequence is documented in [`docs/IMPROVEMENT_PLAN.md`](docs/IMPROVEMENT_PLAN.md). The first priorities are:
+The proposed improvement sequence is documented in [`docs/IMPROVEMENT_PLAN.md`](docs/IMPROVEMENT_PLAN.md). PAWS will remain private-by-design and local-only: no case sharing, account system, backend, analytics, or patient-data persistence is planned. Current priorities are:
 
-1. Establish clinical references and automated tests.
-2. Eliminate the divergent duplicate application file.
-3. Split the monolithic page into maintainable modules.
-4. Improve validation, accessibility, navigation, and responsive behavior.
-5. Decide explicitly whether the product remains private-by-design and local-only or gains authenticated persistence and integrations.
+1. Expand automated tests while preserving established outputs.
+2. Continue splitting the monolithic page into maintainable modules.
+3. Improve validation, accessibility, navigation, and responsive behavior.
+4. Keep all exports and clipboard actions explicit and user-initiated.
+
+## Tests
+
+The test suite uses Node.js' built-in test runner and has no third-party runtime dependencies:
+
+```sh
+npm test
+```
+
+Tests run automatically for pull requests and changes to `main`.
 
 ## Contribution approach
 
